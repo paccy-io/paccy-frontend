@@ -1,0 +1,239 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
+@import url("https://api.fontshare.com/v2/css?f[]=satoshi@700&display=swap");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Hide scrollbar for feature slider */
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+.background-image {
+  background-image: url("/assets/landing2.jpg");
+  display: block;
+  background-size: 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 100%;
+  height: 100vh;
+}
+/* Custom Toast Styling */
+.custom-toast {
+  background-color: #1c1c1b !important; /* Dark background */
+  color: #feebd8 !important; /* Light text color for contrast */
+  font-family: "Arial", sans-serif; /* Clean font */
+  padding: 16px 20px; /* Padding around text */
+  border-radius: 12px; /* Rounded corners */
+  box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.4); /* Soft shadow */
+  font-size: 16px; /* Font size */
+  transition: transform 0.3s ease-out; /* Smooth transition for appearance */
+  font-weight: 500; /* Slightly bold for modern look */
+  border: none; /* Remove default border */
+}
+
+/* Toast entering and exiting animation */
+.custom-toast--enter {
+  transform: translateY(20px); /* Toast slides in from below */
+}
+
+.custom-toast--exit {
+  transform: translateY(-20px); /* Toast slides out upwards */
+}
+
+/* Override default toast animation with custom fade */
+.toast {
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Optional: Customize the close button appearance (remove if not needed) */
+.custom-toast .Toastify__close-button {
+  color: #feebd8;
+  opacity: 1;
+  font-size: 18px;
+}
+
+.satoshi-main {
+  font-family: "Satoshi", sans-serif;
+  font-weight: 700;
+  font-size: 64px;
+  line-height: 70px;
+}
+
+.satoshi {
+  font-family: "Satoshi", sans-serif;
+  font-weight: 700;
+}
+
+/* Fix text selection behavior */
+* {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}
+
+/* Ensure precise text selection without expanding beyond content */
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+span,
+div {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Prevent selection from including padding/margins */
+button,
+.bg-gradient-to-r {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Allow text selection only on actual text content */
+.text-content {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}
+
+/* Prevent unwanted selection expansion in decorative elements */
+.absolute,
+.backdrop-blur-sm {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Fix double-click word selection behavior */
+p,
+span,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  /* Clean word selection boundaries */
+  word-break: normal;
+  overflow-wrap: normal;
+  white-space: normal;
+  word-spacing: normal;
+  letter-spacing: normal;
+}
+
+/* Enhanced text content selection precision */
+.text-content {
+  /* Ensure clean word boundaries on double-click */
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+  line-height: inherit;
+}
+
+/* Prevent selection bleeding into surrounding elements */
+* {
+  /* Reset any inherited selection behavior */
+  -webkit-touch-callout: default;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Specifically target interactive elements to prevent selection */
+button,
+input,
+textarea,
+select,
+[role="button"],
+.cursor-pointer {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Fix selection for gradient text */
+.bg-clip-text {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  user-select: text;
+  word-break: keep-all;
+}
+
+/* Custom Demo Modal Scrollbar */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #feebd8 transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #feebd8 0%, rgba(59, 130, 246, 0.8) 100%);
+  border-radius: 4px;
+  border: 1px solid rgba(254, 235, 216, 0.3);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #feebd8 0%, rgba(59, 130, 246, 1) 100%);
+  border: 1px solid rgba(254, 235, 216, 0.5);
+}
+
+.custom-scrollbar::-webkit-scrollbar-corner {
+  background: transparent;
+}

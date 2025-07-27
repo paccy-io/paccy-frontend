@@ -1,0 +1,728 @@
+"use client";
+
+import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
+
+export default function Home() {
+  const [showFeatureDemo, setShowFeatureDemo] = useState(false);
+  const [activeFeature, setActiveFeature] = useState(0);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+
+  // Auto-play functionality
+  useEffect(() => {
+    if (!showFeatureDemo || !isAutoPlaying) return;
+
+    const interval = setInterval(() => {
+      setActiveFeature((prev) => (prev + 1) % features.length);
+    }, 4000); // Change every 4 seconds
+
+    return () => clearInterval(interval);
+  }, [showFeatureDemo, isAutoPlaying]);
+
+  // Keyboard navigation
+  useEffect(() => {
+    if (!showFeatureDemo) return;
+
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") {
+        setActiveFeature((prev) => (prev > 0 ? prev - 1 : features.length - 1));
+        setIsAutoPlaying(false);
+      } else if (e.key === "ArrowRight") {
+        setActiveFeature((prev) => (prev + 1) % features.length);
+        setIsAutoPlaying(false);
+      } else if (e.key === "Escape") {
+        closeFeatureDemo();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyPress);
+    return () => window.removeEventListener("keydown", handleKeyPress);
+  }, [showFeatureDemo]);
+
+  // Auto-scroll to active feature button
+  useEffect(() => {
+    if (!showFeatureDemo || !scrollContainerRef.current) return;
+
+    const container = scrollContainerRef.current;
+    const activeButton = container.children[activeFeature] as HTMLElement;
+
+    if (activeButton) {
+      const containerRect = container.getBoundingClientRect();
+      const buttonRect = activeButton.getBoundingClientRect();
+
+      // Calculate if button is out of view
+      const isOutOfView =
+        buttonRect.right > containerRect.right ||
+        buttonRect.left < containerRect.left;
+
+      if (isOutOfView) {
+        // Calculate scroll position to center the active button
+        const scrollLeft =
+          activeButton.offsetLeft -
+          container.clientWidth / 2 +
+          activeButton.clientWidth / 2;
+
+        container.scrollTo({
+          left: Math.max(0, scrollLeft),
+          behavior: "smooth",
+        });
+      }
+    }
+  }, [activeFeature, showFeatureDemo]);
+
+  const features = [
+    {
+      id: 0,
+      icon: "📝",
+      title: "Essay Manager + AI",
+      description: "Track essays by school with real-time AI feedback",
+      demo: {
+        title: "AI Essay Assistant in Action",
+        content: "Watch how our AI analyzes your essay in real-time",
+        mockData: {
+          essayText:
+            "The most meaningful experience of my high school years...",
+          feedback: [
+            "Strong opening hook ✓",
+            "Consider adding more specific examples",
+            "Excellent personal reflection",
+            "Grammar: 98% accuracy",
+          ],
+          score: 8.7,
+        },
+      },
+    },
+    {
+      id: 1,
+      icon: "📆",
+      title: "Smart Calendar",
+      description: "Auto-generated timelines and deadline tracking",
+      demo: {
+        title: "Your Personalized Application Timeline",
+        content: "See how deadlines are automatically organized",
+        mockData: {
+          upcomingDeadlines: [
+            {
+              school: "Stanford",
+              task: "Common App Essay",
+              date: "Oct 15",
+              priority: "high",
+            },
+            {
+              school: "MIT",
+              task: "SAT Scores",
+              date: "Nov 1",
+              priority: "medium",
+            },
+            {
+              school: "Harvard",
+              task: "Supplemental Essays",
+              date: "Nov 15",
+              priority: "high",
+            },
+          ],
+        },
+      },
+    },
+    {
+      id: 2,
+      icon: "🎓",
+      title: "Academic Tracking",
+      description: "Monitor GPA, test scores, and competitiveness",
+      demo: {
+        title: "Your Academic Profile Overview",
+        content: "Track your competitiveness across different schools",
+        mockData: {
+          gpa: 3.85,
+          satScore: 1480,
+          matches: [
+            { school: "UC Berkeley", match: "85%", type: "target" },
+            { school: "Stanford", match: "45%", type: "reach" },
+            { school: "UC Davis", match: "95%", type: "safety" },
+          ],
+        },
+      },
+    },
+    {
+      id: 3,
+      icon: "🧩",
+      title: "Extracurricular Manager",
+      description: "Organize activities with AI-enhanced descriptions",
+      demo: {
+        title: "Smart Activity Organization",
+        content: "AI helps enhance your activity descriptions",
+        mockData: {
+          activities: [
+            {
+              name: "Debate Team Captain",
+              hours: "10 hrs/week",
+              impact: "Led team to state finals",
+            },
+            {
+              name: "Community Tutoring",
+              hours: "5 hrs/week",
+              impact: "Helped 25+ students improve grades",
+            },
+            {
+              name: "Research Internship",
+              hours: "15 hrs/week",
+              impact: "Co-authored published paper",
+            },
+          ],
+        },
+      },
+    },
+    {
+      id: 4,
+      icon: "🌍",
+      title: "Peer Network",
+      description: "Connect and collaborate on projects together",
+      demo: {
+        title: "Global Student Collaboration",
+        content: "Connect with peers worldwide for projects",
+        mockData: {
+          connections: [
+            {
+              name: "Sarah M.",
+              country: "Canada",
+              project: "Climate Research",
+            },
+            { name: "Ahmed K.", country: "UAE", project: "App Development" },
+            { name: "Li W.", country: "Singapore", project: "Debate Prep" },
+          ],
+        },
+      },
+    },
+  ];
+
+  const openFeatureDemo = (featureId: number) => {
+    setActiveFeature(featureId);
+    setShowFeatureDemo(true);
+    setIsAutoPlaying(true);
+  };
+
+  const closeFeatureDemo = () => {
+    setShowFeatureDemo(false);
+    setIsAutoPlaying(false);
+  };
+
+  const navigateToAuth = () => {
+    router.push("/auth");
+  };
+
+  const handleFeatureChange = (newIndex: number) => {
+    setActiveFeature(newIndex);
+    setIsAutoPlaying(false); // Pause auto-play when user manually navigates
+
+    // Auto-scroll to bring the new active feature into view
+    setTimeout(() => {
+      if (scrollContainerRef.current) {
+        const container = scrollContainerRef.current;
+        const activeButton = container.children[newIndex] as HTMLElement;
+
+        if (activeButton) {
+          const containerRect = container.getBoundingClientRect();
+          const buttonRect = activeButton.getBoundingClientRect();
+
+          // Calculate if button is out of view
+          const isOutOfView =
+            buttonRect.right > containerRect.right ||
+            buttonRect.left < containerRect.left;
+
+          if (isOutOfView) {
+            // Calculate scroll position to center the active button
+            const scrollLeft =
+              activeButton.offsetLeft -
+              container.clientWidth / 2 +
+              activeButton.clientWidth / 2;
+
+            container.scrollTo({
+              left: Math.max(0, scrollLeft),
+              behavior: "smooth",
+            });
+          }
+        }
+      }
+    }, 100); // Small delay to ensure state update
+  };
+  return (
+    <div className="min-h-screen bg-[#141414] flex flex-col justify-center items-center relative overflow-hidden">
+      {/* Background decorative elements */}
+      <div className="absolute top-20 left-10 w-32 h-32 bg-[#FEEBD8]/10 rounded-full blur-xl"></div>
+      <div className="absolute bottom-32 right-16 w-48 h-48 bg-blue-400/10 rounded-full blur-xl"></div>
+      <div className="absolute top-1/2 left-1/3 w-24 h-24 bg-purple-400/10 rounded-full blur-xl"></div>
+      <div className="absolute top-1/4 right-1/4 w-40 h-40 bg-indigo-400/8 rounded-full blur-xl"></div>
+
+      <div className="z-10 text-center px-6">
+        <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-[#FEEBD8] via-blue-300 to-purple-500 bg-clip-text text-transparent mb-6 font-climate-crisis text-content">
+          Paccy
+        </h1>
+        <p className="text-2xl md:text-3xl text-white/90 mb-6 font-bold tracking-wide text-content">
+          Smart, AI-Powered College Application Platform
+        </p>
+        <p className="text-lg md:text-xl text-[#FEEBD8]/80 max-w-3xl mx-auto mb-8 leading-relaxed font-medium text-content">
+          Navigate the complex college application process with structure,
+          clarity, and collaboration. From AI essay feedback to peer networking
+          - everything you need in one platform.
+        </p>
+
+        {/* CTA Buttons */}
+        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
+          <button
+            onClick={navigateToAuth}
+            className="px-8 py-4 bg-gradient-to-r from-[#FEEBD8] to-blue-300 text-[#141414] font-bold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+          >
+            Start Building Your Profile
+          </button>
+          <button
+            onClick={() => setShowFeatureDemo(true)}
+            className="px-8 py-4 border-2 border-[#FEEBD8]/30 text-[#FEEBD8] font-bold rounded-xl hover:bg-[#FEEBD8]/10 transition-all duration-300"
+          >
+            Explore Features
+          </button>
+        </div>
+
+        {/* Core MVP Features */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          <div
+            onClick={() => openFeatureDemo(0)}
+            className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-[#FEEBD8]/20 hover:border-[#FEEBD8]/40 transition-all duration-300 cursor-pointer hover:scale-105"
+          >
+            <div className="text-3xl mb-3">📝</div>
+            <h3 className="text-lg font-bold text-[#FEEBD8] mb-2 text-content">
+              Essay Manager + AI
+            </h3>
+            <p className="text-white/70 text-sm text-content">
+              Track essays by school with real-time AI feedback
+            </p>
+          </div>
+          <div
+            onClick={() => openFeatureDemo(1)}
+            className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-[#FEEBD8]/20 hover:border-[#FEEBD8]/40 transition-all duration-300 cursor-pointer hover:scale-105"
+          >
+            <div className="text-3xl mb-3">📆</div>
+            <h3 className="text-lg font-bold text-[#FEEBD8] mb-2 text-content">
+              Smart Calendar
+            </h3>
+            <p className="text-white/70 text-sm text-content">
+              Auto-generated timelines and deadline tracking
+            </p>
+          </div>
+          <div
+            onClick={() => openFeatureDemo(2)}
+            className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-[#FEEBD8]/20 hover:border-[#FEEBD8]/40 transition-all duration-300 cursor-pointer hover:scale-105"
+          >
+            <div className="text-3xl mb-3">🎓</div>
+            <h3 className="text-lg font-bold text-[#FEEBD8] mb-2 text-content">
+              Academic Tracking
+            </h3>
+            <p className="text-white/70 text-sm text-content">
+              Monitor GPA, test scores, and competitiveness
+            </p>
+          </div>
+        </div>
+
+        {/* Additional Features */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto mt-6">
+          <div
+            onClick={() => openFeatureDemo(3)}
+            className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-[#FEEBD8]/20 hover:border-[#FEEBD8]/40 transition-all duration-300 cursor-pointer hover:scale-105"
+          >
+            <div className="text-3xl mb-3">🧩</div>
+            <h3 className="text-lg font-bold text-[#FEEBD8] mb-2 text-content">
+              Extracurricular Manager
+            </h3>
+            <p className="text-white/70 text-sm text-content">
+              Organize activities with AI-enhanced descriptions
+            </p>
+          </div>
+          <div
+            onClick={() => openFeatureDemo(4)}
+            className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-[#FEEBD8]/20 hover:border-[#FEEBD8]/40 transition-all duration-300 cursor-pointer hover:scale-105"
+          >
+            <div className="text-3xl mb-3">🌍</div>
+            <h3 className="text-lg font-bold text-[#FEEBD8] mb-2 text-content">
+              Peer Network
+            </h3>
+            <p className="text-white/70 text-sm text-content">
+              Connect and collaborate on projects and extracurriculars together
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Interactive Feature Demo Modal */}
+      {showFeatureDemo && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-[#1A1A1A] rounded-2xl border border-[#FEEBD8]/30 max-w-4xl w-full mx-4 overflow-hidden max-h-[90vh] relative">
+            {/* Custom Scrollable Content */}
+            <div className="custom-scrollbar max-h-[90vh] overflow-y-auto pr-3">
+              {/* Header */}
+              <div className="bg-gradient-to-r from-[#FEEBD8]/20 to-blue-300/20 p-6 border-b border-[#FEEBD8]/20">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="text-3xl">
+                      {features[activeFeature].icon}
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-bold text-[#FEEBD8]">
+                        {features[activeFeature].demo.title}
+                      </h3>
+                      <p className="text-white/70">
+                        {features[activeFeature].demo.content}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={closeFeatureDemo}
+                    className="w-10 h-10 bg-[#141414] rounded-full flex items-center justify-center hover:bg-gray-800 transition-colors"
+                  >
+                    <span className="text-[#FEEBD8] text-xl">×</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Feature Tabs */}
+              <div className="bg-[#141414] px-6 py-4 border-b border-[#FEEBD8]/10">
+                <div className="relative">
+                  {/* Feature Navigation */}
+                  <div className="flex items-center justify-between mb-4">
+                    <button
+                      onClick={() =>
+                        handleFeatureChange(
+                          activeFeature > 0
+                            ? activeFeature - 1
+                            : features.length - 1
+                        )
+                      }
+                      className="w-10 h-10 bg-[#1A1A1A] rounded-full flex items-center justify-center hover:bg-gray-700 transition-colors"
+                    >
+                      <span className="text-[#FEEBD8] text-lg">‹</span>
+                    </button>
+
+                    <div className="flex-1 text-center">
+                      <h4 className="text-lg font-bold text-[#FEEBD8]">
+                        {features[activeFeature].title}
+                      </h4>
+                      <p className="text-white/70 text-sm">
+                        {features[activeFeature].description}
+                      </p>
+                    </div>
+
+                    <button
+                      onClick={() =>
+                        handleFeatureChange(
+                          activeFeature < features.length - 1
+                            ? activeFeature + 1
+                            : 0
+                        )
+                      }
+                      className="w-10 h-10 bg-[#1A1A1A] rounded-full flex items-center justify-center hover:bg-gray-700 transition-colors"
+                    >
+                      <span className="text-[#FEEBD8] text-lg">›</span>
+                    </button>
+                  </div>
+
+                  {/* All Feature Buttons - Scrollable */}
+                  <div
+                    ref={scrollContainerRef}
+                    className="flex space-x-2 overflow-x-auto pb-2 scrollbar-hide"
+                  >
+                    {features.map((feature, index) => (
+                      <button
+                        key={feature.id}
+                        onClick={() => handleFeatureChange(index)}
+                        className={`flex-shrink-0 px-4 py-2 rounded-lg transition-all duration-300 ${
+                          activeFeature === index
+                            ? "bg-gradient-to-r from-[#FEEBD8] to-blue-300 text-[#141414] font-bold"
+                            : "bg-[#1A1A1A] text-white/70 hover:text-[#FEEBD8] hover:bg-[#1A1A1A]/80"
+                        }`}
+                      >
+                        <span className="text-lg mr-2">{feature.icon}</span>
+                        <span className="text-sm">{feature.title}</span>
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Progress Indicators */}
+                  <div className="flex justify-center space-x-2 mt-4">
+                    {features.map((_, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handleFeatureChange(index)}
+                        className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                          activeFeature === index
+                            ? "bg-[#FEEBD8] w-6"
+                            : "bg-white/30 hover:bg-white/50"
+                        }`}
+                      />
+                    ))}
+                  </div>
+
+                  {/* Auto-play Toggle */}
+                  <div className="flex justify-center mt-3">
+                    <button
+                      onClick={() => setIsAutoPlaying(!isAutoPlaying)}
+                      className={`px-3 py-1 rounded-full text-xs transition-all duration-300 ${
+                        isAutoPlaying
+                          ? "bg-[#FEEBD8]/20 text-[#FEEBD8] border border-[#FEEBD8]/30"
+                          : "bg-white/10 text-white/50 border border-white/20"
+                      }`}
+                    >
+                      {isAutoPlaying ? "⏸️ Pause" : "▶️ Auto-play"}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Demo Content */}
+              <div className="p-6">
+                {/* Essay Manager Demo */}
+                {activeFeature === 0 && (
+                  <div className="space-y-6">
+                    <div className="bg-[#141414] rounded-xl p-6 border border-[#FEEBD8]/20">
+                      <h4 className="text-[#FEEBD8] font-bold mb-4">
+                        Your Essay Draft
+                      </h4>
+                      <div className="bg-white/5 rounded-lg p-4 mb-4">
+                        <p className="text-white/80 italic">
+                          {features[0].demo.mockData.essayText}
+                        </p>
+                      </div>
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div>
+                          <h5 className="text-white font-semibold mb-2">
+                            AI Feedback
+                          </h5>
+                          <ul className="space-y-2">
+                            {features[0].demo.mockData?.feedback?.map(
+                              (item, i) => (
+                                <li
+                                  key={i}
+                                  className="text-white/70 text-sm flex items-center"
+                                >
+                                  <span className="text-green-400 mr-2">•</span>
+                                  {item}
+                                </li>
+                              )
+                            )}
+                          </ul>
+                        </div>
+                        <div>
+                          <h5 className="text-white font-semibold mb-2">
+                            Overall Score
+                          </h5>
+                          <div className="text-3xl font-bold text-[#FEEBD8]">
+                            {features[0].demo.mockData?.score}/10
+                          </div>
+                          <p className="text-white/70 text-sm">
+                            Strong foundation with room for enhancement
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Smart Calendar Demo */}
+                {activeFeature === 1 && (
+                  <div className="space-y-6">
+                    <div className="bg-[#141414] rounded-xl p-6 border border-[#FEEBD8]/20">
+                      <h4 className="text-[#FEEBD8] font-bold mb-4">
+                        Upcoming Deadlines
+                      </h4>
+                      <div className="space-y-3">
+                        {features[1].demo.mockData?.upcomingDeadlines?.map(
+                          (deadline, i) => (
+                            <div
+                              key={i}
+                              className="flex items-center justify-between bg-white/5 rounded-lg p-4"
+                            >
+                              <div className="flex items-center space-x-3">
+                                <div
+                                  className={`w-3 h-3 rounded-full ${
+                                    deadline.priority === "high"
+                                      ? "bg-red-400"
+                                      : "bg-yellow-400"
+                                  }`}
+                                ></div>
+                                <div>
+                                  <p className="text-white font-semibold">
+                                    {deadline.school}
+                                  </p>
+                                  <p className="text-white/70 text-sm">
+                                    {deadline.task}
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="text-[#FEEBD8] font-bold">
+                                {deadline.date}
+                              </div>
+                            </div>
+                          )
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Academic Tracking Demo */}
+                {activeFeature === 2 && (
+                  <div className="space-y-6">
+                    <div className="bg-[#141414] rounded-xl p-6 border border-[#FEEBD8]/20">
+                      <h4 className="text-[#FEEBD8] font-bold mb-4">
+                        Your Academic Profile
+                      </h4>
+                      <div className="grid md:grid-cols-2 gap-6">
+                        <div>
+                          <h5 className="text-white font-semibold mb-3">
+                            Stats
+                          </h5>
+                          <div className="space-y-2">
+                            <div className="flex justify-between">
+                              <span className="text-white/70">GPA:</span>
+                              <span className="text-[#FEEBD8] font-bold">
+                                {features[2].demo.mockData?.gpa}
+                              </span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-white/70">SAT Score:</span>
+                              <span className="text-[#FEEBD8] font-bold">
+                                {features[2].demo.mockData?.satScore}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <div>
+                          <h5 className="text-white font-semibold mb-3">
+                            School Matches
+                          </h5>
+                          <div className="space-y-2">
+                            {features[2].demo.mockData?.matches?.map(
+                              (match, i) => (
+                                <div
+                                  key={i}
+                                  className="flex items-center justify-between bg-white/5 rounded-lg p-3"
+                                >
+                                  <span className="text-white">
+                                    {match.school}
+                                  </span>
+                                  <div className="flex items-center space-x-2">
+                                    <span className="text-[#FEEBD8] font-bold">
+                                      {match.match}
+                                    </span>
+                                    <span
+                                      className={`px-2 py-1 rounded-full text-xs ${
+                                        match.type === "safety"
+                                          ? "bg-green-400/20 text-green-400"
+                                          : match.type === "target"
+                                          ? "bg-yellow-400/20 text-yellow-400"
+                                          : "bg-red-400/20 text-red-400"
+                                      }`}
+                                    >
+                                      {match.type}
+                                    </span>
+                                  </div>
+                                </div>
+                              )
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Extracurricular Manager Demo */}
+                {activeFeature === 3 && (
+                  <div className="space-y-6">
+                    <div className="bg-[#141414] rounded-xl p-6 border border-[#FEEBD8]/20">
+                      <h4 className="text-[#FEEBD8] font-bold mb-4">
+                        Your Activities
+                      </h4>
+                      <div className="space-y-4">
+                        {features[3].demo.mockData?.activities?.map(
+                          (activity, i) => (
+                            <div key={i} className="bg-white/5 rounded-lg p-4">
+                              <div className="flex justify-between items-start mb-2">
+                                <h5 className="text-white font-semibold">
+                                  {activity.name}
+                                </h5>
+                                <span className="text-[#FEEBD8] text-sm">
+                                  {activity.hours}
+                                </span>
+                              </div>
+                              <p className="text-white/70 text-sm">
+                                {activity.impact}
+                              </p>
+                            </div>
+                          )
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Peer Network Demo */}
+                {activeFeature === 4 && (
+                  <div className="space-y-6">
+                    <div className="bg-[#141414] rounded-xl p-6 border border-[#FEEBD8]/20">
+                      <h4 className="text-[#FEEBD8] font-bold mb-4">
+                        Your Network
+                      </h4>
+                      <div className="grid md:grid-cols-2 gap-4">
+                        {features[4].demo.mockData?.connections?.map(
+                          (connection, i) => (
+                            <div key={i} className="bg-white/5 rounded-lg p-4">
+                              <div className="flex items-center space-x-3 mb-2">
+                                <div className="w-10 h-10 bg-gradient-to-r from-[#FEEBD8] to-blue-300 rounded-full flex items-center justify-center text-[#141414] font-bold">
+                                  {connection.name.charAt(0)}
+                                </div>
+                                <div>
+                                  <p className="text-white font-semibold">
+                                    {connection.name}
+                                  </p>
+                                  <p className="text-white/70 text-sm">
+                                    {connection.country}
+                                  </p>
+                                </div>
+                              </div>
+                              <p className="text-[#FEEBD8] text-sm">
+                                Working on: {connection.project}
+                              </p>
+                            </div>
+                          )
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* CTA */}
+                <div className="mt-8 text-center">
+                  <div className="bg-gradient-to-r from-[#FEEBD8] to-blue-300 rounded-xl p-6 text-[#141414]">
+                    <h4 className="text-xl font-bold mb-2">
+                      Ready to Experience This?
+                    </h4>
+                    <p className="mb-4 opacity-80">
+                      Join thousands of students already using Paccy for their
+                      college applications.
+                    </p>
+                    <button
+                      onClick={navigateToAuth}
+                      className="px-6 py-3 bg-[#141414] text-[#FEEBD8] rounded-xl font-bold hover:bg-gray-800 transition-colors"
+                    >
+                      Start Your Free Profile
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

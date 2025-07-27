@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://paccy.io/sitemap.xml
+
+# Disallow admin areas
+Disallow: /dashboard/
+Disallow: /api/
+
+# Allow important pages
+Allow: /
+Allow: /about
+Allow: /how-it-works
+Allow: /pricing
+Allow: /contact
+Allow: /auth
