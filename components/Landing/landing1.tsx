@@ -272,82 +272,88 @@ export default function Home() {
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
           <button
             onClick={navigateToAuth}
-            className="px-8 py-4 bg-gradient-to-r from-[#FEEBD8] to-blue-300 text-[#141414] font-bold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+            className="px-8 py-4 bg-gradient-to-r from-[#FEEBD8] to-blue-300 text-[#141414] font-bold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 min-w-[250px]"
           >
             Start Building Your Profile
           </button>
           <button
             onClick={() => setShowFeatureDemo(true)}
-            className="px-8 py-4 border-2 border-[#FEEBD8]/30 text-[#FEEBD8] font-bold rounded-xl hover:bg-[#FEEBD8]/10 transition-all duration-300"
+            className="px-8 py-4 bg-[#1A1A1A] border border-[#FEEBD8]/40 text-[#FEEBD8] font-bold rounded-xl hover:bg-[#FEEBD8]/10 hover:border-[#FEEBD8]/60 transition-all duration-300 shadow-md hover:shadow-lg min-w-[250px] group"
           >
-            Explore Features
+            <span className="flex items-center justify-center gap-2">
+              Explore Features
+              <span className="text-lg group-hover:translate-x-1 transition-transform duration-300">
+                →
+              </span>
+            </span>
           </button>
         </div>
 
         {/* Core MVP Features */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
           <div
             onClick={() => openFeatureDemo(0)}
-            className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-[#FEEBD8]/20 hover:border-[#FEEBD8]/40 transition-all duration-300 cursor-pointer hover:scale-105"
+            className="bg-[#1A1A1A] rounded-xl p-6 border border-[#FEEBD8]/20 hover:border-[#FEEBD8]/40 transition-all duration-300 cursor-pointer hover:scale-105 shadow-lg hover:shadow-xl"
           >
-            <div className="text-3xl mb-3">📝</div>
-            <h3 className="text-lg font-bold text-[#FEEBD8] mb-2 text-content">
+            <div className="text-4xl mb-4">📝</div>
+            <h3 className="text-xl font-bold text-[#FEEBD8] mb-3 text-content">
               Essay Manager + AI
             </h3>
-            <p className="text-white/70 text-sm text-content">
-              Track essays by school with real-time AI feedback
+            <p className="text-white/80 text-base text-content leading-relaxed">
+              Track essays by school with real-time AI feedback and suggestions
             </p>
           </div>
           <div
             onClick={() => openFeatureDemo(1)}
-            className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-[#FEEBD8]/20 hover:border-[#FEEBD8]/40 transition-all duration-300 cursor-pointer hover:scale-105"
+            className="bg-[#1A1A1A] rounded-xl p-6 border border-[#FEEBD8]/20 hover:border-[#FEEBD8]/40 transition-all duration-300 cursor-pointer hover:scale-105 shadow-lg hover:shadow-xl"
           >
-            <div className="text-3xl mb-3">📆</div>
-            <h3 className="text-lg font-bold text-[#FEEBD8] mb-2 text-content">
+            <div className="text-4xl mb-4">📆</div>
+            <h3 className="text-xl font-bold text-[#FEEBD8] mb-3 text-content">
               Smart Calendar
             </h3>
-            <p className="text-white/70 text-sm text-content">
-              Auto-generated timelines and deadline tracking
+            <p className="text-white/80 text-base text-content leading-relaxed">
+              Auto-generated timelines and intelligent deadline tracking
             </p>
           </div>
           <div
             onClick={() => openFeatureDemo(2)}
-            className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-[#FEEBD8]/20 hover:border-[#FEEBD8]/40 transition-all duration-300 cursor-pointer hover:scale-105"
+            className="bg-[#1A1A1A] rounded-xl p-6 border border-[#FEEBD8]/20 hover:border-[#FEEBD8]/40 transition-all duration-300 cursor-pointer hover:scale-105 shadow-lg hover:shadow-xl"
           >
-            <div className="text-3xl mb-3">🎓</div>
-            <h3 className="text-lg font-bold text-[#FEEBD8] mb-2 text-content">
+            <div className="text-4xl mb-4">🎓</div>
+            <h3 className="text-xl font-bold text-[#FEEBD8] mb-3 text-content">
               Academic Tracking
             </h3>
-            <p className="text-white/70 text-sm text-content">
-              Monitor GPA, test scores, and competitiveness
+            <p className="text-white/80 text-base text-content leading-relaxed">
+              Monitor GPA, test scores, and college competitiveness
             </p>
           </div>
         </div>
 
         {/* Additional Features */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto mt-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto mt-8">
           <div
             onClick={() => openFeatureDemo(3)}
-            className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-[#FEEBD8]/20 hover:border-[#FEEBD8]/40 transition-all duration-300 cursor-pointer hover:scale-105"
+            className="bg-[#1A1A1A] rounded-xl p-6 border border-[#FEEBD8]/20 hover:border-[#FEEBD8]/40 transition-all duration-300 cursor-pointer hover:scale-105 shadow-lg hover:shadow-xl"
           >
-            <div className="text-3xl mb-3">🧩</div>
-            <h3 className="text-lg font-bold text-[#FEEBD8] mb-2 text-content">
+            <div className="text-4xl mb-4">🧩</div>
+            <h3 className="text-xl font-bold text-[#FEEBD8] mb-3 text-content">
               Extracurricular Manager
             </h3>
-            <p className="text-white/70 text-sm text-content">
-              Organize activities with AI-enhanced descriptions
+            <p className="text-white/80 text-base text-content leading-relaxed">
+              Organize activities with AI-enhanced descriptions and impact
+              tracking
             </p>
           </div>
           <div
             onClick={() => openFeatureDemo(4)}
-            className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-[#FEEBD8]/20 hover:border-[#FEEBD8]/40 transition-all duration-300 cursor-pointer hover:scale-105"
+            className="bg-[#1A1A1A] rounded-xl p-6 border border-[#FEEBD8]/20 hover:border-[#FEEBD8]/40 transition-all duration-300 cursor-pointer hover:scale-105 shadow-lg hover:shadow-xl"
           >
-            <div className="text-3xl mb-3">🌍</div>
-            <h3 className="text-lg font-bold text-[#FEEBD8] mb-2 text-content">
+            <div className="text-4xl mb-4">🌍</div>
+            <h3 className="text-xl font-bold text-[#FEEBD8] mb-3 text-content">
               Peer Network
             </h3>
-            <p className="text-white/70 text-sm text-content">
-              Connect and collaborate on projects and extracurriculars together
+            <p className="text-white/80 text-base text-content leading-relaxed">
+              Connect and collaborate on projects with students worldwide
             </p>
           </div>
         </div>
@@ -355,29 +361,29 @@ export default function Home() {
 
       {/* Interactive Feature Demo Modal */}
       {showFeatureDemo && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[#1A1A1A] rounded-2xl border border-[#FEEBD8]/30 max-w-4xl w-full mx-4 overflow-hidden max-h-[90vh] relative">
+        <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-2 sm:p-4">
+          <div className="bg-[#1A1A1A] rounded-2xl sm:rounded-3xl border border-[#FEEBD8]/20 shadow-2xl max-w-4xl w-full mx-2 sm:mx-4 overflow-hidden max-h-[95vh] sm:max-h-[90vh] relative">
             {/* Custom Scrollable Content */}
-            <div className="custom-scrollbar max-h-[90vh] overflow-y-auto pr-3">
+            <div className="max-h-[95vh] sm:max-h-[90vh] overflow-y-auto scrollbar-hide">
               {/* Header */}
-              <div className="bg-gradient-to-r from-[#FEEBD8]/20 to-blue-300/20 p-6 border-b border-[#FEEBD8]/20">
+              <div className="bg-gradient-to-r from-[#FEEBD8]/10 to-blue-300/10 p-4 sm:p-6 border-b border-[#FEEBD8]/20">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <div className="text-3xl">
+                  <div className="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0">
+                    <div className="text-2xl sm:text-3xl flex-shrink-0">
                       {features[activeFeature].icon}
                     </div>
-                    <div>
-                      <h3 className="text-2xl font-bold text-[#FEEBD8]">
+                    <div className="min-w-0 flex-1">
+                      <h3 className="text-lg sm:text-2xl font-bold text-[#FEEBD8] mb-1 truncate">
                         {features[activeFeature].demo.title}
                       </h3>
-                      <p className="text-white/70">
+                      <p className="text-white/90 text-sm sm:text-base hidden sm:block">
                         {features[activeFeature].demo.content}
                       </p>
                     </div>
                   </div>
                   <button
                     onClick={closeFeatureDemo}
-                    className="w-10 h-10 bg-[#141414] rounded-full flex items-center justify-center hover:bg-gray-800 transition-colors"
+                    className="w-12 h-12 sm:w-10 sm:h-10 bg-[#FEEBD8]/10 hover:bg-[#FEEBD8]/20 rounded-full flex items-center justify-center transition-all duration-300 border border-[#FEEBD8]/30 flex-shrink-0 ml-2"
                   >
                     <span className="text-[#FEEBD8] text-xl">×</span>
                   </button>
@@ -385,7 +391,7 @@ export default function Home() {
               </div>
 
               {/* Feature Tabs */}
-              <div className="bg-[#141414] px-6 py-4 border-b border-[#FEEBD8]/10">
+              <div className="bg-[#141414] px-4 sm:px-6 py-4 border-b border-[#FEEBD8]/20">
                 <div className="relative">
                   {/* Feature Navigation */}
                   <div className="flex items-center justify-between mb-4">
@@ -397,16 +403,18 @@ export default function Home() {
                             : features.length - 1
                         )
                       }
-                      className="w-10 h-10 bg-[#1A1A1A] rounded-full flex items-center justify-center hover:bg-gray-700 transition-colors"
+                      className="w-12 h-12 sm:w-12 sm:h-12 bg-[#FEEBD8]/10 hover:bg-[#FEEBD8]/20 rounded-full flex items-center justify-center transition-all duration-300 border border-[#FEEBD8]/30"
                     >
-                      <span className="text-[#FEEBD8] text-lg">‹</span>
+                      <span className="text-[#FEEBD8] text-lg sm:text-xl">
+                        ‹
+                      </span>
                     </button>
 
-                    <div className="flex-1 text-center">
-                      <h4 className="text-lg font-bold text-[#FEEBD8]">
+                    <div className="flex-1 text-center px-2 sm:px-0">
+                      <h4 className="text-base sm:text-xl font-bold text-[#FEEBD8]">
                         {features[activeFeature].title}
                       </h4>
-                      <p className="text-white/70 text-sm">
+                      <p className="text-white/80 text-xs sm:text-base hidden sm:block">
                         {features[activeFeature].description}
                       </p>
                     </div>
@@ -419,9 +427,11 @@ export default function Home() {
                             : 0
                         )
                       }
-                      className="w-10 h-10 bg-[#1A1A1A] rounded-full flex items-center justify-center hover:bg-gray-700 transition-colors"
+                      className="w-12 h-12 sm:w-12 sm:h-12 bg-[#FEEBD8]/10 hover:bg-[#FEEBD8]/20 rounded-full flex items-center justify-center transition-all duration-300 border border-[#FEEBD8]/30"
                     >
-                      <span className="text-[#FEEBD8] text-lg">›</span>
+                      <span className="text-[#FEEBD8] text-lg sm:text-xl">
+                        ›
+                      </span>
                     </button>
                   </div>
 
@@ -434,14 +444,18 @@ export default function Home() {
                       <button
                         key={feature.id}
                         onClick={() => handleFeatureChange(index)}
-                        className={`flex-shrink-0 px-4 py-2 rounded-lg transition-all duration-300 ${
+                        className={`flex-shrink-0 px-3 sm:px-6 py-2 sm:py-3 rounded-lg transition-all duration-300 border text-xs sm:text-base ${
                           activeFeature === index
-                            ? "bg-gradient-to-r from-[#FEEBD8] to-blue-300 text-[#141414] font-bold"
-                            : "bg-[#1A1A1A] text-white/70 hover:text-[#FEEBD8] hover:bg-[#1A1A1A]/80"
+                            ? "bg-gradient-to-r from-[#FEEBD8] to-blue-300 text-[#141414] font-bold border-transparent"
+                            : "bg-[#1A1A1A] text-white/80 hover:text-[#FEEBD8] hover:bg-[#1A1A1A]/80 border-[#FEEBD8]/20 hover:border-[#FEEBD8]/40"
                         }`}
                       >
-                        <span className="text-lg mr-2">{feature.icon}</span>
-                        <span className="text-sm">{feature.title}</span>
+                        <span className="text-base sm:text-xl mr-1 sm:mr-3">
+                          {feature.icon}
+                        </span>
+                        <span className="text-xs sm:text-base font-medium">
+                          {feature.title}
+                        </span>
                       </button>
                     ))}
                   </div>
@@ -465,10 +479,10 @@ export default function Home() {
                   <div className="flex justify-center mt-3">
                     <button
                       onClick={() => setIsAutoPlaying(!isAutoPlaying)}
-                      className={`px-3 py-1 rounded-full text-xs transition-all duration-300 ${
+                      className={`px-3 py-1 rounded-full text-xs transition-all duration-300 border ${
                         isAutoPlaying
-                          ? "bg-[#FEEBD8]/20 text-[#FEEBD8] border border-[#FEEBD8]/30"
-                          : "bg-white/10 text-white/50 border border-white/20"
+                          ? "bg-[#FEEBD8]/20 text-[#FEEBD8] border-[#FEEBD8]/30"
+                          : "bg-[#1A1A1A] text-white/70 border-[#FEEBD8]/20 hover:border-[#FEEBD8]/40"
                       }`}
                     >
                       {isAutoPlaying ? "⏸️ Pause" : "▶️ Auto-play"}
@@ -478,22 +492,22 @@ export default function Home() {
               </div>
 
               {/* Demo Content */}
-              <div className="p-6">
+              <div className="p-4 sm:p-6">
                 {/* Essay Manager Demo */}
                 {activeFeature === 0 && (
                   <div className="space-y-6">
-                    <div className="bg-[#141414] rounded-xl p-6 border border-[#FEEBD8]/20">
-                      <h4 className="text-[#FEEBD8] font-bold mb-4">
+                    <div className="bg-[#0F0F0F] rounded-xl p-4 sm:p-6 border border-[#FEEBD8]/20 shadow-lg">
+                      <h4 className="text-[#FEEBD8] font-bold mb-4 text-lg sm:text-xl">
                         Your Essay Draft
                       </h4>
-                      <div className="bg-white/5 rounded-lg p-4 mb-4">
-                        <p className="text-white/80 italic">
+                      <div className="bg-[#1A1A1A] rounded-lg p-3 sm:p-4 mb-4 border border-[#FEEBD8]/10">
+                        <p className="text-white/90 italic text-sm sm:text-base">
                           {features[0].demo.mockData.essayText}
                         </p>
                       </div>
-                      <div className="grid md:grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                          <h5 className="text-white font-semibold mb-2">
+                          <h5 className="text-[#FEEBD8] font-semibold mb-2 text-base sm:text-lg">
                             AI Feedback
                           </h5>
                           <ul className="space-y-2">
@@ -501,23 +515,25 @@ export default function Home() {
                               (item, i) => (
                                 <li
                                   key={i}
-                                  className="text-white/70 text-sm flex items-center"
+                                  className="text-white/90 text-sm sm:text-base flex items-start"
                                 >
-                                  <span className="text-green-400 mr-2">•</span>
-                                  {item}
+                                  <span className="text-green-400 mr-2 mt-0.5 flex-shrink-0">
+                                    •
+                                  </span>
+                                  <span>{item}</span>
                                 </li>
                               )
                             )}
                           </ul>
                         </div>
                         <div>
-                          <h5 className="text-white font-semibold mb-2">
+                          <h5 className="text-[#FEEBD8] font-semibold mb-2 text-base sm:text-lg">
                             Overall Score
                           </h5>
-                          <div className="text-3xl font-bold text-[#FEEBD8]">
+                          <div className="text-2xl sm:text-3xl font-bold text-[#FEEBD8]">
                             {features[0].demo.mockData?.score}/10
                           </div>
-                          <p className="text-white/70 text-sm">
+                          <p className="text-white/80 text-sm sm:text-base">
                             Strong foundation with room for enhancement
                           </p>
                         </div>
@@ -529,8 +545,8 @@ export default function Home() {
                 {/* Smart Calendar Demo */}
                 {activeFeature === 1 && (
                   <div className="space-y-6">
-                    <div className="bg-[#141414] rounded-xl p-6 border border-[#FEEBD8]/20">
-                      <h4 className="text-[#FEEBD8] font-bold mb-4">
+                    <div className="bg-[#0F0F0F] rounded-xl p-4 sm:p-6 border border-[#FEEBD8]/20 shadow-lg">
+                      <h4 className="text-[#FEEBD8] font-bold mb-4 text-lg sm:text-xl">
                         Upcoming Deadlines
                       </h4>
                       <div className="space-y-3">
@@ -538,7 +554,7 @@ export default function Home() {
                           (deadline, i) => (
                             <div
                               key={i}
-                              className="flex items-center justify-between bg-white/5 rounded-lg p-4"
+                              className="flex items-center justify-between bg-[#1A1A1A] rounded-lg p-3 sm:p-4 border border-[#FEEBD8]/10"
                             >
                               <div className="flex items-center space-x-3">
                                 <div
@@ -549,15 +565,15 @@ export default function Home() {
                                   }`}
                                 ></div>
                                 <div>
-                                  <p className="text-white font-semibold">
+                                  <p className="text-white font-semibold drop-shadow-sm">
                                     {deadline.school}
                                   </p>
-                                  <p className="text-white/70 text-sm">
+                                  <p className="text-white/70 text-sm drop-shadow-sm">
                                     {deadline.task}
                                   </p>
                                 </div>
                               </div>
-                              <div className="text-[#FEEBD8] font-bold">
+                              <div className="text-[#FEEBD8] font-bold drop-shadow-sm">
                                 {deadline.date}
                               </div>
                             </div>
@@ -571,32 +587,36 @@ export default function Home() {
                 {/* Academic Tracking Demo */}
                 {activeFeature === 2 && (
                   <div className="space-y-6">
-                    <div className="bg-[#141414] rounded-xl p-6 border border-[#FEEBD8]/20">
-                      <h4 className="text-[#FEEBD8] font-bold mb-4">
+                    <div className="bg-[#0F0F0F] rounded-xl p-4 sm:p-6 border border-[#FEEBD8]/20 shadow-lg">
+                      <h4 className="text-[#FEEBD8] font-bold mb-4 text-lg sm:text-xl">
                         Your Academic Profile
                       </h4>
-                      <div className="grid md:grid-cols-2 gap-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                         <div>
-                          <h5 className="text-white font-semibold mb-3">
+                          <h5 className="text-[#FEEBD8] font-semibold mb-3 text-base sm:text-lg">
                             Stats
                           </h5>
-                          <div className="space-y-2">
-                            <div className="flex justify-between">
-                              <span className="text-white/70">GPA:</span>
-                              <span className="text-[#FEEBD8] font-bold">
+                          <div className="space-y-3">
+                            <div className="flex justify-between items-center">
+                              <span className="text-white/80 text-sm sm:text-base">
+                                GPA:
+                              </span>
+                              <span className="text-[#FEEBD8] font-bold text-base sm:text-lg">
                                 {features[2].demo.mockData?.gpa}
                               </span>
                             </div>
-                            <div className="flex justify-between">
-                              <span className="text-white/70">SAT Score:</span>
-                              <span className="text-[#FEEBD8] font-bold">
+                            <div className="flex justify-between items-center">
+                              <span className="text-white/80 text-sm sm:text-base">
+                                SAT Score:
+                              </span>
+                              <span className="text-[#FEEBD8] font-bold text-base sm:text-lg">
                                 {features[2].demo.mockData?.satScore}
                               </span>
                             </div>
                           </div>
                         </div>
                         <div>
-                          <h5 className="text-white font-semibold mb-3">
+                          <h5 className="text-[#FEEBD8] font-semibold mb-3 text-base sm:text-lg">
                             School Matches
                           </h5>
                           <div className="space-y-2">
@@ -604,13 +624,13 @@ export default function Home() {
                               (match, i) => (
                                 <div
                                   key={i}
-                                  className="flex items-center justify-between bg-white/5 rounded-lg p-3"
+                                  className="flex items-center justify-between bg-[#1A1A1A] rounded-lg p-3 border border-[#FEEBD8]/10"
                                 >
-                                  <span className="text-white">
+                                  <span className="text-white text-sm sm:text-base">
                                     {match.school}
                                   </span>
                                   <div className="flex items-center space-x-2">
-                                    <span className="text-[#FEEBD8] font-bold">
+                                    <span className="text-[#FEEBD8] font-bold text-sm sm:text-base">
                                       {match.match}
                                     </span>
                                     <span
@@ -638,23 +658,26 @@ export default function Home() {
                 {/* Extracurricular Manager Demo */}
                 {activeFeature === 3 && (
                   <div className="space-y-6">
-                    <div className="bg-[#141414] rounded-xl p-6 border border-[#FEEBD8]/20">
-                      <h4 className="text-[#FEEBD8] font-bold mb-4">
+                    <div className="bg-[#0F0F0F] rounded-xl p-4 sm:p-6 border border-[#FEEBD8]/20 shadow-lg">
+                      <h4 className="text-[#FEEBD8] font-bold mb-4 text-lg sm:text-xl">
                         Your Activities
                       </h4>
                       <div className="space-y-4">
                         {features[3].demo.mockData?.activities?.map(
                           (activity, i) => (
-                            <div key={i} className="bg-white/5 rounded-lg p-4">
-                              <div className="flex justify-between items-start mb-2">
-                                <h5 className="text-white font-semibold">
+                            <div
+                              key={i}
+                              className="bg-[#1A1A1A] rounded-lg p-3 sm:p-4 border border-[#FEEBD8]/10"
+                            >
+                              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-2 gap-1 sm:gap-0">
+                                <h5 className="text-white font-semibold text-base sm:text-lg">
                                   {activity.name}
                                 </h5>
-                                <span className="text-[#FEEBD8] text-sm">
+                                <span className="text-[#FEEBD8] text-sm sm:text-base font-medium">
                                   {activity.hours}
                                 </span>
                               </div>
-                              <p className="text-white/70 text-sm">
+                              <p className="text-white/80 text-sm sm:text-base">
                                 {activity.impact}
                               </p>
                             </div>
@@ -668,28 +691,31 @@ export default function Home() {
                 {/* Peer Network Demo */}
                 {activeFeature === 4 && (
                   <div className="space-y-6">
-                    <div className="bg-[#141414] rounded-xl p-6 border border-[#FEEBD8]/20">
-                      <h4 className="text-[#FEEBD8] font-bold mb-4">
+                    <div className="bg-[#0F0F0F] rounded-xl p-4 sm:p-6 border border-[#FEEBD8]/20 shadow-lg">
+                      <h4 className="text-[#FEEBD8] font-bold mb-4 text-lg sm:text-xl">
                         Your Network
                       </h4>
-                      <div className="grid md:grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
                         {features[4].demo.mockData?.connections?.map(
                           (connection, i) => (
-                            <div key={i} className="bg-white/5 rounded-lg p-4">
+                            <div
+                              key={i}
+                              className="bg-[#1A1A1A] rounded-lg p-3 sm:p-4 border border-[#FEEBD8]/10"
+                            >
                               <div className="flex items-center space-x-3 mb-2">
-                                <div className="w-10 h-10 bg-gradient-to-r from-[#FEEBD8] to-blue-300 rounded-full flex items-center justify-center text-[#141414] font-bold">
+                                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-[#FEEBD8] to-blue-300 rounded-full flex items-center justify-center text-[#141414] font-bold text-sm sm:text-base">
                                   {connection.name.charAt(0)}
                                 </div>
-                                <div>
-                                  <p className="text-white font-semibold">
+                                <div className="min-w-0 flex-1">
+                                  <p className="text-white font-semibold text-sm sm:text-base">
                                     {connection.name}
                                   </p>
-                                  <p className="text-white/70 text-sm">
+                                  <p className="text-white/80 text-xs sm:text-sm">
                                     {connection.country}
                                   </p>
                                 </div>
                               </div>
-                              <p className="text-[#FEEBD8] text-sm">
+                              <p className="text-[#FEEBD8] text-xs sm:text-sm">
                                 Working on: {connection.project}
                               </p>
                             </div>
@@ -701,18 +727,18 @@ export default function Home() {
                 )}
 
                 {/* CTA */}
-                <div className="mt-8 text-center">
-                  <div className="bg-gradient-to-r from-[#FEEBD8] to-blue-300 rounded-xl p-6 text-[#141414]">
-                    <h4 className="text-xl font-bold mb-2">
+                <div className="mt-6 sm:mt-8 text-center">
+                  <div className="bg-gradient-to-r from-[#FEEBD8] to-blue-300 rounded-xl p-4 sm:p-6 text-[#141414]">
+                    <h4 className="text-lg sm:text-xl font-bold mb-2">
                       Ready to Experience This?
                     </h4>
-                    <p className="mb-4 opacity-80">
+                    <p className="mb-4 opacity-80 text-sm sm:text-base">
                       Join thousands of students already using Paccy for their
                       college applications.
                     </p>
                     <button
                       onClick={navigateToAuth}
-                      className="px-6 py-3 bg-[#141414] text-[#FEEBD8] rounded-xl font-bold hover:bg-gray-800 transition-colors"
+                      className="px-4 sm:px-6 py-3 bg-[#141414] text-[#FEEBD8] rounded-xl font-bold hover:bg-gray-800 transition-colors text-sm sm:text-base"
                     >
                       Start Your Free Profile
                     </button>

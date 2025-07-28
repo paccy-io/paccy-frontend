@@ -15,7 +15,14 @@ export default function Navbar() {
 
   const { isAuthenticated, user, logout } = useAuth();
   const pathname = usePathname();
-  const isDashboard = pathname?.startsWith('/dashboard');
+  const isDashboard = pathname?.startsWith("/dashboard");
+
+  // Environment check for dashboard visibility
+  const [isDevelopment, setIsDevelopment] = useState(false);
+
+  useEffect(() => {
+    setIsDevelopment(process.env.NODE_ENV === "development");
+  }, []);
 
   const publicPages: Array<IPages> = [
     { title: "How It Works", mtitle: "How It Works", link: "/how-it-works" },
@@ -31,7 +38,8 @@ export default function Navbar() {
     { title: "Calendar", mtitle: "Calendar", link: "/dashboard/calendar" },
   ];
 
-  const pages = isDashboard ? dashboardPages : publicPages;
+  // Only show dashboard pages in development and when on dashboard routes
+  const pages = isDashboard && isDevelopment ? dashboardPages : publicPages;
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -86,16 +94,156 @@ export default function Navbar() {
 
             {/* CTA Button */}
             {isAuthenticated ? (
-              <div className="ml-4 flex items-center space-x-4">
-                <span className="text-[#FEEBD8]/70 text-sm">
-                  Welcome, {user?.name || user?.email}
-                </span>
-                <button
-                  onClick={logout}
-                  className="px-6 py-2 bg-red-500/20 text-red-400 font-semibold rounded-lg hover:bg-red-500/30 transition-all duration-300"
-                >
-                  Logout
-                </button>
+              <div className="ml-4 flex items-center space-x-3">
+                <div className="relative group">
+                  {user?.avatar && (
+                    <div className="relative cursor-pointer">
+                      <img
+                        src={user.avatar}
+                        alt={user.name || "User avatar"}
+                        className="w-10 h-10 rounded-full border-2 border-[#FEEBD8]/30 group-hover:border-[#FEEBD8]/60 transition-all duration-300"
+                      />
+                      <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-[#141414]"></div>
+                    </div>
+                  )}
+
+                  {/* Invisible bridge to prevent dropdown from disappearing */}
+                  <div className="absolute top-full right-0 w-56 h-2 bg-transparent"></div>
+
+                  {/* Dropdown Menu */}
+                  <div className="absolute top-full pt-2 right-0 w-56 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none group-hover:pointer-events-auto z-50">
+                    <div className="bg-[#1A1A1A] border border-[#FEEBD8]/20 rounded-lg shadow-lg">
+                      {/* User Info Header */}
+                      <div className="p-4 border-b border-[#FEEBD8]/10">
+                        <p className="text-[#FEEBD8] text-sm font-medium">
+                          {user?.name || user?.email}
+                        </p>
+                        <p className="text-[#FEEBD8]/70 text-xs">
+                          {user?.role || "User"}
+                        </p>
+                      </div>
+
+                      {/* Menu Items */}
+                      <div className="py-2">
+                        {isDevelopment && (
+                          <Link
+                            href="/dashboard"
+                            className="flex items-center px-4 py-2 text-[#FEEBD8]/80 hover:text-[#FEEBD8] hover:bg-[#FEEBD8]/10 transition-all duration-200"
+                          >
+                            <svg
+                              className="w-4 h-4 mr-3"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
+                              />
+                            </svg>
+                            Dashboard
+                          </Link>
+                        )}
+
+                        {isDevelopment && (
+                          <Link
+                            href="/dashboard/settings"
+                            className="flex items-center px-4 py-2 text-[#FEEBD8]/80 hover:text-[#FEEBD8] hover:bg-[#FEEBD8]/10 transition-all duration-200"
+                          >
+                            <svg
+                              className="w-4 h-4 mr-3"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                              />
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                              />
+                            </svg>
+                            Settings
+                          </Link>
+                        )}
+
+                        {isDevelopment && (
+                          <Link
+                            href="/dashboard/essays"
+                            className="flex items-center px-4 py-2 text-[#FEEBD8]/80 hover:text-[#FEEBD8] hover:bg-[#FEEBD8]/10 transition-all duration-200"
+                          >
+                            <svg
+                              className="w-4 h-4 mr-3"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                              />
+                            </svg>
+                            Essays
+                          </Link>
+                        )}
+
+                        {isDevelopment && (
+                          <Link
+                            href="/dashboard/colleges"
+                            className="flex items-center px-4 py-2 text-[#FEEBD8]/80 hover:text-[#FEEBD8] hover:bg-[#FEEBD8]/10 transition-all duration-200"
+                          >
+                            <svg
+                              className="w-4 h-4 mr-3"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                              />
+                            </svg>
+                            Colleges
+                          </Link>
+                        )}
+
+                        <div className="border-t border-[#FEEBD8]/10 mt-2 pt-2">
+                          <button
+                            onClick={logout}
+                            className="flex items-center w-full px-4 py-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all duration-200"
+                          >
+                            <svg
+                              className="w-4 h-4 mr-3"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                              />
+                            </svg>
+                            Logout
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             ) : (
               <Link
@@ -134,7 +282,11 @@ export default function Navbar() {
         {/* Mobile Navigation */}
         <div
           className={`md:hidden overflow-hidden transition-all duration-300 ${
-            isMenuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+            isMenuOpen
+              ? isAuthenticated
+                ? "max-h-[600px] opacity-100"
+                : "max-h-96 opacity-100"
+              : "max-h-0 opacity-0"
           }`}
         >
           <div className="py-4 space-y-2 border-t border-neutral-700/50">
@@ -152,10 +304,85 @@ export default function Navbar() {
             {/* Mobile CTA */}
             <div className="px-4 pt-4">
               {isAuthenticated ? (
-                <div className="space-y-2">
-                  <p className="text-[#FEEBD8]/70 text-sm">
-                    Welcome, {user?.name || user?.email}
-                  </p>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between p-3 bg-[#1A1A1A] rounded-lg border border-[#FEEBD8]/20">
+                    <div className="flex items-center space-x-3">
+                      {user?.avatar && (
+                        <div className="relative">
+                          <img
+                            src={user.avatar}
+                            alt={user.name || "User avatar"}
+                            className="w-12 h-12 rounded-full border-2 border-[#FEEBD8]/30"
+                          />
+                          <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-[#141414]"></div>
+                        </div>
+                      )}
+                      <div>
+                        <p className="text-[#FEEBD8] text-sm font-medium">
+                          {user?.name || user?.email}
+                        </p>
+                        <p className="text-[#FEEBD8]/70 text-xs">
+                          {user?.role || "User"}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Mobile Quick Actions */}
+                  {isDevelopment && (
+                    <div className="grid grid-cols-2 gap-2">
+                      <Link
+                        href="/dashboard"
+                        onClick={() => setIsMenuOpen(false)}
+                        className="flex items-center justify-center p-3 bg-[#1A1A1A] border border-[#FEEBD8]/20 rounded-lg hover:bg-[#FEEBD8]/10 transition-all duration-300"
+                      >
+                        <svg
+                          className="w-4 h-4 mr-2"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
+                          />
+                        </svg>
+                        <span className="text-[#FEEBD8] text-sm">
+                          Dashboard
+                        </span>
+                      </Link>
+
+                      <Link
+                        href="/dashboard/settings"
+                        onClick={() => setIsMenuOpen(false)}
+                        className="flex items-center justify-center p-3 bg-[#1A1A1A] border border-[#FEEBD8]/20 rounded-lg hover:bg-[#FEEBD8]/10 transition-all duration-300"
+                      >
+                        <svg
+                          className="w-4 h-4 mr-2"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                          />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                          />
+                        </svg>
+                        <span className="text-[#FEEBD8] text-sm">Settings</span>
+                      </Link>
+                    </div>
+                  )}
+
                   <button
                     onClick={() => {
                       logout();

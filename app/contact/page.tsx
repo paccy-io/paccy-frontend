@@ -4,9 +4,11 @@ import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 
 export const metadata: Metadata = {
-  title: 'Contact',
-  description: 'Get in touch with the Paccy team. Have questions about college applications or need support? We\'re here to help you succeed in your higher education journey.',
-  keywords: 'contact paccy, college application support, customer service, help with college apps, paccy support',
+  title: "Contact",
+  description:
+    "Get in touch with the Paccy team. Have questions about college applications or need support? We're here to help you succeed in your higher education journey.",
+  keywords:
+    "contact paccy, college application support, customer service, help with college apps, paccy support",
 };
 
 export default function Home() {

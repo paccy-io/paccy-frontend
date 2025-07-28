@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "../../components/AuthProvider";
+import { authenticateUser, checkEnvironment } from "../actions/auth";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 
@@ -45,7 +46,36 @@ function AuthContent() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setShowDevModal(true);
+    setError("");
+    setLoading(true);
+
+    try {
+      // Use server action to check environment and handle auth
+      const result = await authenticateUser(
+        formData.email,
+        formData.password,
+        isLogin,
+        searchParams.get("redirect") || "/dashboard"
+      );
+
+      if (result.success) {
+        // In development, proceed with login
+        const loginSuccess = await login(formData.email, formData.password);
+        if (loginSuccess && result.redirect) {
+          router.push(result.redirect);
+        }
+      } else if (result.error === "AUTH_NOT_AVAILABLE") {
+        // In production, show the modal
+        setShowDevModal(true);
+      } else {
+        // Invalid credentials or signup not available in development
+        setError(result.error || "Authentication failed");
+      }
+    } catch (err) {
+      setError("Authentication failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSocialLogin = (provider: string) => {
@@ -424,11 +454,13 @@ function AuthContent() {
 
 export default function Auth() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-[#141414] flex items-center justify-center">
-        <div className="text-white">Loading...</div>
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#141414] flex items-center justify-center">
+          <div className="text-white">Loading...</div>
+        </div>
+      }
+    >
       <AuthContent />
     </Suspense>
   );

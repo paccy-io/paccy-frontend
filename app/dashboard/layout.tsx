@@ -1,5 +1,6 @@
 "use client";
 
+import EnvironmentGuard from "../../components/EnvironmentGuard";
 import ProtectedRoute from "../../components/ProtectedRoute";
 
 export default function DashboardLayout({
@@ -8,8 +9,8 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ProtectedRoute>
-      {children}
-    </ProtectedRoute>
+    <EnvironmentGuard requiredEnv="development">
+      <ProtectedRoute>{children}</ProtectedRoute>
+    </EnvironmentGuard>
   );
 }

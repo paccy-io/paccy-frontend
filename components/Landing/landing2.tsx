@@ -80,13 +80,13 @@ export default function Home2() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#141414] to-gray-900 py-20">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#FEEBD8] via-blue-300 to-purple-500 bg-clip-text text-transparent mb-4 font-climate-crisis">
+    <div className="min-h-screen bg-[#141414] py-12 md:py-20">
+      <div className="max-w-7xl mx-auto px-4 md:px-6">
+        <div className="text-center mb-12 md:mb-16">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-[#FEEBD8] via-blue-300 to-purple-500 bg-clip-text text-transparent mb-4 font-climate-crisis">
             Complete College Application Suite
           </h2>
-          <p className="text-xl text-white/80 max-w-3xl mx-auto">
+          <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto leading-relaxed">
             Five powerful features designed to bring structure, clarity, and
             collaboration to your college application journey.
           </p>
@@ -94,7 +94,7 @@ export default function Home2() {
 
         <div
           id="features"
-          className="grid md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8 mb-16"
+          className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8 mb-16"
         >
           {mvpFeatures.map((feature, index) => {
             return (
@@ -111,37 +111,37 @@ export default function Home2() {
         </div>
 
         {/* Why Paccy Section */}
-        <div className="mt-20 text-center">
-          <h3 className="text-3xl font-bold text-[#FEEBD8] mb-8">
+        <div className="mt-12 md:mt-20 text-center">
+          <h3 className="text-2xl md:text-3xl font-bold text-[#FEEBD8] mb-6 md:mb-8">
             Why Students Choose Paccy
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 max-w-5xl mx-auto">
             <div className="bg-[#1A1A1A] rounded-xl p-6 shadow-lg border border-[#FEEBD8]/20 hover:border-[#FEEBD8]/40 transition-all duration-300">
               <div className="text-4xl mb-4">🎯</div>
-              <h4 className="text-xl font-bold text-[#FEEBD8] mb-2">
+              <h4 className="text-lg md:text-xl font-bold text-[#FEEBD8] mb-2">
                 Structure & Clarity
               </h4>
-              <p className="text-white/70">
+              <p className="text-white/80 text-sm md:text-base leading-relaxed">
                 Transform the chaotic application process into an organized,
                 step-by-step journey with clear milestones.
               </p>
             </div>
             <div className="bg-[#1A1A1A] rounded-xl p-6 shadow-lg border border-[#FEEBD8]/20 hover:border-[#FEEBD8]/40 transition-all duration-300">
               <div className="text-4xl mb-4">🤖</div>
-              <h4 className="text-xl font-bold text-[#FEEBD8] mb-2">
+              <h4 className="text-lg md:text-xl font-bold text-[#FEEBD8] mb-2">
                 AI-Powered Guidance
               </h4>
-              <p className="text-white/70">
+              <p className="text-white/80 text-sm md:text-base leading-relaxed">
                 Get intelligent feedback on essays, activities, and profile
                 optimization from our advanced AI assistant.
               </p>
             </div>
             <div className="bg-[#1A1A1A] rounded-xl p-6 shadow-lg border border-[#FEEBD8]/20 hover:border-[#FEEBD8]/40 transition-all duration-300">
               <div className="text-4xl mb-4">🤝</div>
-              <h4 className="text-xl font-bold text-[#FEEBD8] mb-2">
+              <h4 className="text-lg md:text-xl font-bold text-[#FEEBD8] mb-2">
                 Collaborative Network
               </h4>
-              <p className="text-white/70">
+              <p className="text-white/80 text-sm md:text-base leading-relaxed">
                 Connect with peers globally, share insights, and support each
                 other through the application journey.
               </p>
@@ -150,11 +150,11 @@ export default function Home2() {
         </div>
 
         {/* Call to Action Section */}
-        <div className="mt-20 bg-gradient-to-r from-[#FEEBD8] to-blue-300 rounded-2xl p-8 text-[#141414] text-center">
+        <div className="mt-20 bg-gradient-to-r from-[#FEEBD8] to-blue-300 rounded-2xl p-8 text-[#141414] text-center shadow-xl">
           <h3 className="text-3xl font-bold mb-4">
             Ready to Transform Your Application Process?
           </h3>
-          <p className="text-xl text-[#141414]/80 mb-6 max-w-2xl mx-auto">
+          <p className="text-xl text-[#141414]/80 mb-6 max-w-2xl mx-auto leading-relaxed">
             Join high school students worldwide who are using Paccy to navigate
             college applications with confidence and clarity.
           </p>
@@ -209,18 +209,20 @@ export const Card = ({ index, img, title, description, link }: ICard) => {
 
   return (
     <div
-      className={`group hover:scale-105 transition-all duration-300 ${currentBg} border-2 rounded-2xl p-8 shadow-lg hover:shadow-2xl h-full`}
+      className={`group hover:scale-105 transition-all duration-300 ${currentBg} border rounded-2xl p-6 md:p-8 shadow-lg hover:shadow-2xl h-full flex flex-col`}
     >
       <div className="text-center mb-6">
-        <h3 className="text-xl font-bold text-[#FEEBD8] mb-4">{title}</h3>
+        <h3 className="text-lg md:text-xl font-bold text-[#FEEBD8] mb-4">
+          {title}
+        </h3>
         <div
           className={`w-16 h-1 bg-gradient-to-r ${currentGradient} mx-auto rounded-full`}
         ></div>
       </div>
 
-      <ul className="space-y-3 flex-grow">
+      <ul className="space-y-3 flex-grow mb-6">
         {description.map((item, idx) => (
-          <li key={idx} className="flex items-start text-white/80">
+          <li key={idx} className="flex items-start text-white/90">
             <span
               className={`w-2 h-2 bg-gradient-to-r ${currentGradient} rounded-full mr-3 mt-2 flex-shrink-0`}
             ></span>
@@ -229,12 +231,15 @@ export const Card = ({ index, img, title, description, link }: ICard) => {
         ))}
       </ul>
 
-      <div className="mt-6 pt-6 border-t border-[#FEEBD8]/20">
+      <div className="mt-auto pt-6 border-t border-[#FEEBD8]/20">
         <button
           onClick={() => link && router.push(link)}
-          className="w-full py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold rounded-lg hover:shadow-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-300"
+          className="w-full py-3 bg-[#1A1A1A] border border-[#FEEBD8]/40 text-[#FEEBD8] font-semibold rounded-lg hover:bg-[#FEEBD8]/10 hover:border-[#FEEBD8]/60 transition-all duration-300 text-sm md:text-base shadow-md hover:shadow-lg group"
         >
-          Learn More
+          <span className="flex items-center justify-center gap-2">
+            Learn More
+            <span className="text-sm group-hover:translate-x-1 transition-transform duration-300">→</span>
+          </span>
         </button>
       </div>
     </div>

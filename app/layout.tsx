@@ -5,47 +5,51 @@ import { AuthProvider } from "../components/AuthProvider";
 
 export const metadata: Metadata = {
   title: {
-    template: '%s | Paccy',
-    default: 'Paccy - Transform Your College Application Journey',
+    template: "%s | Paccy",
+    default: "Paccy - Transform Your College Application Journey",
   },
-  description: 'Transform your college application journey with Paccy\'s comprehensive suite of tools. Track essays, manage deadlines, build academic profiles, and connect with peers - all in one platform.',
-  keywords: 'college applications, essay tracker, college admissions, academic planner, extracurricular manager, peer network, college prep, university applications',
-  authors: [{ name: 'Paccy Team' }],
-  creator: 'Paccy',
-  publisher: 'Paccy',
-  robots: 'index, follow',
+  description:
+    "Transform your college application journey with Paccy's comprehensive suite of tools. Track essays, manage deadlines, build academic profiles, and connect with peers - all in one platform.",
+  keywords:
+    "college applications, essay tracker, college admissions, academic planner, extracurricular manager, peer network, college prep, university applications",
+  authors: [{ name: "Paccy Team" }],
+  creator: "Paccy",
+  publisher: "Paccy",
+  robots: "index, follow",
   openGraph: {
-    type: 'website',
-    url: 'https://paccy.io',
-    title: 'Paccy - Transform Your College Application Journey',
-    description: 'Transform your college application journey with Paccy\'s comprehensive suite of tools. Track essays, manage deadlines, build academic profiles, and connect with peers - all in one platform.',
+    type: "website",
+    url: "https://paccy.io",
+    title: "Paccy - Transform Your College Application Journey",
+    description:
+      "Transform your college application journey with Paccy's comprehensive suite of tools. Track essays, manage deadlines, build academic profiles, and connect with peers - all in one platform.",
     images: [
       {
-        url: 'https://paccy.io/assets/paccy2.png',
+        url: "https://paccy.io/assets/paccy2.png",
         width: 1200,
         height: 630,
-        alt: 'Paccy - College Application Management Platform',
+        alt: "Paccy - College Application Management Platform",
       },
     ],
-    siteName: 'Paccy',
+    siteName: "Paccy",
   },
   twitter: {
-    card: 'summary_large_image',
-    site: '@paccyio',
-    creator: '@paccyio',
-    title: 'Paccy - Transform Your College Application Journey',
-    description: 'Transform your college application journey with Paccy\'s comprehensive suite of tools. Track essays, manage deadlines, build academic profiles, and connect with peers - all in one platform.',
-    images: ['https://paccy.io/assets/paccy2.png'],
+    card: "summary_large_image",
+    site: "@paccyio",
+    creator: "@paccyio",
+    title: "Paccy - Transform Your College Application Journey",
+    description:
+      "Transform your college application journey with Paccy's comprehensive suite of tools. Track essays, manage deadlines, build academic profiles, and connect with peers - all in one platform.",
+    images: ["https://paccy.io/assets/paccy2.png"],
   },
   icons: {
     icon: [
-      { url: '/favicon.ico', sizes: '32x32', type: 'image/x-icon' },
-      { url: '/assets/paccy2.png', sizes: '32x32', type: 'image/png' },
+      { url: "/favicon.ico", sizes: "32x32", type: "image/x-icon" },
+      { url: "/assets/paccy2.png", sizes: "32x32", type: "image/png" },
     ],
-    apple: '/assets/paccy2.png',
-    shortcut: '/favicon.ico',
+    apple: "/assets/paccy2.png",
+    shortcut: "/favicon.ico",
   },
-  manifest: '/manifest.json',
+  manifest: "/manifest.json",
 };
 
 const geistSans = Geist({
@@ -78,9 +82,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${climateCrisis.variable} antialiased`}
       >
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );
