@@ -238,7 +238,9 @@ export const Card = ({ index, img, title, description, link }: ICard) => {
         >
           <span className="flex items-center justify-center gap-2">
             Learn More
-            <span className="text-sm group-hover:translate-x-1 transition-transform duration-300">→</span>
+            <span className="text-sm group-hover:translate-x-1 transition-transform duration-300">
+              →
+            </span>
           </span>
         </button>
       </div>

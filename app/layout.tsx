@@ -43,13 +43,32 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "/favicon.ico", sizes: "32x32", type: "image/x-icon" },
-      { url: "/assets/paccy2.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
     ],
-    apple: "/assets/paccy2.png",
-    shortcut: "/favicon.ico",
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }
+    ],
+    other: [
+      {
+        rel: "mask-icon",
+        url: "/safari-pinned-tab.svg",
+        color: "#FEEBD8"
+      }
+    ]
   },
-  manifest: "/manifest.json",
+  manifest: "/site.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Paccy"
+  },
+  other: {
+    "theme-color": "#FEEBD8",
+    "msapplication-TileColor": "#141414",
+    "msapplication-config": "/browserconfig.xml"
+  }
 };
 
 const geistSans = Geist({
@@ -79,6 +98,24 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        {/* Additional favicon and PWA meta tags */}
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" href="/favicon-16x16.png" sizes="16x16" type="image/png" />
+        <link rel="icon" href="/favicon-32x32.png" sizes="32x32" type="image/png" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
+        <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#FEEBD8" />
+        <link rel="manifest" href="/site.webmanifest" />
+        
+        <meta name="theme-color" content="#FEEBD8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="Paccy" />
+        <meta name="msapplication-TileColor" content="#141414" />
+        <meta name="msapplication-config" content="/browserconfig.xml" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="application-name" content="Paccy" />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${climateCrisis.variable} antialiased`}
       >
