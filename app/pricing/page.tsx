@@ -44,7 +44,7 @@ export default function Pricing() {
 
             {/* Notification Banner */}
             <div className="max-w-4xl mx-auto mb-8">
-              <div className="bg-gradient-to-r from-orange-500/20 to-yellow-500/20 border border-orange-400/50 rounded-xl p-4 backdrop-blur-sm">
+              <div className="bg-gradient-to-r from-orange-500/20 to-yellow-500/20 border border-orange-400/50 rounded-xl p-4 ">
                 <div className="flex items-center justify-center space-x-3">
                   <span className="text-2xl">🚧</span>
                   <div className="text-center">
@@ -281,7 +281,7 @@ export default function Pricing() {
 
       {/* Cool Custom Alert Modal */}
       {alertInfo.show && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-[#1A1A1A] rounded-2xl border border-orange-400/50 max-w-md w-full mx-4 overflow-hidden">
             {/* Header with gradient */}
             <div className="bg-gradient-to-r from-orange-500/20 to-yellow-500/20 p-6 border-b border-orange-400/30">

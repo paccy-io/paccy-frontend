@@ -36,6 +36,16 @@ const mockUserData = {
   profilePicture: "/api/placeholder/100/100",
   plan: "Pro",
   planExpiry: "2025-06-15",
+  privacy: {
+    isProfilePublic: false,
+    showEmail: false,
+    showPhone: false,
+    allowMessaging: true,
+    dataCollection: true,
+    analytics: false,
+    showOnlineStatus: true,
+    searchableProfile: false,
+  },
   notifications: {
     deadlineReminders: true,
     weeklyReports: true,
@@ -102,6 +112,7 @@ export default function Settings() {
     { id: "notifications", label: "Notifications", icon: <FaBell /> },
     { id: "preferences", label: "Preferences", icon: <FaPalette /> },
     { id: "security", label: "Security", icon: <FaShieldAlt /> },
+    { id: "privacy", label: "Privacy", icon: <FaShieldAlt /> },
     { id: "billing", label: "Billing", icon: <FaCreditCard /> },
   ];
 
@@ -130,6 +141,16 @@ export default function Settings() {
       ...prev,
       preferences: {
         ...prev.preferences,
+        [key]: value,
+      },
+    }));
+  };
+
+  const updatePrivacy = (key: string, value: boolean) => {
+    setUserData((prev) => ({
+      ...prev,
+      privacy: {
+        ...prev.privacy,
         [key]: value,
       },
     }));
@@ -458,6 +479,294 @@ export default function Settings() {
     </div>
   );
 
+  const renderPrivacyTab = () => (
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold text-[#FEEBD8]">Privacy Settings</h2>
+
+      {/* Profile Privacy */}
+      <div className="bg-[#1a1a1a] border border-neutral-700 rounded-lg p-6">
+        <h3 className="text-lg font-semibold text-[#FEEBD8] mb-4">
+          Profile Privacy
+        </h3>
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h4 className="text-[#FEEBD8] font-medium">Profile Visibility</h4>
+              <p className="text-[#FEEBD8]/60 text-sm">
+                {userData.privacy.isProfilePublic
+                  ? "Your profile is visible to other users and can be found in search results"
+                  : "Your profile is private and only visible to you"}
+              </p>
+            </div>
+            <button
+              onClick={() =>
+                updatePrivacy(
+                  "isProfilePublic",
+                  !userData.privacy.isProfilePublic
+                )
+              }
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                userData.privacy.isProfilePublic
+                  ? "bg-[#FEEBD8]"
+                  : "bg-neutral-600"
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  userData.privacy.isProfilePublic
+                    ? "translate-x-6"
+                    : "translate-x-1"
+                }`}
+              />
+            </button>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div>
+              <h4 className="text-[#FEEBD8] font-medium">Searchable Profile</h4>
+              <p className="text-[#FEEBD8]/60 text-sm">
+                Allow your profile to appear in search results
+              </p>
+            </div>
+            <button
+              onClick={() =>
+                updatePrivacy(
+                  "searchableProfile",
+                  !userData.privacy.searchableProfile
+                )
+              }
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                userData.privacy.searchableProfile
+                  ? "bg-[#FEEBD8]"
+                  : "bg-neutral-600"
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  userData.privacy.searchableProfile
+                    ? "translate-x-6"
+                    : "translate-x-1"
+                }`}
+              />
+            </button>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div>
+              <h4 className="text-[#FEEBD8] font-medium">Show Online Status</h4>
+              <p className="text-[#FEEBD8]/60 text-sm">
+                Let others see when you're online
+              </p>
+            </div>
+            <button
+              onClick={() =>
+                updatePrivacy(
+                  "showOnlineStatus",
+                  !userData.privacy.showOnlineStatus
+                )
+              }
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                userData.privacy.showOnlineStatus
+                  ? "bg-[#FEEBD8]"
+                  : "bg-neutral-600"
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  userData.privacy.showOnlineStatus
+                    ? "translate-x-6"
+                    : "translate-x-1"
+                }`}
+              />
+            </button>
+          </div>
+        </div>
+
+        {userData.privacy.isProfilePublic && (
+          <div className="mt-4 p-4 bg-blue-500/10 border border-blue-400/30 rounded-lg">
+            <div className="flex items-start gap-3">
+              <div className="text-blue-400 mt-1">ℹ️</div>
+              <div>
+                <p className="text-blue-200 text-sm font-medium">
+                  Public Profile Benefits
+                </p>
+                <p className="text-blue-300/80 text-sm mt-1">
+                  Other students can find and connect with you, share
+                  experiences, and you'll appear in our student directory.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Contact Information Privacy */}
+      <div className="bg-[#1a1a1a] border border-neutral-700 rounded-lg p-6">
+        <h3 className="text-lg font-semibold text-[#FEEBD8] mb-4">
+          Contact Information
+        </h3>
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h4 className="text-[#FEEBD8] font-medium">Show Email Address</h4>
+              <p className="text-[#FEEBD8]/60 text-sm">
+                Display your email address on your public profile
+              </p>
+            </div>
+            <button
+              onClick={() =>
+                updatePrivacy("showEmail", !userData.privacy.showEmail)
+              }
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                userData.privacy.showEmail ? "bg-[#FEEBD8]" : "bg-neutral-600"
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  userData.privacy.showEmail ? "translate-x-6" : "translate-x-1"
+                }`}
+              />
+            </button>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div>
+              <h4 className="text-[#FEEBD8] font-medium">Show Phone Number</h4>
+              <p className="text-[#FEEBD8]/60 text-sm">
+                Display your phone number on your public profile
+              </p>
+            </div>
+            <button
+              onClick={() =>
+                updatePrivacy("showPhone", !userData.privacy.showPhone)
+              }
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                userData.privacy.showPhone ? "bg-[#FEEBD8]" : "bg-neutral-600"
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  userData.privacy.showPhone ? "translate-x-6" : "translate-x-1"
+                }`}
+              />
+            </button>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div>
+              <h4 className="text-[#FEEBD8] font-medium">Allow Messaging</h4>
+              <p className="text-[#FEEBD8]/60 text-sm">
+                Let other users send you direct messages
+              </p>
+            </div>
+            <button
+              onClick={() =>
+                updatePrivacy(
+                  "allowMessaging",
+                  !userData.privacy.allowMessaging
+                )
+              }
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                userData.privacy.allowMessaging
+                  ? "bg-[#FEEBD8]"
+                  : "bg-neutral-600"
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  userData.privacy.allowMessaging
+                    ? "translate-x-6"
+                    : "translate-x-1"
+                }`}
+              />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Data & Analytics */}
+      <div className="bg-[#1a1a1a] border border-neutral-700 rounded-lg p-6">
+        <h3 className="text-lg font-semibold text-[#FEEBD8] mb-4">
+          Data & Analytics
+        </h3>
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h4 className="text-[#FEEBD8] font-medium">Data Collection</h4>
+              <p className="text-[#FEEBD8]/60 text-sm">
+                Allow us to collect usage data to improve your experience
+              </p>
+            </div>
+            <button
+              onClick={() =>
+                updatePrivacy(
+                  "dataCollection",
+                  !userData.privacy.dataCollection
+                )
+              }
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                userData.privacy.dataCollection
+                  ? "bg-[#FEEBD8]"
+                  : "bg-neutral-600"
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  userData.privacy.dataCollection
+                    ? "translate-x-6"
+                    : "translate-x-1"
+                }`}
+              />
+            </button>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div>
+              <h4 className="text-[#FEEBD8] font-medium">Analytics Tracking</h4>
+              <p className="text-[#FEEBD8]/60 text-sm">
+                Enable analytics to help us understand how you use Paccy
+              </p>
+            </div>
+            <button
+              onClick={() =>
+                updatePrivacy("analytics", !userData.privacy.analytics)
+              }
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                userData.privacy.analytics ? "bg-[#FEEBD8]" : "bg-neutral-600"
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  userData.privacy.analytics ? "translate-x-6" : "translate-x-1"
+                }`}
+              />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Privacy Notice */}
+      <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-400/30 rounded-lg p-4">
+        <div className="flex items-start gap-3">
+          <div className="text-blue-400 mt-1">🔒</div>
+          <div>
+            <p className="text-blue-200 text-sm font-medium mb-2">
+              Your Privacy Matters
+            </p>
+            <p className="text-blue-300/80 text-sm">
+              We're committed to protecting your privacy. You can change these
+              settings at any time. For more information, check out our{" "}
+              <button className="text-[#FEEBD8] underline hover:text-[#E5D5B7]">
+                Privacy Policy
+              </button>
+              .
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   const renderBillingTab = () => (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-[#FEEBD8]">
@@ -465,7 +774,7 @@ export default function Settings() {
       </h2>
 
       {/* Payment System Notice */}
-      <div className="bg-gradient-to-r from-orange-500/20 to-yellow-500/20 border border-orange-400/50 rounded-xl p-4 backdrop-blur-sm">
+      <div className="bg-gradient-to-r from-orange-500/20 to-yellow-500/20 border border-orange-400/50 rounded-xl p-4 ">
         <div className="flex items-center justify-center space-x-3">
           <span className="text-2xl">🚧</span>
           <div className="text-center">
@@ -593,12 +902,10 @@ export default function Settings() {
                 ))}
               </nav>
 
-              <div className="mt-8 pt-6 border-t border-neutral-700">
-                <button className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-red-400 hover:bg-red-500/10 transition-colors">
-                  <FaSignOutAlt />
-                  <span>Sign Out</span>
-                </button>
-              </div>
+              <button className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-red-400 hover:bg-red-500/10 transition-colors mt-4">
+                <FaSignOutAlt />
+                <span>Sign Out</span>
+              </button>
             </div>
           </div>
 
@@ -609,6 +916,7 @@ export default function Settings() {
               {activeTab === "notifications" && renderNotificationsTab()}
               {activeTab === "preferences" && renderPreferencesTab()}
               {activeTab === "security" && renderSecurityTab()}
+              {activeTab === "privacy" && renderPrivacyTab()}
               {activeTab === "billing" && renderBillingTab()}
             </div>
           </div>
@@ -617,7 +925,7 @@ export default function Settings() {
 
       {/* Payment System Alert Modal */}
       {alertInfo.show && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-[#1A1A1A] rounded-2xl border border-orange-400/50 max-w-md w-full mx-4 overflow-hidden">
             {/* Header with gradient */}
             <div className="bg-gradient-to-r from-orange-500/20 to-yellow-500/20 p-6 border-b border-orange-400/30">

@@ -13,9 +13,14 @@ export const metadata: Metadata = {
 
 export default function Home() {
   return (
-    <div className="">
+    <div className="relative min-h-screen overflow-hidden">
+      {/* Background behind everything, including under navbar */}
+      <div
+        className="fixed inset-0 z-0 bg-[#141414] pointer-events-none"
+        aria-hidden="true"
+      />
       <Navbar />
-      <div className="pt-20">
+      <div className="pt-20 relative z-10">
         <Contact />
       </div>
       <Footer />

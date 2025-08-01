@@ -197,6 +197,20 @@ export default function Home() {
     },
   ];
 
+  // Prevent background scroll when modal is open
+  useEffect(() => {
+    if (showFeatureDemo) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+
+    // Cleanup when component unmounts
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [showFeatureDemo]);
+
   const openFeatureDemo = (featureId: number) => {
     setActiveFeature(featureId);
     setShowFeatureDemo(true);
@@ -248,28 +262,47 @@ export default function Home() {
     }, 100); // Small delay to ensure state update
   };
   return (
-    <div className="min-h-screen bg-[#141414] flex flex-col justify-center items-center relative overflow-hidden">
+    <div className="relative min-h-screen overflow-hidden flex flex-col justify-center items-center">
+      {/* Hide the actual Navbar when modal is open by injecting a style tag */}
+      {showFeatureDemo && (
+        <style>{`
+          header, nav, .navbar, [data-navbar], [class*='Navbar'] {
+            opacity: 0.3 !important;
+            pointer-events: none !important;
+            transition: opacity 0.3s;
+          }
+          .glass-separator, [data-glassy-separator], [class*='separator'] {
+            opacity: 0 !important;
+            pointer-events: none !important;
+            transition: opacity 0.3s;
+          }
+        `}</style>
+      )}
+      {/* Fixed background behind everything, including under navbar */}
+      <div
+        className="fixed inset-0 z-0 bg-[#141414] pointer-events-none"
+        aria-hidden="true"
+      />{" "}
       {/* Background decorative elements */}
-      <div className="absolute top-20 left-10 w-32 h-32 bg-[#FEEBD8]/10 rounded-full blur-xl"></div>
-      <div className="absolute bottom-32 right-16 w-48 h-48 bg-blue-400/10 rounded-full blur-xl"></div>
-      <div className="absolute top-1/2 left-1/3 w-24 h-24 bg-purple-400/10 rounded-full blur-xl"></div>
-      <div className="absolute top-1/4 right-1/4 w-40 h-40 bg-indigo-400/8 rounded-full blur-xl"></div>
-
-      <div className="z-10 text-center px-6">
-        <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-[#FEEBD8] via-blue-300 to-purple-500 bg-clip-text text-transparent mb-6 font-climate-crisis text-content">
+      <div className="absolute top-20 left-10 w-32 h-32 bg-[#FEEBD8]/10 rounded-full blur-xl z-10"></div>
+      <div className="absolute bottom-32 right-16 w-48 h-48 bg-blue-400/10 rounded-full blur-xl z-10"></div>
+      <div className="absolute top-1/2 left-1/3 w-24 h-24 bg-purple-400/10 rounded-full blur-xl z-10"></div>
+      <div className="absolute top-1/4 right-1/4 w-40 h-40 bg-indigo-400/8 rounded-full blur-xl z-10"></div>
+      <div className="z-10 text-center px-6 mt-16">
+        <h1 className="text-6xl md:text-7xl font-bold bg-gradient-to-r from-[#FEEBD8] via-blue-300 to-purple-500 bg-clip-text text-transparent mb-6 font-climate-crisis text-content animate-hero-fade-in">
           Paccy
         </h1>
-        <p className="text-2xl md:text-3xl text-white/90 mb-6 font-bold tracking-wide text-content">
+        <p className="text-2xl md:text-3xl text-white/90 mb-6 font-bold tracking-wide text-content animate-hero-fade-in delay-200">
           Smart, AI-Powered College Application Platform
         </p>
-        <p className="text-lg md:text-xl text-[#FEEBD8]/80 max-w-3xl mx-auto mb-8 leading-relaxed font-medium text-content">
+        <p className="text-lg md:text-xl text-[#FEEBD8]/80 max-w-3xl mx-auto mb-8 leading-relaxed font-medium text-content animate-hero-fade-in delay-400">
           Navigate the complex college application process with structure,
           clarity, and collaboration. From AI essay feedback to peer networking
           - everything you need in one platform.
         </p>
 
         {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
+        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8 animate-fade-in-up delay-400">
           <button
             onClick={navigateToAuth}
             className="px-8 py-4 bg-gradient-to-r from-[#FEEBD8] to-blue-300 text-[#141414] font-bold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 min-w-[250px]"
@@ -358,11 +391,10 @@ export default function Home() {
           </div>
         </div>
       </div>
-
       {/* Interactive Feature Demo Modal */}
       {showFeatureDemo && (
-        <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-2 sm:p-4">
-          <div className="bg-[#1A1A1A] rounded-2xl sm:rounded-3xl border border-[#FEEBD8]/20 shadow-2xl max-w-4xl w-full mx-2 sm:mx-4 overflow-hidden max-h-[95vh] sm:max-h-[90vh] relative">
+        <div className="fixed inset-0 bg-black/90 z-[1200] flex items-center justify-center p-2 sm:p-4">
+          <div className="bg-[#1A1A1A] rounded-2xl sm:rounded-3xl border border-[#FEEBD8]/20 shadow-2xl max-w-4xl w-full mx-2 sm:mx-4 overflow-hidden max-h-[95vh] sm:max-h-[90vh] relative z-[1201]">
             {/* Custom Scrollable Content */}
             <div className="max-h-[95vh] sm:max-h-[90vh] overflow-y-auto scrollbar-hide">
               {/* Header */}
