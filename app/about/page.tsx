@@ -45,7 +45,7 @@ export default function About() {
 
           {/* Mission Section */}
           <div className="mb-20">
-            <div className="bg-gradient-to-r from-[#FEEBD8]/10 to-blue-300/10 rounded-2xl p-8 border border-[#FEEBD8]/20 ">
+            <div className="bg-gradient-to-r from-[#FEEBD8]/10 to-blue-300/10 rounded-2xl p-8 border border-[#FEEBD8]/20 backdrop-blur-sm">
               <div className="text-center">
                 <div className="text-5xl mb-6">🎯</div>
                 <h2 className="text-3xl font-bold text-[#FEEBD8] mb-4">

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import dynamic from "next/dynamic";
+import ClientPage from "./ClientPage";
 
 export const metadata: Metadata = {
   description:
@@ -8,8 +8,6 @@ export const metadata: Metadata = {
     "college applications, essay tracker, college admissions, academic planner, extracurricular manager, peer network, college prep, university applications",
 };
 
-import HomeClientWrapper from "./HomeClientWrapper";
-
-export default function Home() {
-  return <HomeClientWrapper />;
+export default function ServerWrapper() {
+  return <ClientPage />;
 }

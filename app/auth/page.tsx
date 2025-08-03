@@ -137,7 +137,7 @@ function AuthContent() {
           </div>
 
           {/* Auth Card */}
-          <div className="bg-[#1A1A1A] rounded-2xl p-8 border border-[#FEEBD8]/20">
+          <div className="bg-[#1A1A1A] rounded-2xl p-8 border border-[#FEEBD8]/20 backdrop-blur-sm">
             {/* Mode Toggle */}
             <div className="flex mb-8 bg-[#141414] rounded-xl p-1">
               <button
@@ -312,9 +312,9 @@ function AuthContent() {
 
             {/* Divider */}
             <div className="my-8 flex items-center">
-              {/* Removed separator, now only in Navbar */}
+              <div className="flex-1 border-t border-[#FEEBD8]/20"></div>
               <span className="px-4 text-white/50 text-sm">or</span>
-              {/* Removed separator, now only in Navbar */}
+              <div className="flex-1 border-t border-[#FEEBD8]/20"></div>
             </div>
 
             {/* Social Login */}

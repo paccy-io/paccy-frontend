@@ -237,3 +237,138 @@ select,
 .custom-scrollbar::-webkit-scrollbar-corner {
   background: transparent;
 }
+
+/* landing animations */
+@keyframes pulse-slow {
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+.animate-pulse-slow {
+  animation: pulse-slow 6s ease-in-out infinite;
+}
+@keyframes pulse-slower {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+.animate-pulse-slower {
+  animation: pulse-slower 10s ease-in-out infinite;
+}
+@keyframes float {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.08);
+  }
+}
+.animate-float {
+  animation: float 8s ease-in-out infinite;
+}
+
+/* Hero Section Animations (from /alpha) */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.animate-fade-in {
+  animation: fade-in 1.2s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-in-up {
+  animation: fade-in-up 1.2s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+@keyframes slide-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(80px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-slide-in-up {
+  animation: slide-in-up 1.3s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+.animate-hero-fade-in {
+  opacity: 0;
+  transform: translateY(40px);
+  animation: hero-fade-in 1.1s cubic-bezier(0.77, 0, 0.18, 1) forwards;
+  animation-fill-mode: forwards; /* animasyon bittiğinde son hali kalır */
+  animation-play-state: running;
+}
+.animate-hero-fade-in.delay-200 {
+  animation-delay: 0.2s;
+}
+.animate-hero-fade-in.delay-400 {
+  animation-delay: 0.4s;
+}
+@keyframes hero-fade-in {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-orb1 {
+  animation: orb1 7s cubic-bezier(0.77, 0, 0.18, 1) infinite alternate;
+}
+.animate-orb2 {
+  animation: orb2 9s cubic-bezier(0.77, 0, 0.18, 1) infinite alternate;
+}
+.animate-orb3 {
+  animation: orb3 8s cubic-bezier(0.77, 0, 0.18, 1) infinite alternate;
+}
+@keyframes orb1 {
+  0% {
+    transform: translateY(0) scale(1);
+    filter: blur(16px);
+  }
+  100% {
+    transform: translateY(-30px) scale(1.08);
+    filter: blur(24px);
+  }
+}
+@keyframes orb2 {
+  0% {
+    transform: translateY(0) scale(1);
+    filter: blur(18px);
+  }
+  100% {
+    transform: translateY(40px) scale(1.12);
+    filter: blur(28px);
+  }
+}
+@keyframes orb3 {
+  0% {
+    transform: translateY(0) scale(1);
+    filter: blur(12px);
+  }
+  100% {
+    transform: translateY(-20px) scale(1.15);
+    filter: blur(20px);
+  }
+}
