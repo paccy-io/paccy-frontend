@@ -22,12 +22,12 @@ export default function Navbar() {
     if (!user?.roles || !Array.isArray(user.roles)) {
       return "User";
     }
-    
+
     // If user has admin role, prioritize it
     if (user.roles.includes("admin")) {
       return "Admin";
     }
-    
+
     // Otherwise, take the first role and capitalize it
     const primaryRole = user.roles[0];
     return primaryRole.charAt(0).toUpperCase() + primaryRole.slice(1);

@@ -285,39 +285,42 @@ export default function Settings() {
             {userData?.profilePicture || userData?.avatar || user?.avatar ? (
               <div className="w-24 h-24 mx-auto mb-4 relative">
                 <img
-                  src={userData?.profilePicture || userData?.avatar || user?.avatar}
-                  alt={`${userData?.firstName || 'User'}'s profile`}
+                  src={
+                    userData?.profilePicture || userData?.avatar || user?.avatar
+                  }
+                  alt={`${userData?.firstName || "User"}'s profile`}
                   className="w-24 h-24 rounded-full object-cover border-2 border-[#FEEBD8]/30"
                   onError={(e) => {
                     // Fallback to initials if image fails to load
-                    e.currentTarget.style.display = 'none';
-                    const fallback = e.currentTarget.nextElementSibling as HTMLElement;
-                    if (fallback) fallback.style.display = 'flex';
+                    e.currentTarget.style.display = "none";
+                    const fallback = e.currentTarget
+                      .nextElementSibling as HTMLElement;
+                    if (fallback) fallback.style.display = "flex";
                   }}
                 />
                 {/* Fallback initials (hidden by default) */}
-                <div 
+                <div
                   className="w-24 h-24 bg-[#FEEBD8] rounded-full flex items-center justify-center absolute top-0 left-0"
-                  style={{ display: 'none' }}
+                  style={{ display: "none" }}
                 >
                   <span className="text-[#141414] text-2xl font-bold">
-                    {userData?.firstName?.[0] || 'U'}
-                    {userData?.lastName?.[0] || ''}
+                    {userData?.firstName?.[0] || "U"}
+                    {userData?.lastName?.[0] || ""}
                   </span>
                 </div>
               </div>
             ) : (
               <div className="w-24 h-24 bg-[#FEEBD8] rounded-full mx-auto mb-4 flex items-center justify-center">
                 <span className="text-[#141414] text-2xl font-bold">
-                  {userData?.firstName?.[0] || 'U'}
-                  {userData?.lastName?.[0] || ''}
+                  {userData?.firstName?.[0] || "U"}
+                  {userData?.lastName?.[0] || ""}
                 </span>
               </div>
             )}
             <button className="text-[#FEEBD8] hover:text-[#E5D5B7] transition-colors text-sm">
               Change Photo
             </button>
-            
+
             {/* User status badges */}
             <div className="flex flex-wrap justify-center gap-2 mt-3">
               {user?.verification_level && user.verification_level > 0 && (
@@ -327,7 +330,7 @@ export default function Settings() {
                   </span>
                 </div>
               )}
-              {userData?.plan && userData.plan !== 'Free' && (
+              {userData?.plan && userData.plan !== "Free" && (
                 <div className="bg-yellow-500/20 border border-yellow-400/30 rounded-full px-3 py-1">
                   <span className="text-yellow-400 text-xs font-medium">
                     ⭐ {userData.plan}
