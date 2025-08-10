@@ -2,19 +2,8 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
-  // Check if the request is for a dashboard route
-  if (request.nextUrl.pathname.startsWith("/dashboard")) {
-    // Check for authentication
-    const isAuthenticated = checkAuthentication(request);
-
-    if (!isAuthenticated) {
-      // Redirect to auth page if not authenticated
-      const authUrl = new URL("/auth", request.url);
-      authUrl.searchParams.set("redirect", request.nextUrl.pathname);
-      return NextResponse.redirect(authUrl);
-    }
-  }
-
+  // Authentication disabled - all pages are now public
+  // This allows access to dashboard and all other pages without authentication
   return NextResponse.next();
 }
 

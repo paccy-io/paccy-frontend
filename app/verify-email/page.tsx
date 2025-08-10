@@ -166,29 +166,31 @@ function VerifyEmailContent() {
 
 export default function VerifyEmail() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-[#141414] flex flex-col">
-        <Navbar />
-        <div className="flex-1 flex items-center justify-center px-4 py-20">
-          <div className="max-w-md w-full">
-            <div className="bg-[#1A1A1A] rounded-2xl border border-[#FEEBD8]/20 p-8">
-              <div className="text-center">
-                <div className="w-16 h-16 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-full flex items-center justify-center text-3xl mb-6 mx-auto animate-pulse">
-                  📧
-                </div>
-                <h1 className="text-3xl font-bold text-[#FEEBD8] mb-4">
-                  Loading...
-                </h1>
-                <div className="flex justify-center">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#FEEBD8]"></div>
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#141414] flex flex-col">
+          <Navbar />
+          <div className="flex-1 flex items-center justify-center px-4 py-20">
+            <div className="max-w-md w-full">
+              <div className="bg-[#1A1A1A] rounded-2xl border border-[#FEEBD8]/20 p-8">
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-full flex items-center justify-center text-3xl mb-6 mx-auto animate-pulse">
+                    📧
+                  </div>
+                  <h1 className="text-3xl font-bold text-[#FEEBD8] mb-4">
+                    Loading...
+                  </h1>
+                  <div className="flex justify-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#FEEBD8]"></div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
+          <Footer />
         </div>
-        <Footer />
-      </div>
-    }>
+      }
+    >
       <VerifyEmailContent />
     </Suspense>
   );
