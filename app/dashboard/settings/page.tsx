@@ -169,6 +169,24 @@ export default function Settings() {
     }
   }, []); // Only run once on mount
 
+  // Fetch fresh user data on page refresh/mount
+  useEffect(() => {
+    const fetchFreshUserData = async () => {
+      if (verifyTokenAndFetchUser && !loading) {
+        setDataLoading(true);
+        try {
+          await verifyTokenAndFetchUser();
+        } catch (error) {
+          console.warn("Failed to fetch fresh user data:", error);
+        } finally {
+          setDataLoading(false);
+        }
+      }
+    };
+
+    fetchFreshUserData();
+  }, []); // Run once when component mounts (page refresh)
+
   const handleUpgradeClick = () => {
     setAlertInfo({ show: true, planName: "Pro" });
   };
@@ -179,6 +197,19 @@ export default function Settings() {
 
   const handleLogout = () => {
     logout();
+  };
+
+  const handleRefreshData = async () => {
+    if (verifyTokenAndFetchUser && !dataLoading) {
+      setDataLoading(true);
+      try {
+        await verifyTokenAndFetchUser();
+      } catch (error) {
+        console.warn("Manual refresh failed:", error);
+      } finally {
+        setDataLoading(false);
+      }
+    }
   };
 
   // Show loading if auth is loading or we don't have user data yet
@@ -1034,6 +1065,30 @@ export default function Settings() {
                   <span className="text-blue-400 text-sm">Syncing...</span>
                 </div>
               )}
+              <button
+                onClick={handleRefreshData}
+                disabled={dataLoading}
+                className="flex items-center gap-2 bg-[#FEEBD8]/10 border border-[#FEEBD8]/30 rounded-lg px-3 py-1 hover:bg-[#FEEBD8]/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <svg
+                  className={`w-4 h-4 text-[#FEEBD8] ${
+                    dataLoading ? "animate-spin" : ""
+                  }`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  />
+                </svg>
+                <span className="text-[#FEEBD8] text-sm">
+                  {dataLoading ? "Refreshing..." : "Refresh"}
+                </span>
+              </button>
             </div>
           </div>
         </div>
