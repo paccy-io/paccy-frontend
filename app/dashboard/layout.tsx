@@ -8,9 +8,6 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <EnvironmentGuard requiredEnv="development">
-      <ProtectedRoute>{children}</ProtectedRoute>
-    </EnvironmentGuard>
-  );
+  // Dashboard is now public - no environment or authentication protection
+  return <>{children}</>;
 }

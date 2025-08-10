@@ -7,5 +7,6 @@ interface DashboardContentProps {
 }
 
 export default function DashboardContent({ children }: DashboardContentProps) {
-  return <ProtectedRoute>{children}</ProtectedRoute>;
+  // Dashboard is now public - no authentication protection
+  return <>{children}</>;
 }
