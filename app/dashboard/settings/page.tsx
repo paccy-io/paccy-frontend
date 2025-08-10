@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
+import { useAuth } from "../../../components/AuthProvider";
 import {
   FaArrowLeft,
   FaUser,
@@ -24,16 +25,12 @@ import {
   FaCrown,
 } from "react-icons/fa";
 
-// Mock user data
-const mockUserData = {
-  firstName: "Sarah",
-  lastName: "Johnson",
-  email: "sarah.johnson@email.com",
+// Mock data for fields not available in backend
+const mockFieldDefaults = {
   phone: "+1 (555) 123-4567",
   graduationYear: "2025",
   highSchool: "Lincoln High School",
   gpa: "3.95",
-  profilePicture: "/api/placeholder/100/100",
   plan: "Pro",
   planExpiry: "2025-06-15",
   privacy: {
@@ -51,12 +48,6 @@ const mockUserData = {
     weeklyReports: true,
     emailUpdates: true,
     pushNotifications: false,
-  },
-  preferences: {
-    theme: "dark",
-    timeFormat: "12h",
-    dateFormat: "MM/DD/YYYY",
-    defaultView: "dashboard",
   },
 };
 
@@ -86,18 +77,97 @@ const planFeatures = {
 };
 
 export default function Settings() {
-  const [userData, setUserData] = useState(mockUserData);
+  const { user, loading, logout, verifyTokenAndFetchUser } = useAuth();
+  const [userData, setUserData] = useState<any>(null);
   const [activeTab, setActiveTab] = useState("profile");
   const [isEditing, setIsEditing] = useState(false);
-  const [editedData, setEditedData] = useState(userData);
+  const [editedData, setEditedData] = useState<any>(null);
   const [alertInfo, setAlertInfo] = useState<{
     show: boolean;
     planName: string;
   }>({ show: false, planName: "" });
+  const [dataLoading, setDataLoading] = useState(false);
 
   useEffect(() => {
     document.title = "Settings | Paccy";
   }, []);
+
+  // Create user data from AuthProvider user or use mock data for missing fields
+  useEffect(() => {
+    if (user) {
+      const combinedUserData = {
+        // Real data from backend
+        firstName: user.first_name || user.name?.split(" ")[0] || "User",
+        lastName: user.last_name || user.name?.split(" ")[1] || "",
+        email: user.email,
+        username: user.username || "",
+
+        // Backend profile data or mock defaults
+        phone: user.profile?.phone || mockFieldDefaults.phone,
+        graduationYear:
+          user.profile?.graduation_year?.toString() ||
+          mockFieldDefaults.graduationYear,
+        highSchool: user.profile?.school || mockFieldDefaults.highSchool,
+        gpa: user.profile?.gpa || mockFieldDefaults.gpa,
+        profilePicture: user.profile?.avatar_url || user.avatar,
+        bio: user.profile?.bio || "",
+        website: user.profile?.website || "",
+
+        // Subscription data (mock for now)
+        plan: mockFieldDefaults.plan,
+        planExpiry: mockFieldDefaults.planExpiry,
+
+        // Privacy settings - merge backend with defaults
+        privacy: {
+          ...mockFieldDefaults.privacy,
+          isProfilePublic:
+            user.profile?.is_public_profile ??
+            mockFieldDefaults.privacy.isProfilePublic,
+        },
+
+        // Notifications - use backend preferences or defaults
+        notifications: {
+          deadlineReminders:
+            user.preferences?.email_notifications ??
+            mockFieldDefaults.notifications.deadlineReminders,
+          weeklyReports: mockFieldDefaults.notifications.weeklyReports,
+          emailUpdates:
+            user.preferences?.email_notifications ??
+            mockFieldDefaults.notifications.emailUpdates,
+          pushNotifications:
+            user.preferences?.push_notifications ??
+            mockFieldDefaults.notifications.pushNotifications,
+        },
+
+        // App preferences - use backend preferences or defaults
+        preferences: {
+          theme: user.preferences?.theme || "dark",
+          timeFormat: "12h",
+          dateFormat: "MM/DD/YYYY",
+          defaultView: "dashboard",
+          language: user.preferences?.language || "en",
+          timezone: user.preferences?.timezone || "UTC",
+        },
+      };
+
+      setUserData(combinedUserData);
+      setEditedData(combinedUserData);
+    }
+  }, [user]);
+
+  // Optional: Try to fetch fresh user data in background (non-blocking)
+  useEffect(() => {
+    if (user && verifyTokenAndFetchUser && !dataLoading) {
+      setDataLoading(true);
+      verifyTokenAndFetchUser()
+        .catch((error) => {
+          console.warn("Background user data fetch failed:", error);
+        })
+        .finally(() => {
+          setDataLoading(false);
+        });
+    }
+  }, []); // Only run once on mount
 
   const handleUpgradeClick = () => {
     setAlertInfo({ show: true, planName: "Pro" });
@@ -106,6 +176,26 @@ export default function Settings() {
   const closeAlert = () => {
     setAlertInfo({ show: false, planName: "" });
   };
+
+  const handleLogout = () => {
+    logout();
+  };
+
+  // Show loading if auth is loading or we don't have user data yet
+  if (loading || !userData) {
+    return (
+      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-[#FEEBD8] text-lg mb-4">
+            Loading your settings...
+          </div>
+          <div className="text-[#FEEBD8]/60 text-sm">
+            This should only take a moment
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const tabs = [
     { id: "profile", label: "Profile", icon: <FaUser /> },
@@ -127,7 +217,7 @@ export default function Settings() {
   };
 
   const updateNotification = (key: string, value: boolean) => {
-    setUserData((prev) => ({
+    setUserData((prev: any) => ({
       ...prev,
       notifications: {
         ...prev.notifications,
@@ -137,7 +227,7 @@ export default function Settings() {
   };
 
   const updatePreference = (key: string, value: string) => {
-    setUserData((prev) => ({
+    setUserData((prev: any) => ({
       ...prev,
       preferences: {
         ...prev.preferences,
@@ -147,7 +237,7 @@ export default function Settings() {
   };
 
   const updatePrivacy = (key: string, value: boolean) => {
-    setUserData((prev) => ({
+    setUserData((prev: any) => ({
       ...prev,
       privacy: {
         ...prev.privacy,
@@ -192,15 +282,59 @@ export default function Settings() {
         {/* Profile Picture */}
         <div className="bg-[#1a1a1a] border border-neutral-700 rounded-lg p-6">
           <div className="text-center">
-            <div className="w-24 h-24 bg-[#FEEBD8] rounded-full mx-auto mb-4 flex items-center justify-center">
-              <span className="text-[#141414] text-2xl font-bold">
-                {userData.firstName[0]}
-                {userData.lastName[0]}
-              </span>
-            </div>
+            {userData?.profilePicture || userData?.avatar || user?.avatar ? (
+              <div className="w-24 h-24 mx-auto mb-4 relative">
+                <img
+                  src={userData?.profilePicture || userData?.avatar || user?.avatar}
+                  alt={`${userData?.firstName || 'User'}'s profile`}
+                  className="w-24 h-24 rounded-full object-cover border-2 border-[#FEEBD8]/30"
+                  onError={(e) => {
+                    // Fallback to initials if image fails to load
+                    e.currentTarget.style.display = 'none';
+                    const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                    if (fallback) fallback.style.display = 'flex';
+                  }}
+                />
+                {/* Fallback initials (hidden by default) */}
+                <div 
+                  className="w-24 h-24 bg-[#FEEBD8] rounded-full flex items-center justify-center absolute top-0 left-0"
+                  style={{ display: 'none' }}
+                >
+                  <span className="text-[#141414] text-2xl font-bold">
+                    {userData?.firstName?.[0] || 'U'}
+                    {userData?.lastName?.[0] || ''}
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <div className="w-24 h-24 bg-[#FEEBD8] rounded-full mx-auto mb-4 flex items-center justify-center">
+                <span className="text-[#141414] text-2xl font-bold">
+                  {userData?.firstName?.[0] || 'U'}
+                  {userData?.lastName?.[0] || ''}
+                </span>
+              </div>
+            )}
             <button className="text-[#FEEBD8] hover:text-[#E5D5B7] transition-colors text-sm">
               Change Photo
             </button>
+            
+            {/* User status badges */}
+            <div className="flex flex-wrap justify-center gap-2 mt-3">
+              {user?.verification_level && user.verification_level > 0 && (
+                <div className="bg-blue-500/20 border border-blue-400/30 rounded-full px-3 py-1">
+                  <span className="text-blue-400 text-xs font-medium">
+                    ✓ Verified
+                  </span>
+                </div>
+              )}
+              {userData?.plan && userData.plan !== 'Free' && (
+                <div className="bg-yellow-500/20 border border-yellow-400/30 rounded-full px-3 py-1">
+                  <span className="text-yellow-400 text-xs font-medium">
+                    ⭐ {userData.plan}
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -218,7 +352,7 @@ export default function Settings() {
                 type="text"
                 value={isEditing ? editedData.firstName : userData.firstName}
                 onChange={(e) =>
-                  setEditedData((prev) => ({
+                  setEditedData((prev: any) => ({
                     ...prev,
                     firstName: e.target.value,
                   }))
@@ -235,7 +369,7 @@ export default function Settings() {
                 type="text"
                 value={isEditing ? editedData.lastName : userData.lastName}
                 onChange={(e) =>
-                  setEditedData((prev) => ({
+                  setEditedData((prev: any) => ({
                     ...prev,
                     lastName: e.target.value,
                   }))
@@ -252,7 +386,10 @@ export default function Settings() {
                 type="email"
                 value={isEditing ? editedData.email : userData.email}
                 onChange={(e) =>
-                  setEditedData((prev) => ({ ...prev, email: e.target.value }))
+                  setEditedData((prev: any) => ({
+                    ...prev,
+                    email: e.target.value,
+                  }))
                 }
                 disabled={!isEditing}
                 className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8] disabled:opacity-50"
@@ -266,7 +403,10 @@ export default function Settings() {
                 type="tel"
                 value={isEditing ? editedData.phone : userData.phone}
                 onChange={(e) =>
-                  setEditedData((prev) => ({ ...prev, phone: e.target.value }))
+                  setEditedData((prev: any) => ({
+                    ...prev,
+                    phone: e.target.value,
+                  }))
                 }
                 disabled={!isEditing}
                 className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8] disabled:opacity-50"
@@ -280,7 +420,7 @@ export default function Settings() {
                 type="text"
                 value={isEditing ? editedData.highSchool : userData.highSchool}
                 onChange={(e) =>
-                  setEditedData((prev) => ({
+                  setEditedData((prev: any) => ({
                     ...prev,
                     highSchool: e.target.value,
                   }))
@@ -301,7 +441,7 @@ export default function Settings() {
                     : userData.graduationYear
                 }
                 onChange={(e) =>
-                  setEditedData((prev) => ({
+                  setEditedData((prev: any) => ({
                     ...prev,
                     graduationYear: e.target.value,
                   }))
@@ -871,13 +1011,27 @@ export default function Settings() {
           >
             <FaArrowLeft size={20} />
           </Link>
-          <div>
+          <div className="flex-1">
             <h1 className="text-4xl font-bold text-[#FEEBD8]">
               Settings & Account
             </h1>
-            <p className="text-[#FEEBD8]/70 mt-2">
-              Manage your account settings and preferences
-            </p>
+            <div className="flex items-center gap-4 mt-2">
+              <p className="text-[#FEEBD8]/70">
+                Manage your account settings and preferences
+              </p>
+              {user && (
+                <div className="flex items-center gap-2 bg-green-900/20 border border-green-600/30 rounded-lg px-3 py-1">
+                  <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                  <span className="text-green-400 text-sm">Live Data</span>
+                </div>
+              )}
+              {dataLoading && (
+                <div className="flex items-center gap-2 bg-blue-900/20 border border-blue-600/30 rounded-lg px-3 py-1">
+                  <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
+                  <span className="text-blue-400 text-sm">Syncing...</span>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -902,7 +1056,10 @@ export default function Settings() {
                 ))}
               </nav>
 
-              <button className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-red-400 hover:bg-red-500/10 transition-colors mt-4">
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-red-400 hover:bg-red-500/10 transition-colors mt-4"
+              >
                 <FaSignOutAlt />
                 <span>Sign Out</span>
               </button>

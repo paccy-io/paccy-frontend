@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "../../components/AuthProvider";
 import { authenticateUser, checkEnvironment } from "../actions/auth";
+import { API_BASE_URL, API_ENDPOINTS } from "../../config/api";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 
@@ -14,6 +15,7 @@ function AuthContent() {
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [showDevModal, setShowDevModal] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
@@ -21,6 +23,7 @@ function AuthContent() {
     confirmPassword: "",
     firstName: "",
     lastName: "",
+    username: "",
     acceptTerms: false,
   });
 
@@ -47,32 +50,274 @@ function AuthContent() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setSuccess("");
     setLoading(true);
 
     try {
-      // Use server action to check environment and handle auth
-      const result = await authenticateUser(
-        formData.email,
-        formData.password,
-        isLogin,
-        searchParams.get("redirect") || "/dashboard"
-      );
-
-      if (result.success) {
-        // In development, proceed with login
-        const loginSuccess = await login(formData.email, formData.password);
-        if (loginSuccess && result.redirect) {
-          router.push(result.redirect);
+      if (isLogin) {
+        // Handle Login using backend API
+        // Validate form
+        if (!formData.email || !formData.password) {
+          setError("Please fill in all fields");
+          return;
         }
-      } else if (result.error === "AUTH_NOT_AVAILABLE") {
-        // In production, show the modal
-        setShowDevModal(true);
+        // Make API call for login
+        const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.LOGIN}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: formData.email,
+            password: formData.password,
+          }),
+        });
+        if (response.ok) {
+          const loginData = await response.json();
+          console.log("Login successful:", loginData); // Debug log
+
+          // Check if user is verified from backend response
+          const isVerified =
+            loginData.is_verified ||
+            loginData.verified ||
+            loginData.email_verified ||
+            true; // Default to true if not specified
+
+          if (!isVerified) {
+            setError(
+              "Please verify your email address before signing in. Check your inbox for a verification link."
+            );
+            return;
+          }
+
+          // Handle successful login - store token for verification
+          const token = loginData.data.token || loginData.data.access_token;
+
+          if (token) {
+            // Store token temporarily for dashboard verification process
+            localStorage.setItem("auth-token", token);
+            document.cookie = `auth-token=${token}; path=/; max-age=86400`; // 24 hours
+
+            // Basic user data for immediate auth state
+            const basicUserData = {
+              id: loginData.id,
+              email: loginData.email || formData.email,
+              name:
+                loginData.name ||
+                loginData.first_name + " " + loginData.last_name ||
+                formData.email,
+              verified: isVerified,
+            };
+
+            // Use the updated AuthProvider login method with basic data
+            // Full user data will be fetched by dashboard via verifyTokenAndFetchUser
+            const loginSuccess = await login(basicUserData, token);
+            if (loginSuccess) {
+              const redirectPath = searchParams.get("redirect") || "/dashboard";
+              router.push(redirectPath);
+            } else {
+              setError("Failed to complete login. Please try again.");
+            }
+          } else {
+            setError("No authentication token received. Please try again.");
+          }
+        } else {
+          console.log("Login failed with status:", response.status); // Debug log
+
+          let errorMessage = "Login failed. Please try again.";
+
+          // Handle different HTTP status codes
+          if (response.status === 400) {
+            errorMessage = "Invalid email or password.";
+          } else if (response.status === 401) {
+            errorMessage = "Invalid email or password.";
+          } else if (response.status === 403) {
+            errorMessage = "Account is not verified. Please check your email.";
+          } else if (response.status === 429) {
+            errorMessage =
+              "Too many login attempts. Please wait a moment and try again.";
+          } else if (response.status === 500) {
+            errorMessage = "Server error. Please try again later.";
+          }
+
+          try {
+            const errorData = await response.json();
+            console.log("Login error data:", errorData); // Debug log
+
+            // Handle different error response structures
+            if (errorData.message) {
+              errorMessage = errorData.message;
+            } else if (errorData.error) {
+              errorMessage = errorData.error;
+            } else if (errorData.detail) {
+              errorMessage = errorData.detail;
+            } else if (typeof errorData === "string") {
+              errorMessage = errorData;
+            } else if (
+              errorData.non_field_errors &&
+              Array.isArray(errorData.non_field_errors)
+            ) {
+              errorMessage = errorData.non_field_errors.join(", ");
+            }
+          } catch (parseError) {
+            console.error("Failed to parse error response:", parseError);
+            // Keep the status-based error message if JSON parsing fails
+          }
+
+          setError(errorMessage);
+        }
       } else {
-        // Invalid credentials or signup not available in development
-        setError(result.error || "Authentication failed");
+        // Handle Registration using API
+        // Validate form
+        if (
+          !formData.firstName ||
+          !formData.lastName ||
+          !formData.username ||
+          !formData.email ||
+          !formData.password ||
+          !formData.confirmPassword
+        ) {
+          setError("Please fill in all fields");
+          return;
+        }
+
+        if (formData.password !== formData.confirmPassword) {
+          setError("Passwords do not match");
+          return;
+        }
+
+        if (formData.password.length < 8) {
+          setError("Password must be at least 8 characters long");
+          return;
+        }
+
+        if (!formData.acceptTerms) {
+          setError("You must accept the Terms of Service to continue");
+          return;
+        }
+
+        // Make API call for registration
+        const response = await fetch(
+          `${API_BASE_URL}${API_ENDPOINTS.REGISTER}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              email: formData.email,
+              username: formData.username,
+              first_name: formData.firstName,
+              last_name: formData.lastName,
+              password: formData.password,
+              terms_accepted: formData.acceptTerms,
+            }),
+          }
+        );
+
+        if (response.ok) {
+          // Registration successful - switch to login mode
+          setIsLogin(true);
+          setFormData({
+            email: formData.email, // Keep email for convenience
+            password: "",
+            confirmPassword: "",
+            firstName: "",
+            lastName: "",
+            username: "",
+            acceptTerms: false,
+          });
+          setError("");
+          // Show success message
+          setSuccess(
+            "Registration successful! Please check your email to verify your account."
+          );
+        } else {
+          console.log("Registration failed with status:", response.status); // Debug log
+
+          let errorMessage = "Registration failed. Please try again.";
+
+          // Handle different HTTP status codes
+          if (response.status === 400) {
+            errorMessage =
+              "Invalid registration data. Please check your inputs.";
+          } else if (response.status === 409) {
+            errorMessage =
+              "An account with this email or username already exists.";
+          } else if (response.status === 422) {
+            errorMessage = "Validation error. Please check your inputs.";
+          } else if (response.status === 500) {
+            errorMessage = "Server error. Please try again later.";
+          } else if (response.status === 429) {
+            errorMessage =
+              "Too many requests. Please wait a moment and try again.";
+          }
+
+          try {
+            const errorData = await response.json();
+            console.log("Registration error data:", errorData); // Debug log
+
+            // Handle different error response structures
+            if (errorData.message) {
+              errorMessage = errorData.message;
+            } else if (errorData.error) {
+              errorMessage = errorData.error;
+            } else if (errorData.detail) {
+              errorMessage = errorData.detail;
+            } else if (typeof errorData === "string") {
+              errorMessage = errorData;
+            } else if (errorData.errors && Array.isArray(errorData.errors)) {
+              // Handle validation errors array
+              errorMessage = errorData.errors.join(", ");
+            } else if (
+              errorData.non_field_errors &&
+              Array.isArray(errorData.non_field_errors)
+            ) {
+              // Handle Django-style errors
+              errorMessage = errorData.non_field_errors.join(", ");
+            } else if (typeof errorData === "object") {
+              // Handle field-specific errors
+              const fieldErrors = [];
+              for (const [field, errors] of Object.entries(errorData)) {
+                if (
+                  field === "email" ||
+                  field === "username" ||
+                  field === "password" ||
+                  field === "first_name" ||
+                  field === "last_name"
+                ) {
+                  if (Array.isArray(errors)) {
+                    fieldErrors.push(`${field}: ${errors.join(", ")}`);
+                  } else if (typeof errors === "string") {
+                    fieldErrors.push(`${field}: ${errors}`);
+                  }
+                }
+              }
+              if (fieldErrors.length > 0) {
+                errorMessage = fieldErrors.join("; ");
+              }
+            }
+          } catch (parseError) {
+            console.error("Failed to parse error response:", parseError);
+            // Keep the status-based error message if JSON parsing fails
+          }
+
+          setError(errorMessage);
+        }
       }
     } catch (err) {
-      setError("Authentication failed. Please try again.");
+      console.error("Authentication error:", err); // Debug log
+
+      // More detailed error handling for both login and registration
+      if (err instanceof TypeError && err.message.includes("fetch")) {
+        setError(
+          "Unable to connect to server. Please check your internet connection."
+        );
+      } else if (err instanceof Error) {
+        setError(`Network error: ${err.message}`);
+      } else {
+        setError("Network error. Please check your connection and try again.");
+      }
     } finally {
       setLoading(false);
     }
@@ -90,6 +335,8 @@ function AuthContent() {
 
   const toggleMode = () => {
     setIsLogin(!isLogin);
+    setError("");
+    setSuccess("");
     // Reset form when switching modes
     setFormData({
       email: "",
@@ -97,6 +344,7 @@ function AuthContent() {
       confirmPassword: "",
       firstName: "",
       lastName: "",
+      username: "",
       acceptTerms: false,
     });
   };
@@ -166,32 +414,48 @@ function AuthContent() {
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Name Fields (Register only) */}
               {!isLogin && (
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-[#FEEBD8] text-sm font-medium mb-2">
-                      First Name
-                    </label>
-                    <input
-                      type="text"
-                      name="firstName"
-                      value={formData.firstName}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 bg-[#141414] border border-[#FEEBD8]/20 rounded-xl text-white placeholder-white/50 focus:border-[#FEEBD8] focus:outline-none transition-colors"
-                      placeholder="John"
-                      required={!isLogin}
-                    />
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-[#FEEBD8] text-sm font-medium mb-2">
+                        First Name
+                      </label>
+                      <input
+                        type="text"
+                        name="firstName"
+                        value={formData.firstName}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 bg-[#141414] border border-[#FEEBD8]/20 rounded-xl text-white placeholder-white/50 focus:border-[#FEEBD8] focus:outline-none transition-colors"
+                        placeholder="John"
+                        required={!isLogin}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[#FEEBD8] text-sm font-medium mb-2">
+                        Last Name
+                      </label>
+                      <input
+                        type="text"
+                        name="lastName"
+                        value={formData.lastName}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 bg-[#141414] border border-[#FEEBD8]/20 rounded-xl text-white placeholder-white/50 focus:border-[#FEEBD8] focus:outline-none transition-colors"
+                        placeholder="Doe"
+                        required={!isLogin}
+                      />
+                    </div>
                   </div>
                   <div>
                     <label className="block text-[#FEEBD8] text-sm font-medium mb-2">
-                      Last Name
+                      Username
                     </label>
                     <input
                       type="text"
-                      name="lastName"
-                      value={formData.lastName}
+                      name="username"
+                      value={formData.username}
                       onChange={handleInputChange}
                       className="w-full px-4 py-3 bg-[#141414] border border-[#FEEBD8]/20 rounded-xl text-white placeholder-white/50 focus:border-[#FEEBD8] focus:outline-none transition-colors"
-                      placeholder="Doe"
+                      placeholder="johndoe"
                       required={!isLogin}
                     />
                   </div>
@@ -261,13 +525,21 @@ function AuthContent() {
                   />
                   <label className="text-white/70 text-sm">
                     I agree to the{" "}
-                    <a href="#" className="text-[#FEEBD8] hover:underline">
+                    <button
+                      type="button"
+                      onClick={() => window.open("/terms", "_blank")}
+                      className="text-[#FEEBD8] hover:underline bg-transparent border-none cursor-pointer"
+                    >
                       Terms of Service
-                    </a>{" "}
+                    </button>{" "}
                     and{" "}
-                    <a href="#" className="text-[#FEEBD8] hover:underline">
+                    <button
+                      type="button"
+                      onClick={() => window.open("/privacy", "_blank")}
+                      className="text-[#FEEBD8] hover:underline bg-transparent border-none cursor-pointer"
+                    >
                       Privacy Policy
-                    </a>
+                    </button>
                   </label>
                 </div>
               )}
@@ -288,6 +560,13 @@ function AuthContent() {
               {error && (
                 <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 mb-4">
                   <p className="text-red-400 text-sm">{error}</p>
+                </div>
+              )}
+
+              {/* Success Display */}
+              {success && (
+                <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3 mb-4">
+                  <p className="text-green-400 text-sm">{success}</p>
                 </div>
               )}
 

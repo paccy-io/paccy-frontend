@@ -4,14 +4,7 @@ import type { NextRequest } from "next/server";
 export function middleware(request: NextRequest) {
   // Check if the request is for a dashboard route
   if (request.nextUrl.pathname.startsWith("/dashboard")) {
-    // In production, completely block dashboard access
-    if (process.env.NODE_ENV === "production") {
-      // Redirect to custom 403 page
-      const forbiddenUrl = new URL("/403", request.url);
-      return NextResponse.redirect(forbiddenUrl);
-    }
-
-    // In development, check for authentication
+    // Check for authentication
     const isAuthenticated = checkAuthentication(request);
 
     if (!isAuthenticated) {
@@ -26,11 +19,6 @@ export function middleware(request: NextRequest) {
 }
 
 function checkAuthentication(request: NextRequest): boolean {
-  // Only allow authentication in development
-  if (process.env.NODE_ENV !== "development") {
-    return false;
-  }
-
   // Check for auth token in cookies
   const authToken = request.cookies.get("auth-token");
 

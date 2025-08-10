@@ -17,6 +17,22 @@ export default function Navbar() {
   const pathname = usePathname();
   const isDashboard = pathname?.startsWith("/dashboard");
 
+  // Function to format user role display
+  const formatUserRole = (user: any) => {
+    if (!user?.roles || !Array.isArray(user.roles)) {
+      return "User";
+    }
+    
+    // If user has admin role, prioritize it
+    if (user.roles.includes("admin")) {
+      return "Admin";
+    }
+    
+    // Otherwise, take the first role and capitalize it
+    const primaryRole = user.roles[0];
+    return primaryRole.charAt(0).toUpperCase() + primaryRole.slice(1);
+  };
+
   // Environment check for dashboard visibility
   const [isDevelopment, setIsDevelopment] = useState(false);
 
@@ -119,7 +135,7 @@ export default function Navbar() {
                                 {user?.name || user?.email}
                               </p>
                               <p className="text-[#FEEBD8]/70 text-xs">
-                                {user?.role || "User"}
+                                {formatUserRole(user)}
                               </p>
                             </div>
                             {/* Menu Items */}
@@ -323,7 +339,7 @@ export default function Navbar() {
                             {user?.name || user?.email}
                           </p>
                           <p className="text-[#FEEBD8]/70 text-xs">
-                            {user?.role || "User"}
+                            {formatUserRole(user)}
                           </p>
                         </div>
                       </div>

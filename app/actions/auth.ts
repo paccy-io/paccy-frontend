@@ -12,40 +12,27 @@ export async function authenticateUser(
   isLogin: boolean,
   redirectPath?: string
 ): Promise<AuthResponse> {
-  // Server-side environment check
-  const isDevelopment = process.env.NODE_ENV === "development";
+  // For now, allow development admin access
+  if (isLogin) {
+    const ADMIN_EMAIL = "admin@paccy.io";
+    const ADMIN_PASSWORD = "123";
 
-  if (isDevelopment) {
-    if (isLogin) {
-      // Development environment - allow actual login
-      const ADMIN_EMAIL = "admin@paccy.io";
-      const ADMIN_PASSWORD = "123";
-
-      if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
-        return {
-          success: true,
-          redirect: redirectPath || "/dashboard",
-        };
-      } else {
-        return {
-          success: false,
-          error:
-            "Invalid email or password. Use admin@paccy.io / 123",
-        };
-      }
+    if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+      return {
+        success: true,
+        redirect: redirectPath || "/dashboard",
+      };
     } else {
-      // Signup not available in development
       return {
         success: false,
-        error:
-          "Sign up is not available in development. Please use admin credentials to login.",
+        error: "Invalid email or password.",
       };
     }
   } else {
-    // Production environment - block authentication
+    // Signup functionality will use the registration page instead
     return {
       success: false,
-      error: "AUTH_NOT_AVAILABLE",
+      error: "Please use the registration page to create an account.",
     };
   }
 }

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
+import { useAuth } from "../../components/AuthProvider";
 import {
   FaUniversity,
   FaPen,
@@ -18,7 +19,7 @@ import {
   FaArrowRight,
 } from "react-icons/fa";
 
-// Mock user data - in real app this would come from authentication
+// Mock user data - fallback when no real data is available
 const mockUser = {
   name: "John Doe",
   email: "john@example.com",
@@ -27,6 +28,11 @@ const mockUser = {
   applications: 3,
   saved: 8,
   profileViews: 12,
+  school: "Not specified",
+  graduationYear: "Not specified",
+  bio: "No bio added yet",
+  theme: "dark",
+  verificationLevel: 1,
 };
 
 // Quick actions data
@@ -123,16 +129,108 @@ const dashboardSections = [
 
 export default function Dashboard() {
   const router = useRouter();
+  const { isAuthenticated, user, loading, verifyTokenAndFetchUser } = useAuth();
 
   useEffect(() => {
     document.title = "Dashboard | Paccy";
   }, []);
 
-  // In a real app, you'd check authentication here
+  // Simple auth check - redirect if not authenticated after loading is done
   useEffect(() => {
-    // Mock authentication check - redirect to auth if not logged in
-    // For demo purposes, we'll assume user is logged in
-  }, []);
+    if (!loading && !isAuthenticated) {
+      router.push("/auth");
+    }
+  }, [loading, isAuthenticated, router]);
+
+  // Optional: Try to fetch fresh user data in background (non-blocking)
+  useEffect(() => {
+    if (!loading && isAuthenticated && verifyTokenAndFetchUser) {
+      // Only run this once when component mounts and user is authenticated
+      verifyTokenAndFetchUser().catch((error) => {
+        console.warn("Background user data fetch failed:", error);
+        // Silently fail - don't block the UI
+      });
+    }
+  }, []); // Empty dependency array - only run once on mount
+
+  // Calculate profile completion based on real user data
+  const calculateProfileCompletion = (user: any) => {
+    if (!user) return 0;
+
+    let completion = 0;
+    const totalFields = 10;
+
+    // Basic info
+    if (user.first_name) completion++;
+    if (user.last_name) completion++;
+    if (user.email) completion++;
+    if (user.username) completion++;
+
+    // Profile info
+    if (user.profile?.bio) completion++;
+    if (user.profile?.school) completion++;
+    if (user.profile?.graduation_year && user.profile.graduation_year > 0)
+      completion++;
+    if (user.profile?.website) completion++;
+    if (user.profile?.avatar_url) completion++;
+
+    // Preferences
+    if (user.preferences) completion++;
+
+    return Math.round((completion / totalFields) * 100);
+  };
+
+  // Get current user data (real or mock)
+  const getCurrentUser = () => {
+    if (user) {
+      const profileCompletion = calculateProfileCompletion(user);
+      const createdDate = user.created_at
+        ? new Date(user.created_at)
+        : new Date();
+      const memberSince = createdDate.toLocaleDateString("en-US", {
+        month: "long",
+        year: "numeric",
+      });
+
+      return {
+        name:
+          user.name ||
+          `${user.first_name || ""} ${user.last_name || ""}`.trim() ||
+          user.username ||
+          user.email,
+        email: user.email,
+        profileCompletion,
+        memberSince,
+        applications: 3, // Mock data - would come from API
+        saved: 8, // Mock data - would come from API
+        profileViews: 12, // Mock data - would come from API
+        school: user.profile?.school || "Not specified",
+        graduationYear: user.profile?.graduation_year || "Not specified",
+        bio: user.profile?.bio || "No bio added yet",
+        theme: user.preferences?.theme || "dark",
+        verificationLevel: user.verification_level || 1,
+      };
+    }
+    return mockUser;
+  };
+
+  // Show loading state - only while auth is loading
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-[#FEEBD8] text-lg mb-4">
+            Loading your dashboard...
+          </div>
+          <div className="text-[#FEEBD8]/60 text-sm">
+            This should only take a moment
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const currentUser = getCurrentUser();
 
   return (
     <div className="min-h-screen bg-[#0a0a0a]">
@@ -142,7 +240,7 @@ export default function Dashboard() {
         {/* Welcome Section */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-[#FEEBD8] mb-2">
-            Welcome back, {mockUser.name}! 👋
+            Welcome back, {currentUser.name}! 👋
           </h1>
           <p className="text-[#FEEBD8]/70 text-lg">
             Let's continue building your future together.
@@ -153,28 +251,28 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6 hover:border-[#FEEBD8]/30 transition-colors">
             <div className="text-2xl font-bold text-[#FEEBD8] mb-1">
-              {mockUser.applications}
+              {currentUser.applications}
             </div>
             <div className="text-[#FEEBD8]/70 text-sm">Active Applications</div>
           </div>
 
           <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6 hover:border-[#FEEBD8]/30 transition-colors">
             <div className="text-2xl font-bold text-[#FEEBD8] mb-1">
-              {mockUser.saved}
+              {currentUser.saved}
             </div>
             <div className="text-[#FEEBD8]/70 text-sm">Saved Universities</div>
           </div>
 
           <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6 hover:border-[#FEEBD8]/30 transition-colors">
             <div className="text-2xl font-bold text-[#FEEBD8] mb-1">
-              {mockUser.profileViews}
+              {currentUser.profileViews}
             </div>
             <div className="text-[#FEEBD8]/70 text-sm">Profile Views</div>
           </div>
 
           <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6 hover:border-[#FEEBD8]/30 transition-colors">
             <div className="text-2xl font-bold text-[#FEEBD8] mb-1">
-              {mockUser.profileCompletion}%
+              {currentUser.profileCompletion}%
             </div>
             <div className="text-[#FEEBD8]/70 text-sm">Profile Complete</div>
           </div>
@@ -248,15 +346,25 @@ export default function Dashboard() {
           <div className="mb-4">
             <div className="flex justify-between text-sm text-[#FEEBD8]/70 mb-2">
               <span>Profile Completion</span>
-              <span>{mockUser.profileCompletion}%</span>
+              <span>{currentUser.profileCompletion}%</span>
             </div>
             <div className="w-full bg-neutral-700 rounded-full h-2">
               <div
                 className="bg-gradient-to-r from-[#FEEBD8] to-[#E5D5B7] h-2 rounded-full transition-all duration-300"
-                style={{ width: `${mockUser.profileCompletion}%` }}
+                style={{ width: `${currentUser.profileCompletion}%` }}
               ></div>
             </div>
           </div>
+          {user && (
+            <div className="mb-4 space-y-2 text-sm text-[#FEEBD8]/70">
+              <div>School: {currentUser.school}</div>
+              <div>Graduation Year: {currentUser.graduationYear}</div>
+              <div>Member Since: {currentUser.memberSince}</div>
+              {user.verification_level && (
+                <div>Verification Level: {user.verification_level}</div>
+              )}
+            </div>
+          )}
           <Link
             href="/dashboard/settings"
             className="inline-block bg-[#FEEBD8] text-[#141414] px-4 py-2 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors"
