@@ -1124,7 +1124,10 @@ export default function Settings() {
       <div className="bg-[#1a1a1a] border border-neutral-700 rounded-lg p-6">
         <div className="space-y-4">
           {Object.entries(userData.notifications).map(([key, value]) => (
-            <div key={key} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-3 sm:p-0">
+            <div
+              key={key}
+              className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-3 sm:p-0"
+            >
               <div className="flex-1 min-w-0">
                 <h3 className="text-[#FEEBD8] font-medium text-sm sm:text-base">
                   {key
@@ -1331,7 +1334,9 @@ export default function Settings() {
         <div className="space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-3 sm:p-0">
             <div className="flex-1 min-w-0">
-              <h4 className="text-[#FEEBD8] font-medium text-sm sm:text-base">Profile Visibility</h4>
+              <h4 className="text-[#FEEBD8] font-medium text-sm sm:text-base">
+                Profile Visibility
+              </h4>
               <p className="text-[#FEEBD8]/60 text-xs sm:text-sm mt-1 pr-2">
                 {userData.privacy.isProfilePublic
                   ? "Your profile is visible to other users and can be found in search results"
@@ -1476,7 +1481,9 @@ export default function Settings() {
               >
                 <span
                   className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    userData.privacy.showEmail ? "translate-x-6" : "translate-x-1"
+                    userData.privacy.showEmail
+                      ? "translate-x-6"
+                      : "translate-x-1"
                   }`}
                 />
               </button>
@@ -1503,7 +1510,9 @@ export default function Settings() {
               >
                 <span
                   className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    userData.privacy.showPhone ? "translate-x-6" : "translate-x-1"
+                    userData.privacy.showPhone
+                      ? "translate-x-6"
+                      : "translate-x-1"
                   }`}
                 />
               </button>
@@ -1512,7 +1521,9 @@ export default function Settings() {
 
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-3 sm:p-0">
             <div className="flex-1 min-w-0">
-              <h4 className="text-[#FEEBD8] font-medium text-sm sm:text-base">Allow Messaging *</h4>
+              <h4 className="text-[#FEEBD8] font-medium text-sm sm:text-base">
+                Allow Messaging *
+              </h4>
               <p className="text-[#FEEBD8]/60 text-xs sm:text-sm mt-1 pr-2">
                 Let other users send you direct messages
               </p>
@@ -1552,7 +1563,9 @@ export default function Settings() {
         <div className="space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-3 sm:p-0">
             <div className="flex-1 min-w-0">
-              <h4 className="text-[#FEEBD8] font-medium text-sm sm:text-base">Data Collection *</h4>
+              <h4 className="text-[#FEEBD8] font-medium text-sm sm:text-base">
+                Data Collection *
+              </h4>
               <p className="text-[#FEEBD8]/60 text-xs sm:text-sm mt-1 pr-2">
                 Allow us to collect usage data to improve your experience
               </p>
@@ -1602,7 +1615,9 @@ export default function Settings() {
               >
                 <span
                   className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    userData.privacy.analytics ? "translate-x-6" : "translate-x-1"
+                    userData.privacy.analytics
+                      ? "translate-x-6"
+                      : "translate-x-1"
                   }`}
                 />
               </button>
