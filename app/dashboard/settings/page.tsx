@@ -5,6 +5,7 @@ import Link from "next/link";
 import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
 import { useAuth } from "../../../components/AuthProvider";
+import { API_BASE_URL } from "../../../config/api";
 import {
   FaArrowLeft,
   FaUser,
@@ -33,6 +34,16 @@ const mockFieldDefaults = {
   gpa: "3.95",
   plan: "Pro",
   planExpiry: "2025-06-15",
+  location: "",
+  birthdate: "",
+  socialLinks: {
+    linkedin: "",
+    twitter: "",
+    instagram: "",
+    facebook: "",
+    website: "",
+    github: "",
+  },
   privacy: {
     isProfilePublic: false,
     showEmail: false,
@@ -44,10 +55,9 @@ const mockFieldDefaults = {
     searchableProfile: false,
   },
   notifications: {
-    deadlineReminders: true,
-    weeklyReports: true,
-    emailUpdates: true,
+    emailNotifications: true,
     pushNotifications: false,
+    weeklyReports: true,
   },
 };
 
@@ -78,6 +88,92 @@ const planFeatures = {
 
 export default function Settings() {
   const { user, loading, logout, verifyTokenAndFetchUser } = useAuth();
+
+  // API functions for updating user data
+  const updateUserFields = async (fields: any) => {
+    try {
+      const token = localStorage.getItem("auth-token");
+      const response = await fetch(`${API_BASE_URL}/users/${user?.id}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(fields),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to update user fields");
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Error updating user fields:", error);
+      throw error;
+    }
+  };
+
+  const updateUserProfile = async (profileData: any) => {
+    try {
+      const token = localStorage.getItem("auth-token");
+
+      const response = await fetch(
+        `${API_BASE_URL}/users/${user?.id}/profile`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(profileData),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Profile update failed:", errorData);
+        throw new Error(errorData.message || "Failed to update user profile");
+      }
+
+      const result = await response.json();
+      console.log("Profile update success:", result);
+      return result;
+    } catch (error) {
+      console.error("Error updating user profile:", error);
+      throw error;
+    }
+  };
+
+  const updateUserPreferences = async (preferences: any) => {
+    try {
+      const token = localStorage.getItem("auth-token");
+      const response = await fetch(
+        `${API_BASE_URL}/users/${user?.id}/preferences`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(preferences),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          errorData.message || "Failed to update user preferences"
+        );
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Error updating user preferences:", error);
+      throw error;
+    }
+  };
+
   const [userData, setUserData] = useState<any>(null);
   const [activeTab, setActiveTab] = useState("profile");
   const [isEditing, setIsEditing] = useState(false);
@@ -87,6 +183,48 @@ export default function Settings() {
     planName: string;
   }>({ show: false, planName: "" });
   const [dataLoading, setDataLoading] = useState(false);
+  const [showProfilePictureModal, setShowProfilePictureModal] = useState(false);
+  const [newProfilePictureUrl, setNewProfilePictureUrl] = useState("");
+  const [previewImageStatus, setPreviewImageStatus] = useState<
+    "loading" | "loaded" | "error" | "idle"
+  >("idle");
+
+  // Loading and error states for API calls
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [updateError, setUpdateError] = useState<string | null>(null);
+  const [updateSuccess, setUpdateSuccess] = useState<string | null>(null);
+
+  // Helper function to convert ISO date to MM-DD-YYYY
+  const formatDateToDisplay = (isoDate: string): string => {
+    if (!isoDate) return "";
+    try {
+      const date = new Date(isoDate);
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      const year = date.getFullYear();
+      return `${month}-${day}-${year}`;
+    } catch (error) {
+      console.warn("Invalid date format:", isoDate);
+      return "";
+    }
+  };
+
+  // Helper function to format MM-DD-YYYY for API (keep same format)
+  const formatDateToAPI = (mmddyyyy: string): string => {
+    if (!mmddyyyy) return "";
+    try {
+      const parts = mmddyyyy.split("-");
+      if (parts.length !== 3) return "";
+      const [month, day, year] = parts;
+      // Return MM-DD-YYYY format as string (same as input but ensure padding)
+      const formattedMonth = month.padStart(2, "0");
+      const formattedDay = day.padStart(2, "0");
+      return `${formattedMonth}-${formattedDay}-${year}`;
+    } catch (error) {
+      console.warn("Invalid date format:", mmddyyyy);
+      return "";
+    }
+  };
 
   useEffect(() => {
     document.title = "Settings | Paccy";
@@ -112,6 +250,12 @@ export default function Settings() {
         profilePicture: user.profile?.avatar_url || user.avatar,
         bio: user.profile?.bio || "",
         website: user.profile?.website || "",
+        location: user.profile?.location || mockFieldDefaults.location,
+        birthdate:
+          formatDateToDisplay(user.profile?.birthdate) ||
+          mockFieldDefaults.birthdate,
+        socialLinks:
+          user.profile?.social_links || mockFieldDefaults.socialLinks,
 
         // Subscription data (mock for now)
         plan: mockFieldDefaults.plan,
@@ -125,18 +269,15 @@ export default function Settings() {
             mockFieldDefaults.privacy.isProfilePublic,
         },
 
-        // Notifications - use backend preferences or defaults
+        // Notifications - use backend preferences or defaults (reordered)
         notifications: {
-          deadlineReminders:
+          emailNotifications:
             user.preferences?.email_notifications ??
-            mockFieldDefaults.notifications.deadlineReminders,
-          weeklyReports: mockFieldDefaults.notifications.weeklyReports,
-          emailUpdates:
-            user.preferences?.email_notifications ??
-            mockFieldDefaults.notifications.emailUpdates,
+            mockFieldDefaults.notifications.emailNotifications,
           pushNotifications:
             user.preferences?.push_notifications ??
             mockFieldDefaults.notifications.pushNotifications,
+          weeklyReports: mockFieldDefaults.notifications.weeklyReports,
         },
 
         // App preferences - use backend preferences or defaults
@@ -212,6 +353,69 @@ export default function Settings() {
     }
   };
 
+  const handleProfilePictureUpdate = async () => {
+    if (newProfilePictureUrl.trim()) {
+      const newUrl = newProfilePictureUrl.trim();
+
+      // Check if the profile picture is actually changing
+      if (newUrl === userData.profilePicture) {
+        setShowProfilePictureModal(false);
+        setNewProfilePictureUrl("");
+        setUpdateSuccess("No changes detected");
+        setTimeout(() => setUpdateSuccess(null), 3000);
+        return;
+      }
+
+      setIsUpdating(true);
+      setUpdateError(null);
+      setUpdateSuccess(null);
+
+      try {
+        // Update profile picture via API only if it's different
+        await updateUserProfile({
+          avatar_url: newUrl,
+        });
+
+        // Update local state
+        setUserData((prev: any) => ({
+          ...prev,
+          profilePicture: newUrl,
+        }));
+        setEditedData((prev: any) => ({
+          ...prev,
+          profilePicture: newUrl,
+        }));
+
+        setShowProfilePictureModal(false);
+        setNewProfilePictureUrl("");
+        setUpdateSuccess("Profile picture updated successfully!");
+
+        // Clear success message after 3 seconds
+        setTimeout(() => setUpdateSuccess(null), 3000);
+      } catch (error: any) {
+        setUpdateError(error.message || "Failed to update profile picture");
+        console.error("Error updating profile picture:", error);
+      } finally {
+        setIsUpdating(false);
+      }
+    }
+  };
+
+  const handleProfilePictureModalClose = () => {
+    setShowProfilePictureModal(false);
+    setNewProfilePictureUrl("");
+    setPreviewImageStatus("idle");
+  };
+
+  // Handle preview image URL changes
+  useEffect(() => {
+    if (newProfilePictureUrl.trim()) {
+      setPreviewImageStatus("loading");
+    } else {
+      setPreviewImageStatus("idle");
+    }
+  }, [newProfilePictureUrl]);
+
   // Show loading if auth is loading or we don't have user data yet
   if (loading || !userData) {
     return (
@@ -237,9 +441,100 @@ export default function Settings() {
     { id: "billing", label: "Billing", icon: <FaCreditCard /> },
   ];
 
-  const handleSave = () => {
-    setUserData(editedData);
-    setIsEditing(false);
+  const handleSave = async () => {
+    setIsUpdating(true);
+    setUpdateError(null);
+    setUpdateSuccess(null);
+
+    try {
+      const updatedFields: string[] = [];
+
+      // Check for changes in basic user fields (first_name, last_name, username)
+      const userFieldsData: any = {};
+      if (editedData.firstName !== userData.firstName) {
+        userFieldsData.first_name = editedData.firstName;
+        updatedFields.push("first name");
+      }
+      if (editedData.lastName !== userData.lastName) {
+        userFieldsData.last_name = editedData.lastName;
+        updatedFields.push("last name");
+      }
+      if (editedData.username !== userData.username) {
+        userFieldsData.username = editedData.username;
+        updatedFields.push("username");
+      }
+
+      // Check for changes in profile data (avatar_url, bio, graduation_year, school, website, location, birthdate, social_links)
+      const profileData: any = {};
+      if (editedData.profilePicture !== userData.profilePicture) {
+        profileData.avatar_url = editedData.profilePicture;
+        updatedFields.push("profile picture");
+      }
+      if (editedData.bio !== userData.bio) {
+        profileData.bio = editedData.bio;
+        updatedFields.push("bio");
+      }
+      const newGradYear = editedData.graduationYear
+        ? parseInt(editedData.graduationYear)
+        : null;
+      const oldGradYear = userData.graduationYear
+        ? parseInt(userData.graduationYear)
+        : null;
+      if (newGradYear !== oldGradYear) {
+        profileData.graduation_year = newGradYear;
+        updatedFields.push("graduation year");
+      }
+      if (editedData.highSchool !== userData.highSchool) {
+        profileData.school = editedData.highSchool;
+        updatedFields.push("school");
+      }
+      if (editedData.website !== userData.website) {
+        profileData.website = editedData.website;
+        updatedFields.push("website");
+      }
+      if (editedData.location !== userData.location) {
+        profileData.location = editedData.location;
+        updatedFields.push("location");
+      }
+      if (editedData.birthdate !== userData.birthdate) {
+        const formattedBirthdate = formatDateToAPI(editedData.birthdate);
+        profileData.birthdate = formattedBirthdate;
+        updatedFields.push("birthdate");
+      }
+      if (
+        JSON.stringify(editedData.socialLinks) !==
+        JSON.stringify(userData.socialLinks)
+      ) {
+        profileData.social_links = editedData.socialLinks;
+        updatedFields.push("social links");
+      }
+
+      // Only send requests for endpoints that have changes
+      if (Object.keys(userFieldsData).length > 0) {
+        await updateUserFields(userFieldsData);
+      }
+      if (Object.keys(profileData).length > 0) {
+        await updateUserProfile(profileData);
+      }
+
+      // Update local state
+      setUserData(editedData);
+      setIsEditing(false);
+
+      if (updatedFields.length > 0) {
+        setUpdateSuccess(`Updated: ${updatedFields.join(", ")}`);
+      } else {
+        setUpdateSuccess("No changes detected");
+      }
+
+      // Clear success message after 3 seconds
+      setTimeout(() => setUpdateSuccess(null), 3000);
+    } catch (error: any) {
+      setUpdateError(error.message || "Failed to update profile");
+      console.error("Error updating profile:", error);
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   const handleCancel = () => {
@@ -247,34 +542,157 @@ export default function Settings() {
     setIsEditing(false);
   };
 
-  const updateNotification = (key: string, value: boolean) => {
-    setUserData((prev: any) => ({
-      ...prev,
-      notifications: {
-        ...prev.notifications,
-        [key]: value,
-      },
-    }));
+  const updateNotification = async (key: string, value: boolean) => {
+    try {
+      // Check if the value is actually changing
+      const currentValue = userData.notifications[key];
+      if (currentValue === value) {
+        return; // No change needed
+      }
+
+      // Clear any existing error/success messages
+      setUpdateError(null);
+      setUpdateSuccess(null);
+
+      // Only email_notifications and push_notifications are connected to backend
+      if (key === "emailNotifications") {
+        await updateUserPreferences({
+          email_notifications: value,
+        });
+      } else if (key === "pushNotifications") {
+        await updateUserPreferences({
+          push_notifications: value,
+        });
+      }
+      // weeklyReports is not connected to backend yet - only local state
+
+      // Update local state for all
+      setUserData((prev: any) => ({
+        ...prev,
+        notifications: {
+          ...prev.notifications,
+          [key]: value,
+        },
+      }));
+
+      // Show success message with friendly names
+      const friendlyNames: { [key: string]: string } = {
+        emailNotifications: "Email notifications",
+        pushNotifications: "Push notifications",
+        weeklyReports: "Weekly reports",
+      };
+
+      const friendlyName = friendlyNames[key] || key;
+      const status = value ? "enabled" : "disabled";
+      setUpdateSuccess(`${friendlyName} ${status} successfully!`);
+
+      // Clear success message after 3 seconds
+      setTimeout(() => setUpdateSuccess(null), 3000);
+    } catch (error: any) {
+      setUpdateError(
+        error.message || "Failed to update notification preference"
+      );
+      console.error("Error updating notification:", error);
+    }
   };
 
-  const updatePreference = (key: string, value: string) => {
-    setUserData((prev: any) => ({
-      ...prev,
-      preferences: {
-        ...prev.preferences,
-        [key]: value,
-      },
-    }));
+  const updatePreference = async (key: string, value: string) => {
+    try {
+      // Check if the value is actually changing
+      const currentValue = userData.preferences[key];
+      if (currentValue === value) {
+        return; // No change needed
+      }
+
+      // Clear any existing error/success messages
+      setUpdateError(null);
+      setUpdateSuccess(null);
+
+      // Only theme, language, timezone are connected to backend
+      if (key === "theme" || key === "language" || key === "timezone") {
+        await updateUserPreferences({
+          [key]: value,
+        });
+      }
+      // timeFormat, dateFormat, defaultView are not connected to backend yet - only local state
+
+      // Update local state for all
+      setUserData((prev: any) => ({
+        ...prev,
+        preferences: {
+          ...prev.preferences,
+          [key]: value,
+        },
+      }));
+
+      // Show success message
+      const friendlyKey = key.replace(/([A-Z])/g, " $1").toLowerCase();
+      setUpdateSuccess(
+        `${
+          friendlyKey.charAt(0).toUpperCase() + friendlyKey.slice(1)
+        } updated successfully!`
+      );
+
+      // Clear success message after 3 seconds
+      setTimeout(() => setUpdateSuccess(null), 3000);
+    } catch (error: any) {
+      setUpdateError(error.message || "Failed to update preference");
+      console.error("Error updating preference:", error);
+    }
   };
 
-  const updatePrivacy = (key: string, value: boolean) => {
-    setUserData((prev: any) => ({
-      ...prev,
-      privacy: {
-        ...prev.privacy,
-        [key]: value,
-      },
-    }));
+  const updatePrivacy = async (key: string, value: boolean) => {
+    try {
+      // Check if the value is actually changing
+      const currentValue = userData.privacy[key];
+      if (currentValue === value) {
+        return; // No change needed
+      }
+
+      // Clear any existing error/success messages
+      setUpdateError(null);
+      setUpdateSuccess(null);
+
+      // Privacy settings go to profile endpoint as is_public_profile
+      if (key === "isProfilePublic") {
+        await updateUserProfile({
+          is_public_profile: value,
+        });
+      } else {
+        // For other privacy settings, keep them local for now
+        // (these might not have backend endpoints yet)
+      }
+
+      // Update local state
+      setUserData((prev: any) => ({
+        ...prev,
+        privacy: {
+          ...prev.privacy,
+          [key]: value,
+        },
+      }));
+
+      // Show success message with friendly names
+      const friendlyNames: { [key: string]: string } = {
+        isProfilePublic: "Profile visibility",
+        searchableProfile: "Searchable profile",
+        showOnlineStatus: "Online status visibility",
+        showEmail: "Email visibility",
+        showPhone: "Phone visibility",
+        allowMessaging: "Messaging permissions",
+        dataCollection: "Data collection",
+        analytics: "Analytics tracking",
+      };
+
+      const friendlyName = friendlyNames[key] || key;
+      setUpdateSuccess(`${friendlyName} updated successfully!`);
+
+      // Clear success message after 3 seconds
+      setTimeout(() => setUpdateSuccess(null), 3000);
+    } catch (error: any) {
+      setUpdateError(error.message || "Failed to update privacy setting");
+      console.error("Error updating privacy:", error);
+    }
   };
 
   const renderProfileTab = () => (
@@ -295,9 +713,17 @@ export default function Settings() {
           <div className="flex gap-2">
             <button
               onClick={handleSave}
-              className="bg-green-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-600 transition-colors"
+              disabled={isUpdating}
+              className="bg-green-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
-              Save
+              {isUpdating ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Saving...
+                </>
+              ) : (
+                "Save"
+              )}
             </button>
             <button
               onClick={handleCancel}
@@ -311,49 +737,78 @@ export default function Settings() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Profile Picture */}
-        <div className="bg-[#1a1a1a] border border-neutral-700 rounded-lg p-6">
-          <div className="text-center">
-            {userData?.profilePicture || userData?.avatar || user?.avatar ? (
-              <div className="w-24 h-24 mx-auto mb-4 relative">
-                <img
-                  src={
-                    userData?.profilePicture || userData?.avatar || user?.avatar
-                  }
-                  alt={`${userData?.firstName || "User"}'s profile`}
-                  className="w-24 h-24 rounded-full object-cover border-2 border-[#FEEBD8]/30"
-                  onError={(e) => {
-                    // Fallback to initials if image fails to load
-                    e.currentTarget.style.display = "none";
-                    const fallback = e.currentTarget
-                      .nextElementSibling as HTMLElement;
-                    if (fallback) fallback.style.display = "flex";
-                  }}
-                />
-                {/* Fallback initials (hidden by default) */}
-                <div
-                  className="w-24 h-24 bg-[#FEEBD8] rounded-full flex items-center justify-center absolute top-0 left-0"
-                  style={{ display: "none" }}
-                >
-                  <span className="text-[#141414] text-2xl font-bold">
+        <div className="bg-gradient-to-br from-[#1a1a1a] to-[#141414] border border-neutral-700/50 rounded-xl p-8 shadow-lg">
+          <div className="flex flex-col items-center">
+            {/* Profile Picture with enhanced styling */}
+            <div
+              className="relative mb-6 group cursor-pointer"
+              onClick={() => setShowProfilePictureModal(true)}
+            >
+              {userData?.profilePicture || userData?.avatar || user?.avatar ? (
+                <div className="w-32 h-32 relative">
+                  <img
+                    src={
+                      userData?.profilePicture ||
+                      userData?.avatar ||
+                      user?.avatar
+                    }
+                    alt={`${userData?.firstName || "User"}'s profile`}
+                    className="w-32 h-32 rounded-full object-cover border-4 border-[#FEEBD8]/20 shadow-xl group-hover:border-[#FEEBD8]/40 transition-all duration-200"
+                    onError={(e) => {
+                      // Fallback to initials if image fails to load
+                      e.currentTarget.style.display = "none";
+                      const fallback = e.currentTarget
+                        .nextElementSibling as HTMLElement;
+                      if (fallback) fallback.style.display = "flex";
+                    }}
+                  />
+                  {/* Fallback initials (hidden by default) */}
+                  <div
+                    className="w-32 h-32 bg-gradient-to-br from-[#FEEBD8] to-[#E5D5B7] rounded-full flex items-center justify-center absolute top-0 left-0 shadow-xl group-hover:from-[#FEEBD8]/90 group-hover:to-[#E5D5B7]/90 transition-all duration-200"
+                    style={{ display: "none" }}
+                  >
+                    <span className="text-[#141414] text-3xl font-bold">
+                      {userData?.firstName?.[0] || "U"}
+                      {userData?.lastName?.[0] || ""}
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <div className="w-32 h-32 bg-gradient-to-br from-[#FEEBD8] to-[#E5D5B7] rounded-full flex items-center justify-center shadow-xl group-hover:from-[#FEEBD8]/90 group-hover:to-[#E5D5B7]/90 transition-all duration-200">
+                  <span className="text-[#141414] text-3xl font-bold">
                     {userData?.firstName?.[0] || "U"}
                     {userData?.lastName?.[0] || ""}
                   </span>
                 </div>
-              </div>
-            ) : (
-              <div className="w-24 h-24 bg-[#FEEBD8] rounded-full mx-auto mb-4 flex items-center justify-center">
-                <span className="text-[#141414] text-2xl font-bold">
-                  {userData?.firstName?.[0] || "U"}
-                  {userData?.lastName?.[0] || ""}
+              )}
+
+              {/* Hover overlay */}
+              <div className="absolute inset-0 bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
+                <span className="text-white text-sm font-medium">
+                  Change Avatar
                 </span>
               </div>
-            )}
-            <button className="text-[#FEEBD8] hover:text-[#E5D5B7] transition-colors text-sm">
-              Change Photo
-            </button>
+
+              {/* Online status indicator - repositioned to bottom right */}
+              <div className="absolute bottom-0 right-0 w-6 h-6 bg-green-500 border-4 border-[#1a1a1a] rounded-full"></div>
+            </div>
+
+            {/* User Info */}
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-bold text-[#FEEBD8] mb-2">
+                {userData?.firstName} {userData?.lastName}
+              </h2>
+              {userData?.username && (
+                <div className="inline-flex items-center gap-1 bg-[#FEEBD8]/10 backdrop-blur-sm border border-[#FEEBD8]/20 rounded-full px-4 py-2">
+                  <span className="text-[#FEEBD8]/90 text-sm font-medium">
+                    @{userData.username}
+                  </span>
+                </div>
+              )}
+            </div>
 
             {/* User status badges */}
-            <div className="flex flex-wrap justify-center gap-2 mt-3">
+            <div className="flex flex-wrap justify-center gap-2 mt-4">
               {user?.verification_level && user.verification_level > 0 && (
                 <div className="bg-blue-500/20 border border-blue-400/30 rounded-full px-3 py-1">
                   <span className="text-blue-400 text-xs font-medium">
@@ -425,9 +880,12 @@ export default function Settings() {
                     email: e.target.value,
                   }))
                 }
-                disabled={!isEditing}
+                disabled={true} // Disabled: Email changes not available yet
                 className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8] disabled:opacity-50"
               />
+              <p className="text-[#FEEBD8]/40 text-xs mt-1">
+                Email changes coming soon
+              </p>
             </div>
             <div>
               <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
@@ -442,9 +900,12 @@ export default function Settings() {
                     phone: e.target.value,
                   }))
                 }
-                disabled={!isEditing}
+                disabled={true} // Disabled: Phone field not available in current API endpoints
                 className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8] disabled:opacity-50"
               />
+              <p className="text-[#FEEBD8]/40 text-xs mt-1">
+                Phone field coming soon
+              </p>
             </div>
             <div>
               <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
@@ -484,6 +945,170 @@ export default function Settings() {
                 className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8] disabled:opacity-50"
               />
             </div>
+            <div>
+              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+                Location
+              </label>
+              <input
+                type="text"
+                value={isEditing ? editedData.location : userData.location}
+                onChange={(e) =>
+                  setEditedData((prev: any) => ({
+                    ...prev,
+                    location: e.target.value,
+                  }))
+                }
+                disabled={!isEditing}
+                placeholder="City, Country"
+                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8] disabled:opacity-50"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+                Birthdate
+              </label>
+              <input
+                type="text"
+                value={isEditing ? editedData.birthdate : userData.birthdate}
+                onChange={(e) =>
+                  setEditedData((prev: any) => ({
+                    ...prev,
+                    birthdate: e.target.value,
+                  }))
+                }
+                disabled={!isEditing}
+                placeholder="MM-DD-YYYY"
+                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8] disabled:opacity-50"
+              />
+            </div>
+
+            {/* Social Links Section */}
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+                Social Links
+              </label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs text-[#FEEBD8]/50 mb-1">
+                    LinkedIn
+                  </label>
+                  <input
+                    type="url"
+                    value={
+                      isEditing
+                        ? editedData.socialLinks.linkedin
+                        : userData.socialLinks.linkedin
+                    }
+                    onChange={(e) =>
+                      setEditedData((prev: any) => ({
+                        ...prev,
+                        socialLinks: {
+                          ...prev.socialLinks,
+                          linkedin: e.target.value,
+                        },
+                      }))
+                    }
+                    disabled={!isEditing}
+                    placeholder="https://linkedin.com/in/username"
+                    className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-[#FEEBD8] text-sm focus:outline-none focus:border-[#FEEBD8] disabled:opacity-50"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-[#FEEBD8]/50 mb-1">
+                    Twitter
+                  </label>
+                  <input
+                    type="url"
+                    value={
+                      isEditing
+                        ? editedData.socialLinks.twitter
+                        : userData.socialLinks.twitter
+                    }
+                    onChange={(e) =>
+                      setEditedData((prev: any) => ({
+                        ...prev,
+                        socialLinks: {
+                          ...prev.socialLinks,
+                          twitter: e.target.value,
+                        },
+                      }))
+                    }
+                    disabled={!isEditing}
+                    placeholder="https://twitter.com/username"
+                    className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-[#FEEBD8] text-sm focus:outline-none focus:border-[#FEEBD8] disabled:opacity-50"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-[#FEEBD8]/50 mb-1">
+                    Instagram
+                  </label>
+                  <input
+                    type="url"
+                    value={
+                      isEditing
+                        ? editedData.socialLinks.instagram
+                        : userData.socialLinks.instagram
+                    }
+                    onChange={(e) =>
+                      setEditedData((prev: any) => ({
+                        ...prev,
+                        socialLinks: {
+                          ...prev.socialLinks,
+                          instagram: e.target.value,
+                        },
+                      }))
+                    }
+                    disabled={!isEditing}
+                    placeholder="https://instagram.com/username"
+                    className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-[#FEEBD8] text-sm focus:outline-none focus:border-[#FEEBD8] disabled:opacity-50"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-[#FEEBD8]/50 mb-1">
+                    GitHub
+                  </label>
+                  <input
+                    type="url"
+                    value={
+                      isEditing
+                        ? editedData.socialLinks.github
+                        : userData.socialLinks.github
+                    }
+                    onChange={(e) =>
+                      setEditedData((prev: any) => ({
+                        ...prev,
+                        socialLinks: {
+                          ...prev.socialLinks,
+                          github: e.target.value,
+                        },
+                      }))
+                    }
+                    disabled={!isEditing}
+                    placeholder="https://github.com/username"
+                    className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-[#FEEBD8] text-sm focus:outline-none focus:border-[#FEEBD8] disabled:opacity-50"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+                Bio
+              </label>
+              <textarea
+                value={isEditing ? editedData.bio : userData.bio}
+                onChange={(e) =>
+                  setEditedData((prev: any) => ({
+                    ...prev,
+                    bio: e.target.value,
+                  }))
+                }
+                disabled={!isEditing}
+                rows={3}
+                placeholder="Tell us about yourself..."
+                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8] disabled:opacity-50 resize-none"
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -505,14 +1130,13 @@ export default function Settings() {
                   {key
                     .replace(/([A-Z])/g, " $1")
                     .replace(/^./, (str) => str.toUpperCase())}
+                  {key === "weeklyReports" && " *"}
                 </h3>
                 <p className="text-[#FEEBD8]/60 text-sm">
-                  {key === "deadlineReminders" &&
-                    "Get notified about upcoming application deadlines"}
+                  {key === "emailNotifications" &&
+                    "Get notified via email about deadlines, updates, and new features"}
                   {key === "weeklyReports" &&
-                    "Receive weekly progress reports via email"}
-                  {key === "emailUpdates" &&
-                    "Get updates about new features and tips"}
+                    "Receive weekly progress reports via email (coming soon)"}
                   {key === "pushNotifications" &&
                     "Receive push notifications on your device"}
                 </p>
@@ -553,13 +1177,12 @@ export default function Settings() {
             >
               <option value="dark">Dark</option>
               <option value="light">Light</option>
-              <option value="auto">Auto</option>
             </select>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
-              Time Format
+              Time Format *
             </label>
             <select
               value={userData.preferences.timeFormat}
@@ -573,7 +1196,7 @@ export default function Settings() {
 
           <div>
             <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
-              Date Format
+              Date Format *
             </label>
             <select
               value={userData.preferences.dateFormat}
@@ -588,7 +1211,7 @@ export default function Settings() {
 
           <div>
             <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
-              Default View
+              Default View *
             </label>
             <select
               value={userData.preferences.defaultView}
@@ -598,6 +1221,47 @@ export default function Settings() {
               <option value="dashboard">Dashboard</option>
               <option value="colleges">Colleges</option>
               <option value="calendar">Calendar</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+              Language
+            </label>
+            <select
+              value={userData.preferences.language}
+              onChange={(e) => updatePreference("language", e.target.value)}
+              className="bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+            >
+              <option value="en">English</option>
+              <option value="en-US">English (United States)</option>
+              <option value="en-GB">English (United Kingdom)</option>
+              <option value="es-ES">Español (España)</option>
+              <option value="fr-FR">Français (France)</option>
+              <option value="de-DE">Deutsch (Deutschland)</option>
+              <option value="it-IT">Italiano (Italia)</option>
+              <option value="tr-TR">Türkçe (Türkiye)</option>
+              <option value="zh-CN">中文 (简体)</option>
+              <option value="zh-TW">中文 (繁體)</option>
+              <option value="ja-JP">日本語 (日本)</option>
+              <option value="ko-KR">한국어 (대한민국)</option>
+              <option value="pt-BR">Português (Brasil)</option>
+              <option value="pt-PT">Português (Portugal)</option>
+              <option value="ru-RU">Русский (Россия)</option>
+              <option value="ar-SA">العربية (السعودية)</option>
+              <option value="nl-NL">Nederlands (Nederland)</option>
+              <option value="sv-SE">Svenska (Sverige)</option>
+              <option value="da-DK">Dansk (Danmark)</option>
+              <option value="no-NO">Norsk (Norge)</option>
+              <option value="fi-FI">Suomi (Suomi)</option>
+              <option value="pl-PL">Polski (Polska)</option>
+              <option value="cs-CZ">Čeština (Česká republika)</option>
+              <option value="hu-HU">Magyar (Magyarország)</option>
+              <option value="el-GR">Ελληνικά (Ελλάδα)</option>
+              <option value="he-IL">עברית (ישראל)</option>
+              <option value="hi-IN">हिन्दी (भारत)</option>
+              <option value="th-TH">ไทย (ไทย)</option>
+              <option value="vi-VN">Tiếng Việt (Việt Nam)</option>
             </select>
           </div>
         </div>
@@ -697,7 +1361,9 @@ export default function Settings() {
 
           <div className="flex items-center justify-between">
             <div>
-              <h4 className="text-[#FEEBD8] font-medium">Searchable Profile</h4>
+              <h4 className="text-[#FEEBD8] font-medium">
+                Searchable Profile *
+              </h4>
               <p className="text-[#FEEBD8]/60 text-sm">
                 Allow your profile to appear in search results
               </p>
@@ -727,7 +1393,9 @@ export default function Settings() {
 
           <div className="flex items-center justify-between">
             <div>
-              <h4 className="text-[#FEEBD8] font-medium">Show Online Status</h4>
+              <h4 className="text-[#FEEBD8] font-medium">
+                Show Online Status *
+              </h4>
               <p className="text-[#FEEBD8]/60 text-sm">
                 Let others see when you're online
               </p>
@@ -782,7 +1450,9 @@ export default function Settings() {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h4 className="text-[#FEEBD8] font-medium">Show Email Address</h4>
+              <h4 className="text-[#FEEBD8] font-medium">
+                Show Email Address *
+              </h4>
               <p className="text-[#FEEBD8]/60 text-sm">
                 Display your email address on your public profile
               </p>
@@ -805,7 +1475,9 @@ export default function Settings() {
 
           <div className="flex items-center justify-between">
             <div>
-              <h4 className="text-[#FEEBD8] font-medium">Show Phone Number</h4>
+              <h4 className="text-[#FEEBD8] font-medium">
+                Show Phone Number *
+              </h4>
               <p className="text-[#FEEBD8]/60 text-sm">
                 Display your phone number on your public profile
               </p>
@@ -828,7 +1500,7 @@ export default function Settings() {
 
           <div className="flex items-center justify-between">
             <div>
-              <h4 className="text-[#FEEBD8] font-medium">Allow Messaging</h4>
+              <h4 className="text-[#FEEBD8] font-medium">Allow Messaging *</h4>
               <p className="text-[#FEEBD8]/60 text-sm">
                 Let other users send you direct messages
               </p>
@@ -866,7 +1538,7 @@ export default function Settings() {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h4 className="text-[#FEEBD8] font-medium">Data Collection</h4>
+              <h4 className="text-[#FEEBD8] font-medium">Data Collection *</h4>
               <p className="text-[#FEEBD8]/60 text-sm">
                 Allow us to collect usage data to improve your experience
               </p>
@@ -896,7 +1568,9 @@ export default function Settings() {
 
           <div className="flex items-center justify-between">
             <div>
-              <h4 className="text-[#FEEBD8] font-medium">Analytics Tracking</h4>
+              <h4 className="text-[#FEEBD8] font-medium">
+                Analytics Tracking *
+              </h4>
               <p className="text-[#FEEBD8]/60 text-sm">
                 Enable analytics to help us understand how you use Paccy
               </p>
@@ -1090,6 +1764,9 @@ export default function Settings() {
                 </span>
               </button>
             </div>
+            <p className="text-[#FEEBD8]/50 text-xs mt-2">
+              * Settings marked with asterisk are not connected to backend yet
+            </p>
           </div>
         </div>
 
@@ -1127,6 +1804,49 @@ export default function Settings() {
           {/* Main Content */}
           <div className="flex-1">
             <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-8">
+              {/* Feedback Messages */}
+              {updateError && (
+                <div className="mb-6 p-4 bg-red-500/20 border border-red-500/30 rounded-lg text-red-400">
+                  <div className="flex items-center gap-2">
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    {updateError}
+                  </div>
+                </div>
+              )}
+
+              {updateSuccess && (
+                <div className="mb-6 p-4 bg-green-500/20 border border-green-500/30 rounded-lg text-green-400">
+                  <div className="flex items-center gap-2">
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                    {updateSuccess}
+                  </div>
+                </div>
+              )}
+
               {activeTab === "profile" && renderProfileTab()}
               {activeTab === "notifications" && renderNotificationsTab()}
               {activeTab === "preferences" && renderPreferencesTab()}
@@ -1137,6 +1857,132 @@ export default function Settings() {
           </div>
         </div>
       </div>
+
+      {/* Profile Picture Modal */}
+      {showProfilePictureModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6 w-full max-w-md">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-semibold text-[#FEEBD8]">
+                Change Profile Picture
+              </h2>
+              <button
+                onClick={handleProfilePictureModalClose}
+                className="text-[#FEEBD8]/50 hover:text-[#FEEBD8] transition-colors"
+              >
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-[#FEEBD8]/70 text-sm mb-2">
+                  Profile Picture URL
+                </label>
+                <input
+                  type="url"
+                  value={newProfilePictureUrl}
+                  onChange={(e) => setNewProfilePictureUrl(e.target.value)}
+                  placeholder="https://example.com/your-image.jpg"
+                  className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg px-4 py-3 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8] placeholder-[#FEEBD8]/40"
+                />
+                <p className="text-[#FEEBD8]/50 text-xs mt-2">
+                  Enter a direct link to an image (JPG, PNG, GIF, WebP)
+                </p>
+              </div>
+
+              {/* Preview */}
+              {newProfilePictureUrl && (
+                <div className="text-center">
+                  <p className="text-[#FEEBD8]/70 text-sm mb-2">Preview:</p>
+                  <div className="w-20 h-20 mx-auto rounded-full overflow-hidden border-2 border-[#FEEBD8]/20 bg-neutral-800 flex items-center justify-center relative">
+                    {previewImageStatus === "loading" && (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="w-6 h-6 border-2 border-[#FEEBD8]/30 border-t-[#FEEBD8] rounded-full animate-spin"></div>
+                      </div>
+                    )}
+                    {previewImageStatus === "error" && (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <svg
+                          className="w-8 h-8 text-red-400"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.232 15.5c-.77.833.192 2.5 1.732 2.5z"
+                          />
+                        </svg>
+                      </div>
+                    )}
+                    <img
+                      src={newProfilePictureUrl}
+                      alt="Preview"
+                      className={`w-full h-full object-cover transition-opacity duration-200 ${
+                        previewImageStatus === "loaded"
+                          ? "opacity-100"
+                          : "opacity-0"
+                      }`}
+                      onLoad={() => setPreviewImageStatus("loaded")}
+                      onError={() => setPreviewImageStatus("error")}
+                    />
+                  </div>
+                  {previewImageStatus === "error" && (
+                    <p className="text-red-400 text-xs mt-2">
+                      Failed to load image. Please check the URL.
+                    </p>
+                  )}
+                  {previewImageStatus === "loaded" && (
+                    <p className="text-[#FEEBD8]/50 text-xs mt-2">
+                      {newProfilePictureUrl.length > 50
+                        ? `${newProfilePictureUrl.substring(0, 50)}...`
+                        : newProfilePictureUrl}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  onClick={handleProfilePictureModalClose}
+                  className="flex-1 px-4 py-2 border border-neutral-700/50 rounded-lg text-[#FEEBD8]/70 hover:text-[#FEEBD8] hover:border-[#FEEBD8]/30 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleProfilePictureUpdate}
+                  disabled={!newProfilePictureUrl.trim() || isUpdating}
+                  className="flex-1 bg-[#FEEBD8] text-[#141414] px-4 py-2 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {isUpdating ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-[#141414] border-t-transparent rounded-full animate-spin"></div>
+                      Updating...
+                    </>
+                  ) : (
+                    "Update"
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Payment System Alert Modal */}
       {alertInfo.show && (

@@ -6,4 +6,7 @@ export const API_ENDPOINTS = {
   LOGIN: "/login",
   VERIFY_TOKEN: "/verify",
   GET_USER: "/users",
+  UPDATE_USER_FIELDS: "/users", // PUT /users/:userID
+  UPDATE_USER_PROFILE: "/users", // PUT /users/:userID/profile
+  UPDATE_USER_PREFERENCES: "/users", // PUT /users/:userID/preferences
 } as const;

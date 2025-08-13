@@ -124,7 +124,7 @@ export default function Navbar() {
                           alt={user.name || "User avatar"}
                           className="w-10 h-10 rounded-full border-2 border-[#FEEBD8]/30 group-hover:border-[#FEEBD8]/60 transition-all duration-300"
                         />
-                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-[#141414]"></div>
+                        <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-[#141414]"></div>
                         <div className="absolute top-full right-0 w-56 h-2 bg-transparent"></div>
                         {/* Dropdown Menu */}
                         <div className="absolute top-full pt-2 right-0 w-56 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none group-hover:pointer-events-auto z-50">
@@ -319,7 +319,7 @@ export default function Navbar() {
                               alt={user.name || "User avatar"}
                               className="w-12 h-12 rounded-full border-2 border-[#FEEBD8]/30"
                             />
-                            <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-[#141414]"></div>
+                            <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-[#141414]"></div>
                           </div>
                         )}
                         <div>
