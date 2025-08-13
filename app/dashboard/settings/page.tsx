@@ -1124,15 +1124,15 @@ export default function Settings() {
       <div className="bg-[#1a1a1a] border border-neutral-700 rounded-lg p-6">
         <div className="space-y-4">
           {Object.entries(userData.notifications).map(([key, value]) => (
-            <div key={key} className="flex items-center justify-between">
-              <div>
-                <h3 className="text-[#FEEBD8] font-medium">
+            <div key={key} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-3 sm:p-0">
+              <div className="flex-1 min-w-0">
+                <h3 className="text-[#FEEBD8] font-medium text-sm sm:text-base">
                   {key
                     .replace(/([A-Z])/g, " $1")
                     .replace(/^./, (str) => str.toUpperCase())}
                   {key === "weeklyReports" && " *"}
                 </h3>
-                <p className="text-[#FEEBD8]/60 text-sm">
+                <p className="text-[#FEEBD8]/60 text-xs sm:text-sm mt-1 pr-2">
                   {key === "emailNotifications" &&
                     "Get notified via email about deadlines, updates, and new features"}
                   {key === "weeklyReports" &&
@@ -1141,18 +1141,20 @@ export default function Settings() {
                     "Receive push notifications on your device"}
                 </p>
               </div>
-              <button
-                onClick={() => updateNotification(key, !value)}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  value ? "bg-[#FEEBD8]" : "bg-neutral-600"
-                }`}
-              >
-                <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    value ? "translate-x-6" : "translate-x-1"
+              <div className="flex-shrink-0 self-start sm:self-auto">
+                <button
+                  onClick={() => updateNotification(key, !value)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors touch-manipulation ${
+                    value ? "bg-[#FEEBD8]" : "bg-neutral-600"
                   }`}
-                />
-              </button>
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      value ? "translate-x-6" : "translate-x-1"
+                    }`}
+                  />
+                </button>
+              </div>
             </div>
           ))}
         </div>
@@ -1327,100 +1329,106 @@ export default function Settings() {
           Profile Privacy
         </h3>
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h4 className="text-[#FEEBD8] font-medium">Profile Visibility</h4>
-              <p className="text-[#FEEBD8]/60 text-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-3 sm:p-0">
+            <div className="flex-1 min-w-0">
+              <h4 className="text-[#FEEBD8] font-medium text-sm sm:text-base">Profile Visibility</h4>
+              <p className="text-[#FEEBD8]/60 text-xs sm:text-sm mt-1 pr-2">
                 {userData.privacy.isProfilePublic
                   ? "Your profile is visible to other users and can be found in search results"
                   : "Your profile is private and only visible to you"}
               </p>
             </div>
-            <button
-              onClick={() =>
-                updatePrivacy(
-                  "isProfilePublic",
-                  !userData.privacy.isProfilePublic
-                )
-              }
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                userData.privacy.isProfilePublic
-                  ? "bg-[#FEEBD8]"
-                  : "bg-neutral-600"
-              }`}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+            <div className="flex-shrink-0 self-start sm:self-auto">
+              <button
+                onClick={() =>
+                  updatePrivacy(
+                    "isProfilePublic",
+                    !userData.privacy.isProfilePublic
+                  )
+                }
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors touch-manipulation ${
                   userData.privacy.isProfilePublic
-                    ? "translate-x-6"
-                    : "translate-x-1"
+                    ? "bg-[#FEEBD8]"
+                    : "bg-neutral-600"
                 }`}
-              />
-            </button>
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    userData.privacy.isProfilePublic
+                      ? "translate-x-6"
+                      : "translate-x-1"
+                  }`}
+                />
+              </button>
+            </div>
           </div>
 
-          <div className="flex items-center justify-between">
-            <div>
-              <h4 className="text-[#FEEBD8] font-medium">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-3 sm:p-0">
+            <div className="flex-1 min-w-0">
+              <h4 className="text-[#FEEBD8] font-medium text-sm sm:text-base">
                 Searchable Profile *
               </h4>
-              <p className="text-[#FEEBD8]/60 text-sm">
+              <p className="text-[#FEEBD8]/60 text-xs sm:text-sm mt-1 pr-2">
                 Allow your profile to appear in search results
               </p>
             </div>
-            <button
-              onClick={() =>
-                updatePrivacy(
-                  "searchableProfile",
-                  !userData.privacy.searchableProfile
-                )
-              }
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                userData.privacy.searchableProfile
-                  ? "bg-[#FEEBD8]"
-                  : "bg-neutral-600"
-              }`}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+            <div className="flex-shrink-0 self-start sm:self-auto">
+              <button
+                onClick={() =>
+                  updatePrivacy(
+                    "searchableProfile",
+                    !userData.privacy.searchableProfile
+                  )
+                }
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors touch-manipulation ${
                   userData.privacy.searchableProfile
-                    ? "translate-x-6"
-                    : "translate-x-1"
+                    ? "bg-[#FEEBD8]"
+                    : "bg-neutral-600"
                 }`}
-              />
-            </button>
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    userData.privacy.searchableProfile
+                      ? "translate-x-6"
+                      : "translate-x-1"
+                  }`}
+                />
+              </button>
+            </div>
           </div>
 
-          <div className="flex items-center justify-between">
-            <div>
-              <h4 className="text-[#FEEBD8] font-medium">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-3 sm:p-0">
+            <div className="flex-1 min-w-0">
+              <h4 className="text-[#FEEBD8] font-medium text-sm sm:text-base">
                 Show Online Status *
               </h4>
-              <p className="text-[#FEEBD8]/60 text-sm">
+              <p className="text-[#FEEBD8]/60 text-xs sm:text-sm mt-1 pr-2">
                 Let others see when you're online
               </p>
             </div>
-            <button
-              onClick={() =>
-                updatePrivacy(
-                  "showOnlineStatus",
-                  !userData.privacy.showOnlineStatus
-                )
-              }
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                userData.privacy.showOnlineStatus
-                  ? "bg-[#FEEBD8]"
-                  : "bg-neutral-600"
-              }`}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+            <div className="flex-shrink-0 self-start sm:self-auto">
+              <button
+                onClick={() =>
+                  updatePrivacy(
+                    "showOnlineStatus",
+                    !userData.privacy.showOnlineStatus
+                  )
+                }
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors touch-manipulation ${
                   userData.privacy.showOnlineStatus
-                    ? "translate-x-6"
-                    : "translate-x-1"
+                    ? "bg-[#FEEBD8]"
+                    : "bg-neutral-600"
                 }`}
-              />
-            </button>
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    userData.privacy.showOnlineStatus
+                      ? "translate-x-6"
+                      : "translate-x-1"
+                  }`}
+                />
+              </button>
+            </div>
           </div>
         </div>
 
@@ -1448,84 +1456,90 @@ export default function Settings() {
           Contact Information
         </h3>
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h4 className="text-[#FEEBD8] font-medium">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-3 sm:p-0">
+            <div className="flex-1 min-w-0">
+              <h4 className="text-[#FEEBD8] font-medium text-sm sm:text-base">
                 Show Email Address *
               </h4>
-              <p className="text-[#FEEBD8]/60 text-sm">
+              <p className="text-[#FEEBD8]/60 text-xs sm:text-sm mt-1 pr-2">
                 Display your email address on your public profile
               </p>
             </div>
-            <button
-              onClick={() =>
-                updatePrivacy("showEmail", !userData.privacy.showEmail)
-              }
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                userData.privacy.showEmail ? "bg-[#FEEBD8]" : "bg-neutral-600"
-              }`}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  userData.privacy.showEmail ? "translate-x-6" : "translate-x-1"
+            <div className="flex-shrink-0 self-start sm:self-auto">
+              <button
+                onClick={() =>
+                  updatePrivacy("showEmail", !userData.privacy.showEmail)
+                }
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors touch-manipulation ${
+                  userData.privacy.showEmail ? "bg-[#FEEBD8]" : "bg-neutral-600"
                 }`}
-              />
-            </button>
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    userData.privacy.showEmail ? "translate-x-6" : "translate-x-1"
+                  }`}
+                />
+              </button>
+            </div>
           </div>
 
-          <div className="flex items-center justify-between">
-            <div>
-              <h4 className="text-[#FEEBD8] font-medium">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-3 sm:p-0">
+            <div className="flex-1 min-w-0">
+              <h4 className="text-[#FEEBD8] font-medium text-sm sm:text-base">
                 Show Phone Number *
               </h4>
-              <p className="text-[#FEEBD8]/60 text-sm">
+              <p className="text-[#FEEBD8]/60 text-xs sm:text-sm mt-1 pr-2">
                 Display your phone number on your public profile
               </p>
             </div>
-            <button
-              onClick={() =>
-                updatePrivacy("showPhone", !userData.privacy.showPhone)
-              }
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                userData.privacy.showPhone ? "bg-[#FEEBD8]" : "bg-neutral-600"
-              }`}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  userData.privacy.showPhone ? "translate-x-6" : "translate-x-1"
+            <div className="flex-shrink-0 self-start sm:self-auto">
+              <button
+                onClick={() =>
+                  updatePrivacy("showPhone", !userData.privacy.showPhone)
+                }
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors touch-manipulation ${
+                  userData.privacy.showPhone ? "bg-[#FEEBD8]" : "bg-neutral-600"
                 }`}
-              />
-            </button>
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    userData.privacy.showPhone ? "translate-x-6" : "translate-x-1"
+                  }`}
+                />
+              </button>
+            </div>
           </div>
 
-          <div className="flex items-center justify-between">
-            <div>
-              <h4 className="text-[#FEEBD8] font-medium">Allow Messaging *</h4>
-              <p className="text-[#FEEBD8]/60 text-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-3 sm:p-0">
+            <div className="flex-1 min-w-0">
+              <h4 className="text-[#FEEBD8] font-medium text-sm sm:text-base">Allow Messaging *</h4>
+              <p className="text-[#FEEBD8]/60 text-xs sm:text-sm mt-1 pr-2">
                 Let other users send you direct messages
               </p>
             </div>
-            <button
-              onClick={() =>
-                updatePrivacy(
-                  "allowMessaging",
-                  !userData.privacy.allowMessaging
-                )
-              }
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                userData.privacy.allowMessaging
-                  ? "bg-[#FEEBD8]"
-                  : "bg-neutral-600"
-              }`}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+            <div className="flex-shrink-0 self-start sm:self-auto">
+              <button
+                onClick={() =>
+                  updatePrivacy(
+                    "allowMessaging",
+                    !userData.privacy.allowMessaging
+                  )
+                }
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors touch-manipulation ${
                   userData.privacy.allowMessaging
-                    ? "translate-x-6"
-                    : "translate-x-1"
+                    ? "bg-[#FEEBD8]"
+                    : "bg-neutral-600"
                 }`}
-              />
-            </button>
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    userData.privacy.allowMessaging
+                      ? "translate-x-6"
+                      : "translate-x-1"
+                  }`}
+                />
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -1536,59 +1550,63 @@ export default function Settings() {
           Data & Analytics
         </h3>
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h4 className="text-[#FEEBD8] font-medium">Data Collection *</h4>
-              <p className="text-[#FEEBD8]/60 text-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-3 sm:p-0">
+            <div className="flex-1 min-w-0">
+              <h4 className="text-[#FEEBD8] font-medium text-sm sm:text-base">Data Collection *</h4>
+              <p className="text-[#FEEBD8]/60 text-xs sm:text-sm mt-1 pr-2">
                 Allow us to collect usage data to improve your experience
               </p>
             </div>
-            <button
-              onClick={() =>
-                updatePrivacy(
-                  "dataCollection",
-                  !userData.privacy.dataCollection
-                )
-              }
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                userData.privacy.dataCollection
-                  ? "bg-[#FEEBD8]"
-                  : "bg-neutral-600"
-              }`}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+            <div className="flex-shrink-0 self-start sm:self-auto">
+              <button
+                onClick={() =>
+                  updatePrivacy(
+                    "dataCollection",
+                    !userData.privacy.dataCollection
+                  )
+                }
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors touch-manipulation ${
                   userData.privacy.dataCollection
-                    ? "translate-x-6"
-                    : "translate-x-1"
+                    ? "bg-[#FEEBD8]"
+                    : "bg-neutral-600"
                 }`}
-              />
-            </button>
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    userData.privacy.dataCollection
+                      ? "translate-x-6"
+                      : "translate-x-1"
+                  }`}
+                />
+              </button>
+            </div>
           </div>
 
-          <div className="flex items-center justify-between">
-            <div>
-              <h4 className="text-[#FEEBD8] font-medium">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-3 sm:p-0">
+            <div className="flex-1 min-w-0">
+              <h4 className="text-[#FEEBD8] font-medium text-sm sm:text-base">
                 Analytics Tracking *
               </h4>
-              <p className="text-[#FEEBD8]/60 text-sm">
+              <p className="text-[#FEEBD8]/60 text-xs sm:text-sm mt-1 pr-2">
                 Enable analytics to help us understand how you use Paccy
               </p>
             </div>
-            <button
-              onClick={() =>
-                updatePrivacy("analytics", !userData.privacy.analytics)
-              }
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                userData.privacy.analytics ? "bg-[#FEEBD8]" : "bg-neutral-600"
-              }`}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  userData.privacy.analytics ? "translate-x-6" : "translate-x-1"
+            <div className="flex-shrink-0 self-start sm:self-auto">
+              <button
+                onClick={() =>
+                  updatePrivacy("analytics", !userData.privacy.analytics)
+                }
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors touch-manipulation ${
+                  userData.privacy.analytics ? "bg-[#FEEBD8]" : "bg-neutral-600"
                 }`}
-              />
-            </button>
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    userData.privacy.analytics ? "translate-x-6" : "translate-x-1"
+                  }`}
+                />
+              </button>
+            </div>
           </div>
         </div>
       </div>
