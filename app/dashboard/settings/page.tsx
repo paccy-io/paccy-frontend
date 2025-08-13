@@ -1724,7 +1724,7 @@ export default function Settings() {
               Settings & Account
             </h1>
             <div className="flex items-center gap-4 mt-2">
-              <p className="text-[#FEEBD8]/70">
+              <p className="text-[#FEEBD8]/70 hidden md:block">
                 Manage your account settings and preferences
               </p>
               {user && (
