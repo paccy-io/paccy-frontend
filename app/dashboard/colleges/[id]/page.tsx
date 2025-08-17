@@ -137,21 +137,30 @@ interface Document {
   status: "Draft" | "Final" | "Submitted";
 }
 
-// Mock data - REMOVE WHEN BACKEND IS READY
+// Color mappings for status, type, and priority badges
 const statusColors: Record<string, string> = {
-  Researching: "bg-gray-500",
-  "In Progress": "bg-yellow-500",
-  "Ready to Submit": "bg-blue-500",
-  Submitted: "bg-green-500",
-  Accepted: "bg-emerald-500",
-  Rejected: "bg-red-500",
-  Waitlisted: "bg-orange-500",
+  not_started: "bg-gray-500",
+  in_progress: "bg-yellow-500",
+  submitted: "bg-blue-500",
+  under_review: "bg-indigo-500",
+  accepted: "bg-green-500",
+  rejected: "bg-red-500",
+  deferred: "bg-orange-500",
+  waitlisted: "bg-amber-500",
+  withdrawn: "bg-gray-600",
 };
 
 const typeColors: Record<string, string> = {
-  ED: "bg-purple-500",
-  EA: "bg-blue-500",
-  RD: "bg-gray-500",
+  early_decision: "bg-purple-500",
+  early_action: "bg-blue-500",
+  regular_decision: "bg-gray-500",
+  rolling_admission: "bg-teal-500",
+};
+
+const priorityColors: Record<string, string> = {
+  reach: "bg-red-500",
+  target: "bg-yellow-500",
+  safety: "bg-green-500",
 };
 
 // Helper functions for date format conversion
@@ -220,6 +229,7 @@ export default function CollegeDetail() {
   );
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [newTag, setNewTag] = useState("");
+  const [tagsInput, setTagsInput] = useState("");
 
   // Form data
   const [editForm, setEditForm] = useState<Partial<College>>({});
@@ -259,7 +269,10 @@ export default function CollegeDetail() {
         applicationFee: college.applicationFee,
         tags: college.tags,
         notes: college.notes,
+        priority: college.priority,
       });
+      // Initialize tags input with current tags
+      setTagsInput(college.tags?.join(", ") || "");
     }
   }, [showEditCollegeModal, college]);
 
@@ -290,6 +303,10 @@ export default function CollegeDetail() {
         updatedAt: application.updated_at,
         applicationFee: application.application_fee,
         contactEmail: application.contact_email,
+        priority: application.priority
+          ? ((application.priority.charAt(0).toUpperCase() +
+              application.priority.slice(1)) as "Safety" | "Target" | "Reach")
+          : undefined,
       };
 
       setCollege(transformedCollege);
@@ -631,11 +648,19 @@ export default function CollegeDetail() {
       updateData.application_fee = editForm.applicationFee;
     }
 
+    // Handle priority
+    if (editForm.priority !== college.priority) {
+      updateData.priority = editForm.priority
+        ? editForm.priority.toLowerCase()
+        : null;
+    }
+
     // Only proceed if there are changes to update
     if (Object.keys(updateData).length === 0) {
       console.log("No changes detected, skipping update");
       setShowEditCollegeModal(false);
       setEditForm({});
+      setTagsInput("");
       return;
     }
 
@@ -659,6 +684,7 @@ export default function CollegeDetail() {
 
       setShowEditCollegeModal(false);
       setEditForm({});
+      setTagsInput("");
       showSuccess("College information updated successfully!");
     } catch (error) {
       // Error notification is handled automatically by the API
@@ -748,7 +774,7 @@ export default function CollegeDetail() {
             const progress =
               checklist.tasks.length > 0
                 ? (completedTasks / checklist.tasks.length) * 100
-                : 0;
+                : 100; // If no tasks, consider checklist 100% complete
             return acc + progress;
           }, 0) / backendChecklists.length
         )
@@ -760,32 +786,47 @@ export default function CollegeDetail() {
 
       <div className="max-w-screen-xl mx-auto px-4 md:px-10 py-8 pt-28">
         {/* Header */}
-        <div className="flex items-center space-x-4 mb-8">
+        <div className="flex flex-col lg:flex-row lg:items-start space-y-4 lg:space-y-0 lg:space-x-4 mb-8">
           <Link
             href="/dashboard/colleges"
-            className="text-[#FEEBD8]/70 hover:text-[#FEEBD8] transition-colors"
+            className="text-[#FEEBD8]/70 hover:text-[#FEEBD8] transition-colors self-start"
           >
             <FaArrowLeft size={20} />
           </Link>
           <div className="flex-1">
-            <div className="flex items-center gap-4 mb-2">
-              <h1 className="text-4xl font-bold text-[#FEEBD8]">
+            <div className="mb-4">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#FEEBD8] mb-3">
                 {college.universityName}
               </h1>
-              <span
-                className={`px-3 py-1 rounded-full text-sm text-white ${
-                  statusColors[college.status]
-                }`}
-              >
-                {college.status}
-              </span>
-              <span
-                className={`px-3 py-1 rounded-full text-sm text-white ${
-                  typeColors[college.type]
-                }`}
-              >
-                {college.type}
-              </span>
+              <div className="flex flex-wrap items-center gap-2">
+                <span
+                  className={`px-3 py-1 rounded-full text-sm text-white ${
+                    statusColors[college.status]
+                  }`}
+                >
+                  {college.status
+                    .replace(/_/g, " ")
+                    .replace(/\b\w/g, (l) => l.toUpperCase())}
+                </span>
+                <span
+                  className={`px-3 py-1 rounded-full text-sm text-white ${
+                    typeColors[college.type]
+                  }`}
+                >
+                  {college.type
+                    .replace(/_/g, " ")
+                    .replace(/\b\w/g, (l) => l.toUpperCase())}
+                </span>
+                {college.priority && (
+                  <span
+                    className={`px-3 py-1 rounded-full text-sm text-white ${
+                      priorityColors[college.priority.toLowerCase()]
+                    }`}
+                  >
+                    {college.priority}
+                  </span>
+                )}
+              </div>
             </div>
             <p className="text-[#FEEBD8]/70">
               {college.universityState && `${college.universityState}, `}
@@ -800,10 +841,10 @@ export default function CollegeDetail() {
               </div>
             )}
           </div>
-          <div className="flex gap-3">
+          <div className="w-full lg:w-auto">
             <button
               onClick={() => setShowEditCollegeModal(true)}
-              className="bg-[#FEEBD8] text-[#141414] px-6 py-3 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors flex items-center space-x-2"
+              className="bg-[#FEEBD8] text-[#141414] px-4 sm:px-6 py-3 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors flex items-center justify-center space-x-2 w-full lg:w-auto"
             >
               <FaEdit />
               <span>Edit College</span>
@@ -893,6 +934,23 @@ export default function CollegeDetail() {
                     </div>
                   </div>
                 )}
+
+              {college.priority && (
+                <div>
+                  <label className="text-[#FEEBD8]/70 text-sm">
+                    Priority Level
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`px-3 py-1 rounded-full text-sm text-white font-medium ${
+                        priorityColors[college.priority.toLowerCase()]
+                      }`}
+                    >
+                      {college.priority}
+                    </span>
+                  </div>
+                </div>
+              )}
 
               {college.contactEmail && (
                 <div>
@@ -1059,20 +1117,20 @@ export default function CollegeDetail() {
             >
               <button
                 onClick={() => toggleChecklist(checklist.id)}
-                className="w-full p-6 text-left hover:bg-neutral-800/50 transition-colors"
+                className="w-full p-4 sm:p-6 text-left hover:bg-neutral-800/50 transition-colors"
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="flex items-center gap-4 flex-1">
                     {expandedChecklists.has(checklist.id) ? (
-                      <FaChevronDown className="text-[#FEEBD8]/50" />
+                      <FaChevronDown className="text-[#FEEBD8]/50 flex-shrink-0" />
                     ) : (
-                      <FaChevronRight className="text-[#FEEBD8]/50" />
+                      <FaChevronRight className="text-[#FEEBD8]/50 flex-shrink-0" />
                     )}
-                    <div>
+                    <div className="flex-1 min-w-0">
                       <h3 className="text-lg font-semibold text-[#FEEBD8]">
                         {checklist.name}
                       </h3>
-                      <div className="flex items-center gap-4 mt-2">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mt-2">
                         <div className="text-sm text-[#FEEBD8]/70">
                           {
                             checklist.tasks.filter((task) => task.completed)
@@ -1080,42 +1138,44 @@ export default function CollegeDetail() {
                           }{" "}
                           of {checklist.tasks.length} completed
                         </div>
-                        <div className="w-32 bg-neutral-700 rounded-full h-2">
-                          <div
-                            className="bg-gradient-to-r from-[#FEEBD8] to-[#E5D5B7] h-2 rounded-full transition-all duration-300"
-                            style={{
-                              width: `${
-                                checklist.tasks.length > 0
-                                  ? Math.round(
-                                      (checklist.tasks.filter(
-                                        (task) => task.completed
-                                      ).length /
-                                        checklist.tasks.length) *
-                                        100
-                                    )
-                                  : 0
-                              }%`,
-                            }}
-                          ></div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-24 sm:w-32 bg-neutral-700 rounded-full h-2">
+                            <div
+                              className="bg-gradient-to-r from-[#FEEBD8] to-[#E5D5B7] h-2 rounded-full transition-all duration-300"
+                              style={{
+                                width: `${
+                                  checklist.tasks.length > 0
+                                    ? Math.round(
+                                        (checklist.tasks.filter(
+                                          (task) => task.completed
+                                        ).length /
+                                          checklist.tasks.length) *
+                                          100
+                                      )
+                                    : 0
+                                }%`,
+                              }}
+                            ></div>
+                          </div>
+                          <span className="text-sm text-[#FEEBD8]/70">
+                            {checklist.tasks.length > 0
+                              ? Math.round(
+                                  (checklist.tasks.filter(
+                                    (task) => task.completed
+                                  ).length /
+                                    checklist.tasks.length) *
+                                    100
+                                )
+                              : 0}
+                            %
+                          </span>
                         </div>
-                        <span className="text-sm text-[#FEEBD8]/70">
-                          {checklist.tasks.length > 0
-                            ? Math.round(
-                                (checklist.tasks.filter(
-                                  (task) => task.completed
-                                ).length /
-                                  checklist.tasks.length) *
-                                  100
-                              )
-                            : 0}
-                          %
-                        </span>
                       </div>
                     </div>
                   </div>
 
                   <div
-                    className="flex items-center gap-2"
+                    className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 min-w-0"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <button
@@ -1124,19 +1184,19 @@ export default function CollegeDetail() {
                         setEditingChecklistId(checklist.id);
                         setShowEditChecklistModal(true);
                       }}
-                      className="px-3 py-1 bg-yellow-600 text-white rounded text-sm hover:bg-yellow-700 transition-colors flex items-center gap-1"
+                      className="px-3 py-2 bg-yellow-600 text-white rounded text-sm hover:bg-yellow-700 transition-colors flex items-center gap-1 justify-center touch-manipulation"
                       title="Edit Checklist"
                     >
                       <FaEdit size={12} />
-                      Edit
+                      <span>Edit</span>
                     </button>
                     <button
                       onClick={() => handleDeleteChecklist(checklist.id)}
-                      className="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700 transition-colors flex items-center gap-1"
+                      className="px-3 py-2 bg-red-600 text-white rounded text-sm hover:bg-red-700 transition-colors flex items-center gap-1 justify-center touch-manipulation"
                       title="Delete Checklist"
                     >
                       <FaTrash size={12} />
-                      Delete
+                      <span>Delete</span>
                     </button>
                   </div>
                 </div>
@@ -1384,15 +1444,16 @@ export default function CollegeDetail() {
       {/* Edit College Modal */}
       {showEditCollegeModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-[#1a1a1a] border border-neutral-700/50 rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-[#1a1a1a] border border-neutral-700/50 rounded-lg p-4 sm:p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-[#FEEBD8]">
+              <h2 className="text-lg sm:text-xl font-semibold text-[#FEEBD8]">
                 Edit College Information
               </h2>
               <button
                 onClick={() => {
                   setShowEditCollegeModal(false);
                   setEditForm({});
+                  setTagsInput("");
                 }}
                 className="text-[#FEEBD8]/50 hover:text-[#FEEBD8] transition-colors"
               >
@@ -1420,7 +1481,7 @@ export default function CollegeDetail() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[#FEEBD8]/70 text-sm mb-2">
                     State
@@ -1464,65 +1525,92 @@ export default function CollegeDetail() {
                 </div>
               </div>
 
-              <div>
-                <label className="block text-[#FEEBD8]/70 text-sm mb-2">
-                  Major
-                </label>
-                <input
-                  type="text"
-                  value={editForm.major || college?.major || ""}
-                  onChange={(e) =>
-                    setEditForm((prev) => ({
-                      ...prev,
-                      major: e.target.value,
-                    }))
-                  }
-                  className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
-                  placeholder="e.g., Computer Science"
-                />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[#FEEBD8]/70 text-sm mb-2">
+                    Major
+                  </label>
+                  <input
+                    type="text"
+                    value={editForm.major || college?.major || ""}
+                    onChange={(e) =>
+                      setEditForm((prev) => ({
+                        ...prev,
+                        major: e.target.value,
+                      }))
+                    }
+                    className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
+                    placeholder="e.g., Computer Science"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[#FEEBD8]/70 text-sm mb-2">
+                    Priority Level
+                  </label>
+                  <select
+                    value={editForm.priority || college?.priority || ""}
+                    onChange={(e) =>
+                      setEditForm((prev) => ({
+                        ...prev,
+                        priority: e.target.value
+                          ? (e.target.value as "Safety" | "Target" | "Reach")
+                          : undefined,
+                      }))
+                    }
+                    className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
+                  >
+                    <option value="">Select Priority Level</option>
+                    <option value="Safety">Safety</option>
+                    <option value="Target">Target</option>
+                    <option value="Reach">Reach</option>
+                  </select>
+                </div>
               </div>
 
-              <div>
-                <label className="block text-[#FEEBD8]/70 text-sm mb-2">
-                  Website(s)
-                </label>
-                <input
-                  type="text"
-                  value={
-                    editForm.universityWebsite ||
-                    college?.universityWebsite ||
-                    ""
-                  }
-                  onChange={(e) =>
-                    setEditForm((prev) => ({
-                      ...prev,
-                      universityWebsite: e.target.value,
-                    }))
-                  }
-                  className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
-                  placeholder="e.g., https://www.university.edu"
-                />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[#FEEBD8]/70 text-sm mb-2">
+                    Website(s)
+                  </label>
+                  <input
+                    type="text"
+                    value={
+                      editForm.universityWebsite ||
+                      college?.universityWebsite ||
+                      ""
+                    }
+                    onChange={(e) =>
+                      setEditForm((prev) => ({
+                        ...prev,
+                        universityWebsite: e.target.value,
+                      }))
+                    }
+                    className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
+                    placeholder="e.g., https://www.university.edu"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[#FEEBD8]/70 text-sm mb-2">
+                    Contact Email
+                  </label>
+                  <input
+                    type="email"
+                    value={editForm.contactEmail || college?.contactEmail || ""}
+                    onChange={(e) =>
+                      setEditForm((prev) => ({
+                        ...prev,
+                        contactEmail: e.target.value,
+                      }))
+                    }
+                    className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
+                    placeholder="admissions@university.edu"
+                  />
+                </div>
               </div>
 
-              <div>
-                <label className="block text-[#FEEBD8]/70 text-sm mb-2">
-                  Contact Email
-                </label>
-                <input
-                  type="email"
-                  value={editForm.contactEmail || college?.contactEmail || ""}
-                  onChange={(e) =>
-                    setEditForm((prev) => ({
-                      ...prev,
-                      contactEmail: e.target.value,
-                    }))
-                  }
-                  className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
-                  placeholder="admissions@university.edu"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[#FEEBD8]/70 text-sm mb-2">
                     Status
@@ -1570,7 +1658,7 @@ export default function CollegeDetail() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[#FEEBD8]/70 text-sm mb-2">
                     Application Deadline
@@ -1617,18 +1705,19 @@ export default function CollegeDetail() {
                 </label>
                 <input
                   type="text"
-                  value={
-                    editForm.tags?.join(", ") || college?.tags?.join(", ") || ""
-                  }
-                  onChange={(e) =>
+                  value={tagsInput}
+                  onChange={(e) => setTagsInput(e.target.value)}
+                  onBlur={(e) => {
+                    // Process tags on blur (when user leaves the field)
+                    const processedTags = e.target.value
+                      .split(",")
+                      .map((tag) => tag.trim())
+                      .filter((tag) => tag);
                     setEditForm((prev) => ({
                       ...prev,
-                      tags: e.target.value
-                        .split(",")
-                        .map((tag) => tag.trim())
-                        .filter((tag) => tag),
-                    }))
-                  }
+                      tags: processedTags,
+                    }));
+                  }}
                   className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
                   placeholder="e.g., Ivy League, Engineering, Research"
                 />
@@ -1648,7 +1737,7 @@ export default function CollegeDetail() {
                 />
               </div>
 
-              <div className="flex gap-3 pt-4">
+              <div className="flex flex-col sm:flex-row gap-3 pt-4">
                 <button
                   onClick={handleSaveCollege}
                   className="flex-1 bg-[#FEEBD8] text-[#141414] px-4 py-2 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors"
@@ -1659,6 +1748,7 @@ export default function CollegeDetail() {
                   onClick={() => {
                     setShowEditCollegeModal(false);
                     setEditForm({});
+                    setTagsInput("");
                   }}
                   className="px-4 py-2 border border-neutral-700/50 rounded-lg text-[#FEEBD8]/70 hover:text-[#FEEBD8] hover:border-[#FEEBD8]/30 transition-colors"
                 >
@@ -1673,9 +1763,9 @@ export default function CollegeDetail() {
       {/* Edit Checklist Modal */}
       {showEditChecklistModal && editingChecklist && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-[#1a1a1a] border border-neutral-700/50 rounded-lg p-6 w-full max-w-md">
+          <div className="bg-[#1a1a1a] border border-neutral-700/50 rounded-lg p-4 sm:p-6 w-full max-w-md">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-[#FEEBD8]">
+              <h2 className="text-lg sm:text-xl font-semibold text-[#FEEBD8]">
                 Edit Checklist
               </h2>
               <button
@@ -1748,7 +1838,7 @@ export default function CollegeDetail() {
                 />
               </div>
 
-              <div className="flex gap-3 pt-4">
+              <div className="flex flex-col sm:flex-row gap-3 pt-4">
                 <button
                   onClick={async () => {
                     if (editingChecklistId && editingChecklist) {
@@ -1797,9 +1887,9 @@ export default function CollegeDetail() {
       {/* Add Checklist Modal */}
       {showAddChecklistModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-[#1a1a1a] border border-neutral-700/50 rounded-lg p-6 w-full max-w-md">
+          <div className="bg-[#1a1a1a] border border-neutral-700/50 rounded-lg p-4 sm:p-6 w-full max-w-md">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-[#FEEBD8]">
+              <h2 className="text-lg sm:text-xl font-semibold text-[#FEEBD8]">
                 Add New Checklist
               </h2>
               <button
@@ -1833,7 +1923,7 @@ export default function CollegeDetail() {
                   required
                 />
               </div>
-              <div className="flex gap-3 pt-4">
+              <div className="flex flex-col sm:flex-row gap-3 pt-4">
                 <button
                   type="submit"
                   className="flex-1 bg-[#FEEBD8] text-[#141414] px-4 py-2 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors"
@@ -1940,7 +2030,7 @@ export default function CollegeDetail() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[#FEEBD8]/70 text-sm mb-2">
                     Deadline
@@ -1968,7 +2058,7 @@ export default function CollegeDetail() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[#FEEBD8]/70 text-sm mb-2">
                     Task Type
@@ -2019,7 +2109,7 @@ export default function CollegeDetail() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[#FEEBD8]/70 text-sm mb-2">
                     Status
@@ -2067,7 +2157,7 @@ export default function CollegeDetail() {
                 />
               </div>
 
-              <div className="flex gap-3 pt-4">
+              <div className="flex flex-col sm:flex-row gap-3 pt-4">
                 <button
                   type="submit"
                   className="flex-1 bg-[#FEEBD8] text-[#141414] px-4 py-2 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors"
@@ -2129,7 +2219,7 @@ export default function CollegeDetail() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[#FEEBD8]/70 text-sm mb-2">
                     Deadline
@@ -2176,7 +2266,7 @@ export default function CollegeDetail() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[#FEEBD8]/70 text-sm mb-2">
                     Task Type
@@ -2242,7 +2332,7 @@ export default function CollegeDetail() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[#FEEBD8]/70 text-sm mb-2">
                     Status
@@ -2330,7 +2420,7 @@ export default function CollegeDetail() {
                 </label>
               </div>
 
-              <div className="flex gap-3 pt-4">
+              <div className="flex flex-col sm:flex-row gap-3 pt-4">
                 <button
                   onClick={async () => {
                     if (editingChecklistId && editingTask && editingTaskId) {

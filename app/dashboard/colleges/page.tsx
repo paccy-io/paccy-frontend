@@ -72,6 +72,22 @@ interface CollegeDisplay {
 const transformCollegeApplication = (
   app: CollegeApplication
 ): CollegeDisplay => {
+  // Calculate progress from checklists/tasks
+  let progress = 0;
+  if (app.checklists && app.checklists.length > 0) {
+    const totalTasks = app.checklists.reduce(
+      (acc, checklist) => acc + checklist.tasks.length,
+      0
+    );
+    const completedTasks = app.checklists.reduce(
+      (acc, checklist) =>
+        acc + checklist.tasks.filter((task) => task.completed).length,
+      0
+    );
+    progress =
+      totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+  }
+
   return {
     id: app.id,
     universityName: app.name,
@@ -84,7 +100,7 @@ const transformCollegeApplication = (
     major: app.major || "",
     notes: app.notes || "",
     tags: app.tags || [],
-    progress: app.progress || 0,
+    progress: progress, // Use calculated progress
     priority: app.priority,
     location: app.location,
     applicationFee: app.application_fee,
@@ -826,7 +842,7 @@ export default function CollegeTracker() {
 
       <div className="max-w-screen-2xl mx-auto px-4 md:px-10 py-8 pt-28">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <div className="flex items-center space-x-4">
             <button
               onClick={() => router.push("/dashboard")}
@@ -835,7 +851,7 @@ export default function CollegeTracker() {
               <FaArrowLeft size={20} />
             </button>
             <div>
-              <h1 className="text-4xl font-bold text-[#FEEBD8]">
+              <h1 className="text-3xl sm:text-4xl font-bold text-[#FEEBD8]">
                 College Applications
               </h1>
               <p className="text-[#FEEBD8]/70 mt-2">
@@ -845,7 +861,7 @@ export default function CollegeTracker() {
           </div>
           <button
             onClick={() => setShowAddCollegeForm(true)}
-            className="bg-[#FEEBD8] text-[#141414] px-6 py-3 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors flex items-center space-x-2"
+            className="bg-[#FEEBD8] text-[#141414] px-4 sm:px-6 py-3 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors flex items-center justify-center space-x-2 w-full sm:w-auto"
           >
             <FaPlus />
             <span>Add Application</span>
@@ -1165,11 +1181,11 @@ export default function CollegeTracker() {
                       // View Mode - Clean Button Layout
                       <>
                         <button
-                          onClick={() => handleEditCollege(college)}
-                          className="w-full px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center justify-center gap-2 text-sm"
+                          onClick={() => handleCollegeClick(college.id)}
+                          className="w-full px-3 py-2 bg-[#FEEBD8] text-[#141414] rounded-lg hover:bg-[#E5D5B7] flex items-center justify-center gap-2 text-sm font-semibold"
                         >
-                          <FaEdit size={14} />
-                          Edit
+                          <FaChevronRight size={14} />
+                          View Details
                         </button>
                         <button
                           onClick={() => handleDeleteCollege(college.id)}
@@ -1177,13 +1193,6 @@ export default function CollegeTracker() {
                         >
                           <FaTrash size={14} />
                           Delete
-                        </button>
-                        <button
-                          onClick={() => handleCollegeClick(college.id)}
-                          className="w-full px-3 py-2 bg-[#FEEBD8] text-[#141414] rounded-lg hover:bg-[#E5D5B7] flex items-center justify-center gap-2 text-sm font-semibold"
-                        >
-                          <FaChevronRight size={14} />
-                          View Details
                         </button>
                       </>
                     )}
