@@ -766,18 +766,20 @@ export default function CollegeDetail() {
 
   const overallProgress =
     backendChecklists.length > 0
-      ? Math.round(
-          backendChecklists.reduce((acc, checklist) => {
-            const completedTasks = checklist.tasks.filter(
-              (task) => task.completed
-            ).length;
-            const progress =
-              checklist.tasks.length > 0
-                ? (completedTasks / checklist.tasks.length) * 100
-                : 100; // If no tasks, consider checklist 100% complete
-            return acc + progress;
-          }, 0) / backendChecklists.length
-        )
+      ? (() => {
+          const totalTasks = backendChecklists.reduce(
+            (acc, checklist) => acc + checklist.tasks.length,
+            0
+          );
+          const completedTasks = backendChecklists.reduce(
+            (acc, checklist) =>
+              acc + checklist.tasks.filter((task) => task.completed).length,
+            0
+          );
+          return totalTasks > 0
+            ? Math.round((completedTasks / totalTasks) * 100)
+            : 0;
+        })()
       : 0;
 
   return (
