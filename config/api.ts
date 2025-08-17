@@ -9,4 +9,10 @@ export const API_ENDPOINTS = {
   UPDATE_USER_FIELDS: "/users", // PUT /users/:userID
   UPDATE_USER_PROFILE: "/users", // PUT /users/:userID/profile
   UPDATE_USER_PREFERENCES: "/users", // PUT /users/:userID/preferences
+
+  // College Applications
+  COLLEGE_APPLICATIONS: "/college-applications",
+  COLLEGE_APPLICATION_DEADLINES: "/college-applications/deadlines/upcoming",
+  COLLEGE_APPLICATION_CHECKLISTS: "/college-applications/checklists",
+  COLLEGE_APPLICATION_TASKS: "/college-applications/tasks",
 } as const;

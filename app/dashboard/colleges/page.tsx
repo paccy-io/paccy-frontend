@@ -1,10 +1,19 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
+import { COLLEGE_MAJORS, POPULAR_MAJORS } from "../../../lib/majors";
+import { api, ApiError } from "../../../lib/api/college-applications";
+import {
+  CollegeApplication,
+  Status,
+  ApplicationType,
+  Priority,
+  Category,
+} from "../../../lib/types";
+import { useToast } from "../../../lib/hooks/useToast";
 import {
   FaPlus,
   FaSearch,
@@ -22,6 +31,9 @@ import {
   FaTasks,
   FaBell,
   FaChartLine,
+  FaChevronDown,
+  FaSave,
+  FaTimes,
 } from "react-icons/fa";
 
 // Types
@@ -34,75 +46,107 @@ interface University {
   "state-province": string | null;
 }
 
-interface College {
+// Transform backend CollegeApplication to UI display format
+interface CollegeDisplay {
   id: string;
   universityName: string;
   universityCountry: string;
   universityState: string | null;
   universityWebsite: string;
-  status: string;
+  status: Status;
   deadline: string;
-  type: string;
+  type: ApplicationType;
+  major: string;
   notes: string;
   tags: string[];
   progress: number;
+  priority: Priority;
+  location?: string;
+  applicationFee?: number;
+  contactEmail?: string;
   createdAt: string;
   updatedAt: string;
 }
 
-// Mock data for colleges
-const mockColleges: College[] = [
-  {
-    id: "1",
-    universityName: "Harvard University",
-    universityCountry: "United States",
-    universityState: "Massachusetts",
-    universityWebsite: "https://harvard.edu",
-    status: "In Progress",
-    deadline: "2026-01-01",
-    type: "RD",
-    notes: "Need to finish personal statement",
-    tags: ["Ivy League", "Reach"],
-    progress: 65,
-    createdAt: "2024-09-15",
-    updatedAt: "2024-12-01",
-  },
-  {
-    id: "2",
-    universityName: "Stanford University",
-    universityCountry: "United States",
-    universityState: "California",
-    universityWebsite: "https://stanford.edu",
-    status: "Ready to Submit",
-    deadline: "2025-12-15",
-    type: "EA",
-    notes: "All materials ready for submission",
-    tags: ["Reach", "Tech"],
-    progress: 95,
-    createdAt: "2024-08-20",
-    updatedAt: "2024-11-28",
-  },
-];
-
-const statusColors: Record<string, string> = {
-  Researching: "bg-gray-500",
-  "In Progress": "bg-yellow-500",
-  "Ready to Submit": "bg-blue-500",
-  Submitted: "bg-green-500",
-  Accepted: "bg-emerald-500",
-  Rejected: "bg-red-500",
-  Waitlisted: "bg-orange-500",
+// Helper function to transform backend data to UI format
+const transformCollegeApplication = (
+  app: CollegeApplication
+): CollegeDisplay => {
+  return {
+    id: app.id,
+    universityName: app.name,
+    universityCountry: "United States", // Default as not in backend schema
+    universityState: null, // Parse from location if needed
+    universityWebsite: app.websites?.[0] || "",
+    status: app.status,
+    deadline: app.deadline || "",
+    type: app.application_type,
+    major: app.major || "",
+    notes: app.notes || "",
+    tags: app.tags || [],
+    progress: app.progress || 0,
+    priority: app.priority,
+    location: app.location,
+    applicationFee: app.application_fee,
+    contactEmail: app.contact_email,
+    createdAt: app.created_at,
+    updatedAt: app.updated_at,
+  };
 };
 
-const typeColors: Record<string, string> = {
-  ED: "bg-purple-500",
-  EA: "bg-blue-500",
-  RD: "bg-gray-500",
+const statusColors: Record<Status, string> = {
+  [Status.NOT_STARTED]: "bg-gray-500",
+  [Status.IN_PROGRESS]: "bg-yellow-500",
+  [Status.SUBMITTED]: "bg-green-500",
+  [Status.UNDER_REVIEW]: "bg-blue-500",
+  [Status.ACCEPTED]: "bg-emerald-500",
+  [Status.REJECTED]: "bg-red-500",
+  [Status.DEFERRED]: "bg-orange-500",
+  [Status.WAITLISTED]: "bg-orange-400",
+  [Status.WITHDRAWN]: "bg-gray-400",
+};
+
+const typeColors: Record<ApplicationType, string> = {
+  [ApplicationType.EARLY_DECISION]: "bg-purple-500",
+  [ApplicationType.EARLY_ACTION]: "bg-blue-500",
+  [ApplicationType.REGULAR_DECISION]: "bg-gray-500",
+  [ApplicationType.ROLLING_ADMISSION]: "bg-green-500",
+};
+
+// Helper functions for date format conversion
+const formatDateForInput = (isoDate: string | undefined) => {
+  if (!isoDate) return "";
+  return isoDate.split("T")[0]; // Extract YYYY-MM-DD from ISO format
+};
+
+const formatDateForBackend = (inputDate: string) => {
+  if (!inputDate) return "";
+  return `${inputDate}T23:59:59Z`; // Convert to ISO 8601 format
 };
 
 export default function CollegeTracker() {
   const router = useRouter();
-  const [colleges, setColleges] = useState<College[]>(mockColleges);
+  const { success: showSuccess, error: showError } = useToast();
+
+  // Backend integration states
+  const [colleges, setColleges] = useState<CollegeDisplay[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Reset form function
+  const resetForm = () => {
+    setSelectedUniversity(null);
+    setUniversitySearch("");
+    setCustomUniversityName("");
+    setMajorInput("");
+    setApplicationType("");
+    setPriority("");
+    setDeadline("");
+    setNotes("");
+    setShowUniversityDropdown(false);
+    setShowMajorDropdown(false);
+    setShowCustomUniversity(false);
+  };
+
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("All");
   const [filterType, setFilterType] = useState("All");
@@ -119,6 +163,52 @@ export default function CollegeTracker() {
     useState<University | null>(null);
   const [customUniversityName, setCustomUniversityName] = useState("");
   const [isLoadingUniversities, setIsLoadingUniversities] = useState(false);
+  const [showCustomUniversity, setShowCustomUniversity] = useState(false);
+
+  // Major selection states
+  const [majorInput, setMajorInput] = useState("");
+  const [showMajorDropdown, setShowMajorDropdown] = useState(false);
+  const [filteredMajors, setFilteredMajors] = useState<string[]>([]);
+  const majorDropdownRef = useRef<HTMLDivElement>(null);
+
+  // New college form states
+  const [applicationType, setApplicationType] = useState("");
+  const [priority, setPriority] = useState("");
+  const [deadline, setDeadline] = useState("");
+  const [notes, setNotes] = useState("");
+
+  // Edit states
+  const [editingCollegeId, setEditingCollegeId] = useState<string | null>(null);
+  const [editForm, setEditForm] = useState({
+    name: "",
+    status: "",
+    deadline: "",
+    major: "",
+    notes: "",
+    application_type: "",
+    priority: "",
+  });
+
+  // Load colleges from backend on component mount
+  useEffect(() => {
+    loadColleges();
+  }, []);
+
+  const loadColleges = async () => {
+    try {
+      setIsLoading(true);
+      const applications = await api.collegeApplications.getAll();
+      const transformedColleges = applications.map(transformCollegeApplication);
+      setColleges(transformedColleges);
+    } catch (error) {
+      console.error("Failed to load colleges:", error);
+      showError(
+        error instanceof ApiError ? error.message : "Failed to load colleges"
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     document.title = "College Applications | Paccy";
@@ -144,7 +234,34 @@ export default function CollegeTracker() {
     fetchUniversities();
   }, []);
 
-  // Filter universities based on search
+  // Filter majors based on input
+  useEffect(() => {
+    if (majorInput.trim()) {
+      const filtered = COLLEGE_MAJORS.filter((major) =>
+        major.toLowerCase().includes(majorInput.toLowerCase())
+      );
+      setFilteredMajors(filtered);
+    } else {
+      setFilteredMajors(COLLEGE_MAJORS.slice(0, 10)); // Show first 10 when empty
+    }
+  }, [majorInput]);
+
+  // Handle click outside for major dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        majorDropdownRef.current &&
+        !majorDropdownRef.current.contains(event.target as Node)
+      ) {
+        setShowMajorDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []); // Filter universities based on search
   useEffect(() => {
     if (universitySearch && universities.length > 0 && !selectedUniversity) {
       const filtered = universities
@@ -185,54 +302,177 @@ export default function CollegeTracker() {
   };
 
   const handleCustomUniversityToggle = () => {
+    setShowCustomUniversity(!showCustomUniversity);
     setSelectedUniversity(null);
     setUniversitySearch("");
     setShowUniversityDropdown(false);
+    setCustomUniversityName("");
   };
 
-  const handleCreateApplication = () => {
+  const handleCreateApplication = async () => {
     if (!selectedUniversity && !customUniversityName.trim()) {
       alert("Please select a university or enter a custom university name.");
       return;
     }
 
-    const newCollege: College = {
-      id: Date.now().toString(),
-      universityName: selectedUniversity
-        ? selectedUniversity.name
-        : customUniversityName,
-      universityCountry: selectedUniversity
-        ? selectedUniversity.country
-        : "Unknown",
-      universityState: selectedUniversity
-        ? selectedUniversity["state-province"]
-        : null,
-      universityWebsite: selectedUniversity
-        ? selectedUniversity.web_pages[0] || ""
-        : "",
-      status: "Researching",
+    if (!majorInput.trim()) {
+      alert("Please select or enter a major.");
+      return;
+    }
+
+    try {
+      const createData = {
+        name: selectedUniversity
+          ? selectedUniversity.name
+          : customUniversityName,
+        websites: selectedUniversity ? selectedUniversity.web_pages : [],
+        status: Status.NOT_STARTED,
+        application_type: (applicationType ||
+          ApplicationType.REGULAR_DECISION) as ApplicationType,
+        priority: (priority || Priority.TARGET) as Priority,
+        major: majorInput,
+        deadline: deadline || undefined,
+        notes: notes || undefined,
+        location: selectedUniversity
+          ? `${selectedUniversity["state-province"] || ""}, ${
+              selectedUniversity.country
+            }`
+          : undefined,
+      };
+
+      const newApplication = await api.collegeApplications.create(createData);
+      const newCollege = transformCollegeApplication(newApplication);
+
+      setColleges((prev) => [...prev, newCollege]);
+      setShowAddCollegeForm(false);
+      resetForm();
+
+      showSuccess(`Added ${newCollege.universityName} to your applications!`);
+
+      // Navigate to the college detail page
+      if (selectedUniversity) {
+        const universityParam = encodeURIComponent(
+          JSON.stringify(selectedUniversity)
+        );
+        router.push(
+          `/dashboard/colleges/${newCollege.id}?university=${universityParam}`
+        );
+      } else {
+        router.push(`/dashboard/colleges/${newCollege.id}`);
+      }
+    } catch (error) {
+      console.error("Failed to create college application:", error);
+      showError(
+        error instanceof ApiError
+          ? error.message
+          : "Failed to create college application"
+      );
+    }
+  };
+
+  // Edit college application
+  const handleEditCollege = (college: CollegeDisplay) => {
+    setEditingCollegeId(college.id);
+    setEditForm({
+      name: college.universityName,
+      status: college.status,
+      deadline: college.deadline,
+      major: college.major,
+      notes: college.notes,
+      application_type: college.type,
+      priority: "target", // Default since not stored in UI College interface
+    });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingCollegeId(null);
+    setEditForm({
+      name: "",
+      status: "",
       deadline: "",
-      type: "RD",
+      major: "",
       notes: "",
-      tags: [],
-      progress: 0,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
+      application_type: "",
+      priority: "",
+    });
+  };
 
-    setColleges((prev) => [...prev, newCollege]);
-    setShowAddCollegeForm(false);
+  const handleUpdateCollege = async (collegeId: string) => {
+    try {
+      const updateData = {
+        name: editForm.name,
+        status: editForm.status as Status,
+        deadline: editForm.deadline || undefined,
+        major: editForm.major,
+        notes: editForm.notes || undefined,
+        application_type: editForm.application_type as ApplicationType,
+        priority: editForm.priority as Priority,
+      };
 
-    // Navigate to the college detail page with university data
-    if (selectedUniversity) {
-      const universityParam = encodeURIComponent(
-        JSON.stringify(selectedUniversity)
+      const updatedApplication = await api.collegeApplications.update(
+        collegeId,
+        updateData
       );
-      router.push(
-        `/dashboard/colleges/${newCollege.id}?university=${universityParam}`
+      const updatedCollege = transformCollegeApplication(updatedApplication);
+
+      setColleges((prev) =>
+        prev.map((c) => (c.id === collegeId ? updatedCollege : c))
       );
-    } else {
-      router.push(`/dashboard/colleges/${newCollege.id}`);
+      setEditingCollegeId(null);
+      showSuccess("College application updated successfully");
+    } catch (error) {
+      console.error("Failed to update college application:", error);
+      showError(
+        error instanceof ApiError
+          ? error.message
+          : "Failed to update college application"
+      );
+    }
+  };
+
+  // Delete college application
+  const handleDeleteCollege = async (collegeId: string) => {
+    if (!confirm("Are you sure you want to delete this college application?")) {
+      return;
+    }
+
+    try {
+      await api.collegeApplications.delete(collegeId);
+      setColleges((prev) => prev.filter((c) => c.id !== collegeId));
+      showSuccess("College application deleted successfully");
+    } catch (error) {
+      console.error("Failed to delete college application:", error);
+      showError(
+        error instanceof ApiError
+          ? error.message
+          : "Failed to delete college application"
+      );
+    }
+  };
+
+  // Example: Create a checklist for a college application
+  const handleCreateChecklist = async (
+    collegeId: string,
+    checklistName: string
+  ) => {
+    try {
+      const createData = {
+        application_id: collegeId,
+        name: checklistName,
+        category: Category.APPLICATION,
+        description: "Application checklist",
+      };
+
+      await api.checklists.create(createData);
+      showSuccess(`Created checklist "${checklistName}" successfully`);
+
+      // Refresh the colleges to show updated data
+      await loadColleges();
+    } catch (error) {
+      console.error("Failed to create checklist:", error);
+      showError(
+        error instanceof ApiError ? error.message : "Failed to create checklist"
+      );
     }
   };
 
@@ -364,18 +604,21 @@ export default function CollegeTracker() {
                 </div>
 
                 {/* Custom University Option */}
-                <div className="text-center">
-                  <div className="text-[#FEEBD8]/50 text-sm mb-4">or</div>
+                {!showCustomUniversity && (
+                  <div className="text-center">
+                    <div className="text-[#FEEBD8]/50 text-sm mb-4">or</div>
 
-                  <button
-                    onClick={handleCustomUniversityToggle}
-                    className="text-[#FEEBD8] hover:text-[#E5D5B7] transition-colors text-sm underline"
-                  >
-                    Can't find your university? Add it manually
-                  </button>
-                </div>
+                    <button
+                      type="button"
+                      onClick={handleCustomUniversityToggle}
+                      className="text-blue-400 hover:text-blue-300 transition-colors text-sm underline"
+                    >
+                      Can't find your university? Add custom name
+                    </button>
+                  </div>
+                )}
 
-                {!selectedUniversity && (
+                {showCustomUniversity && (
                   <div>
                     <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
                       Custom University Name
@@ -387,13 +630,154 @@ export default function CollegeTracker() {
                       onChange={(e) => setCustomUniversityName(e.target.value)}
                       className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-3 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowCustomUniversity(false)}
+                      className="mt-2 text-sm text-[#FEEBD8]/70 hover:text-[#FEEBD8] underline"
+                    >
+                      Back to university search
+                    </button>
                   </div>
                 )}
+
+                {/* Major Selection */}
+                <div ref={majorDropdownRef}>
+                  <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+                    Major
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder="Search or select a major..."
+                      value={majorInput}
+                      onChange={(e) => {
+                        setMajorInput(e.target.value);
+                        setShowMajorDropdown(true);
+                      }}
+                      onFocus={() => setShowMajorDropdown(true)}
+                      className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-3 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                    />
+
+                    {showMajorDropdown && filteredMajors.length > 0 && (
+                      <div className="absolute z-50 w-full mt-1 bg-neutral-800 border border-neutral-700 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                        {filteredMajors.slice(0, 10).map((major, index) => (
+                          <div
+                            key={index}
+                            onClick={() => {
+                              setMajorInput(major);
+                              setShowMajorDropdown(false);
+                            }}
+                            className="px-4 py-2 text-[#FEEBD8] hover:bg-neutral-700 cursor-pointer"
+                          >
+                            {major}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Popular Majors Quick Selection */}
+                  <div className="mt-3">
+                    <p className="text-xs text-[#FEEBD8]/50 mb-2">
+                      Popular majors:
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {POPULAR_MAJORS.slice(0, 6).map((major) => (
+                        <button
+                          key={major}
+                          type="button"
+                          onClick={() => {
+                            setMajorInput(major);
+                            setShowMajorDropdown(false);
+                          }}
+                          className="px-3 py-1 text-xs bg-neutral-700 text-[#FEEBD8]/80 rounded-md hover:bg-neutral-600 transition-colors"
+                        >
+                          {major}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Application Type */}
+                <div>
+                  <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+                    Application Type
+                  </label>
+                  <select
+                    value={applicationType}
+                    onChange={(e) => setApplicationType(e.target.value)}
+                    className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-3 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                  >
+                    <option value="">Select Application Type</option>
+                    <option value={ApplicationType.EARLY_DECISION}>
+                      Early Decision
+                    </option>
+                    <option value={ApplicationType.EARLY_ACTION}>
+                      Early Action
+                    </option>
+                    <option value={ApplicationType.REGULAR_DECISION}>
+                      Regular Decision
+                    </option>
+                    <option value={ApplicationType.ROLLING_ADMISSION}>
+                      Rolling Admission
+                    </option>
+                  </select>
+                </div>
+
+                {/* Priority */}
+                <div>
+                  <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+                    Priority Level
+                  </label>
+                  <select
+                    value={priority}
+                    onChange={(e) => setPriority(e.target.value)}
+                    className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-3 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                  >
+                    <option value="">Select Priority</option>
+                    <option value={Priority.REACH}>Reach</option>
+                    <option value={Priority.TARGET}>Target</option>
+                    <option value={Priority.SAFETY}>Safety</option>
+                  </select>
+                </div>
+
+                {/* Deadline */}
+                <div>
+                  <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+                    Application Deadline
+                  </label>
+                  <input
+                    type="date"
+                    value={formatDateForInput(deadline)}
+                    onChange={(e) =>
+                      setDeadline(formatDateForBackend(e.target.value))
+                    }
+                    className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-3 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                  />
+                </div>
+
+                {/* Notes */}
+                <div>
+                  <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+                    Notes (Optional)
+                  </label>
+                  <textarea
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    placeholder="Add any additional notes about this application..."
+                    rows={3}
+                    className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-3 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8] resize-none"
+                  />
+                </div>
 
                 {/* Action Buttons */}
                 <div className="flex gap-4 pt-6">
                   <button
-                    onClick={() => setShowAddCollegeForm(false)}
+                    onClick={() => {
+                      setShowAddCollegeForm(false);
+                      resetForm();
+                    }}
                     className="flex-1 bg-neutral-700 text-[#FEEBD8] px-6 py-3 rounded-lg font-medium hover:bg-neutral-600 transition-colors"
                   >
                     Cancel
@@ -401,7 +785,8 @@ export default function CollegeTracker() {
                   <button
                     onClick={handleCreateApplication}
                     disabled={
-                      !selectedUniversity && !customUniversityName.trim()
+                      (!selectedUniversity && !customUniversityName.trim()) ||
+                      !majorInput.trim()
                     }
                     className="flex-1 bg-[#FEEBD8] text-[#141414] px-6 py-3 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
@@ -418,6 +803,23 @@ export default function CollegeTracker() {
     );
   }
 
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[#0a0a0a]">
+        <Navbar />
+        <div className="max-w-screen-2xl mx-auto px-4 md:px-10 py-8 pt-28">
+          <div className="flex items-center justify-center min-h-[400px]">
+            <div className="text-white text-lg">
+              Loading college applications...
+            </div>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#0a0a0a]">
       <Navbar />
@@ -426,12 +828,12 @@ export default function CollegeTracker() {
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center space-x-4">
-            <Link
-              href="/dashboard"
+            <button
+              onClick={() => router.push("/dashboard")}
               className="text-[#FEEBD8]/70 hover:text-[#FEEBD8] transition-colors"
             >
               <FaArrowLeft size={20} />
-            </Link>
+            </button>
             <div>
               <h1 className="text-4xl font-bold text-[#FEEBD8]">
                 College Applications
@@ -461,14 +863,14 @@ export default function CollegeTracker() {
 
           <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
             <div className="text-2xl font-bold text-green-400 mb-1">
-              {colleges.filter((c) => c.status === "Submitted").length}
+              {colleges.filter((c) => c.status === Status.SUBMITTED).length}
             </div>
             <div className="text-[#FEEBD8]/70 text-sm">Submitted</div>
           </div>
 
           <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
             <div className="text-2xl font-bold text-yellow-400 mb-1">
-              {colleges.filter((c) => c.status === "In Progress").length}
+              {colleges.filter((c) => c.status === Status.IN_PROGRESS).length}
             </div>
             <div className="text-[#FEEBD8]/70 text-sm">In Progress</div>
           </div>
@@ -508,13 +910,15 @@ export default function CollegeTracker() {
               className="bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
             >
               <option value="All">All Statuses</option>
-              <option value="Researching">Researching</option>
-              <option value="In Progress">In Progress</option>
-              <option value="Ready to Submit">Ready to Submit</option>
-              <option value="Submitted">Submitted</option>
-              <option value="Accepted">Accepted</option>
-              <option value="Rejected">Rejected</option>
-              <option value="Waitlisted">Waitlisted</option>
+              <option value={Status.NOT_STARTED}>Not Started</option>
+              <option value={Status.IN_PROGRESS}>In Progress</option>
+              <option value={Status.SUBMITTED}>Submitted</option>
+              <option value={Status.UNDER_REVIEW}>Under Review</option>
+              <option value={Status.ACCEPTED}>Accepted</option>
+              <option value={Status.REJECTED}>Rejected</option>
+              <option value={Status.DEFERRED}>Deferred</option>
+              <option value={Status.WAITLISTED}>Waitlisted</option>
+              <option value={Status.WITHDRAWN}>Withdrawn</option>
             </select>
 
             {/* Type Filter */}
@@ -524,9 +928,16 @@ export default function CollegeTracker() {
               className="bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
             >
               <option value="All">All Types</option>
-              <option value="ED">Early Decision</option>
-              <option value="EA">Early Action</option>
-              <option value="RD">Regular Decision</option>
+              <option value={ApplicationType.EARLY_DECISION}>
+                Early Decision
+              </option>
+              <option value={ApplicationType.EARLY_ACTION}>Early Action</option>
+              <option value={ApplicationType.REGULAR_DECISION}>
+                Regular Decision
+              </option>
+              <option value={ApplicationType.ROLLING_ADMISSION}>
+                Rolling Admission
+              </option>
             </select>
           </div>
         </div>
@@ -541,18 +952,21 @@ export default function CollegeTracker() {
             return (
               <div
                 key={college.id}
-                onClick={() => handleCollegeClick(college.id)}
-                className={`bg-[#141414] border rounded-lg p-6 hover:border-[#FEEBD8]/30 transition-colors cursor-pointer ${
+                className={`bg-[#141414] border rounded-lg p-6 transition-colors ${
                   isUrgent ? "border-red-500/50" : "border-neutral-700/50"
                 }`}
               >
                 <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                   <div className="flex-1">
+                    {/* College Header */}
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-3">
-                        <h3 className="text-xl font-semibold text-[#FEEBD8]">
+                        <span
+                          className="text-xl font-semibold text-[#FEEBD8] hover:text-[#E5D5B7] cursor-pointer transition-colors"
+                          onClick={() => handleCollegeClick(college.id)}
+                        >
                           {college.universityName}
-                        </h3>
+                        </span>
                         <span
                           className={`px-2 py-1 rounded-full text-xs text-white ${
                             statusColors[college.status]
@@ -568,29 +982,26 @@ export default function CollegeTracker() {
                           {college.type}
                         </span>
                       </div>
-                      <FaChevronRight className="text-[#FEEBD8]/30" />
                     </div>
 
-                    <p className="text-[#FEEBD8]/70 text-sm mb-2">
-                      {college.universityState &&
-                        `${college.universityState}, `}
-                      {college.universityCountry}
-                    </p>
+                    {/* Location */}
+                    <div className="text-[#FEEBD8]/70 text-sm mb-2">
+                      {college.location || college.universityCountry}
+                    </div>
 
-                    <div className="flex items-center gap-4 mb-3">
-                      <div className="flex items-center gap-2 text-sm text-[#FEEBD8]/70">
-                        <FaCalendar />
-                        <span>Due: {formatDeadlineMain(college.deadline)}</span>
-                        {daysUntil !== null && daysUntil > 0 && (
-                          <span
-                            className={`${
-                              isUrgent ? "text-red-400" : "text-yellow-400"
-                            }`}
-                          >
-                            ({daysUntil} days)
-                          </span>
-                        )}
-                      </div>
+                    {/* Deadline */}
+                    <div className="flex items-center gap-2 text-sm text-[#FEEBD8]/70 mb-3">
+                      <FaCalendar />
+                      <span>Due: {formatDeadlineMain(college.deadline)}</span>
+                      {daysUntil !== null && daysUntil > 0 && (
+                        <span
+                          className={`${
+                            isUrgent ? "text-red-400" : "text-yellow-400"
+                          }`}
+                        >
+                          ({daysUntil} days)
+                        </span>
+                      )}
                     </div>
 
                     {/* Progress Bar */}
@@ -607,38 +1018,175 @@ export default function CollegeTracker() {
                       </div>
                     </div>
 
-                    {/* Tags */}
-                    <div className="flex flex-wrap gap-2 mb-3">
-                      {college.tags.map((tag, idx) => (
-                        <span
-                          key={idx}
-                          className="px-2 py-1 bg-neutral-800 text-[#FEEBD8]/70 text-xs rounded-full"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
+                    {/* Major */}
+                    {college.major && (
+                      <div className="text-[#FEEBD8]/70 text-sm mb-3">
+                        <strong>Major:</strong> {college.major}
+                      </div>
+                    )}
 
+                    {/* Tags */}
+                    {college.tags && college.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mb-3">
+                        {college.tags.map((tag: string, idx: number) => (
+                          <span
+                            key={idx}
+                            className="px-2 py-1 bg-neutral-800 text-[#FEEBD8]/70 text-xs rounded-full"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Notes */}
                     {college.notes && (
-                      <p className="text-[#FEEBD8]/60 text-sm italic">
+                      <div className="text-[#FEEBD8]/60 text-sm italic">
                         {college.notes}
-                      </p>
+                      </div>
                     )}
                   </div>
 
-                  <div className="flex items-center gap-4 text-[#FEEBD8]/50">
-                    <div className="flex items-center gap-2">
-                      <FaTasks size={16} />
-                      <span className="text-sm">Checklists</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <FaBell size={16} />
-                      <span className="text-sm">Reminders</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <FaChartLine size={16} />
-                      <span className="text-sm">Analytics</span>
-                    </div>
+                  {/* Action Buttons - Separate Section to Avoid Nesting */}
+                  <div className="flex flex-col gap-3 min-w-[200px]">
+                    {editingCollegeId === college.id ? (
+                      // Edit Mode
+                      <>
+                        <input
+                          type="text"
+                          value={editForm.name}
+                          onChange={(e) =>
+                            setEditForm({ ...editForm, name: e.target.value })
+                          }
+                          placeholder="University Name"
+                          className="px-3 py-2 bg-neutral-800 text-white rounded-lg border border-neutral-600"
+                        />
+                        <select
+                          value={editForm.status}
+                          onChange={(e) =>
+                            setEditForm({ ...editForm, status: e.target.value })
+                          }
+                          className="px-3 py-2 bg-neutral-800 text-white rounded-lg border border-neutral-600"
+                        >
+                          <option value="">Select Status</option>
+                          <option value={Status.NOT_STARTED}>
+                            Not Started
+                          </option>
+                          <option value={Status.IN_PROGRESS}>
+                            In Progress
+                          </option>
+                          <option value={Status.SUBMITTED}>Submitted</option>
+                          <option value={Status.UNDER_REVIEW}>
+                            Under Review
+                          </option>
+                          <option value={Status.ACCEPTED}>Accepted</option>
+                          <option value={Status.REJECTED}>Rejected</option>
+                          <option value={Status.DEFERRED}>Deferred</option>
+                          <option value={Status.WAITLISTED}>Waitlisted</option>
+                          <option value={Status.WITHDRAWN}>Withdrawn</option>
+                        </select>
+                        <select
+                          value={editForm.application_type}
+                          onChange={(e) =>
+                            setEditForm({
+                              ...editForm,
+                              application_type: e.target.value,
+                            })
+                          }
+                          className="px-3 py-2 bg-neutral-800 text-white rounded-lg border border-neutral-600"
+                        >
+                          <option value="">Select Application Type</option>
+                          <option value={ApplicationType.EARLY_DECISION}>
+                            Early Decision
+                          </option>
+                          <option value={ApplicationType.EARLY_ACTION}>
+                            Early Action
+                          </option>
+                          <option value={ApplicationType.REGULAR_DECISION}>
+                            Regular Decision
+                          </option>
+                          <option value={ApplicationType.ROLLING_ADMISSION}>
+                            Rolling Admission
+                          </option>
+                        </select>
+                        <select
+                          value={editForm.priority}
+                          onChange={(e) =>
+                            setEditForm({
+                              ...editForm,
+                              priority: e.target.value,
+                            })
+                          }
+                          className="px-3 py-2 bg-neutral-800 text-white rounded-lg border border-neutral-600"
+                        >
+                          <option value="">Select Priority</option>
+                          <option value={Priority.REACH}>Reach</option>
+                          <option value={Priority.TARGET}>Target</option>
+                          <option value={Priority.SAFETY}>Safety</option>
+                        </select>
+                        <input
+                          type="date"
+                          value={formatDateForInput(editForm.deadline)}
+                          onChange={(e) =>
+                            setEditForm({
+                              ...editForm,
+                              deadline: formatDateForBackend(e.target.value),
+                            })
+                          }
+                          className="px-3 py-2 bg-neutral-800 text-white rounded-lg border border-neutral-600"
+                        />
+                        <input
+                          type="text"
+                          value={editForm.major}
+                          onChange={(e) =>
+                            setEditForm({ ...editForm, major: e.target.value })
+                          }
+                          placeholder="Major"
+                          className="px-3 py-2 bg-neutral-800 text-white rounded-lg border border-neutral-600"
+                        />
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleUpdateCollege(college.id)}
+                            className="flex-1 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center justify-center gap-2"
+                          >
+                            <FaSave size={14} />
+                            Save
+                          </button>
+                          <button
+                            onClick={handleCancelEdit}
+                            className="flex-1 px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 flex items-center justify-center gap-2"
+                          >
+                            <FaTimes size={14} />
+                            Cancel
+                          </button>
+                        </div>
+                      </>
+                    ) : (
+                      // View Mode - Clean Button Layout
+                      <>
+                        <button
+                          onClick={() => handleEditCollege(college)}
+                          className="w-full px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center justify-center gap-2 text-sm"
+                        >
+                          <FaEdit size={14} />
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeleteCollege(college.id)}
+                          className="w-full px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center justify-center gap-2 text-sm"
+                        >
+                          <FaTrash size={14} />
+                          Delete
+                        </button>
+                        <button
+                          onClick={() => handleCollegeClick(college.id)}
+                          className="w-full px-3 py-2 bg-[#FEEBD8] text-[#141414] rounded-lg hover:bg-[#E5D5B7] flex items-center justify-center gap-2 text-sm font-semibold"
+                        >
+                          <FaChevronRight size={14} />
+                          View Details
+                        </button>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
