@@ -1072,10 +1072,17 @@ export default function CollegeDetail() {
               Quick Actions
             </h3>
             <div className="space-y-3">
-              <button className="w-full bg-[#FEEBD8]/10 border border-[#FEEBD8]/30 text-[#FEEBD8] px-4 py-2 rounded-lg hover:bg-[#FEEBD8]/20 transition-colors flex items-center gap-2">
+              <Link
+                href={`/dashboard/essays?college=${encodeURIComponent(
+                  backendApplication?.name || ""
+                )}&major=${encodeURIComponent(
+                  backendApplication?.major || ""
+                )}`}
+                className="w-full bg-[#FEEBD8]/10 border border-[#FEEBD8]/30 text-[#FEEBD8] px-4 py-2 rounded-lg hover:bg-[#FEEBD8]/20 transition-colors flex items-center gap-2"
+              >
                 <FaFileAlt />
                 <span>View Essays</span>
-              </button>
+              </Link>
               <button className="w-full bg-[#FEEBD8]/10 border border-[#FEEBD8]/30 text-[#FEEBD8] px-4 py-2 rounded-lg hover:bg-[#FEEBD8]/20 transition-colors flex items-center gap-2">
                 <FaBell />
                 <span>Set Reminder</span>

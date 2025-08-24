@@ -15,4 +15,7 @@ export const API_ENDPOINTS = {
   COLLEGE_APPLICATION_DEADLINES: "/college-applications/deadlines/upcoming",
   COLLEGE_APPLICATION_CHECKLISTS: "/college-applications/checklists",
   COLLEGE_APPLICATION_TASKS: "/college-applications/tasks",
+
+  // Essays
+  ESSAYS: "/essays",
 } as const;

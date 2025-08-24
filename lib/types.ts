@@ -78,6 +78,16 @@ export enum TaskResponsible {
   OTHER = "other",
 }
 
+// Essay Status Enum matching backend
+export enum EssayStatus {
+  NOT_STARTED = "not_started",
+  IN_PROGRESS = "in_progress",
+  NOT_SUBMITTED = "not_submitted",
+  REVIEW_NEEDED = "review_needed",
+  SUBMITTED = "submitted",
+  COMPLETED = "completed",
+}
+
 // Model interfaces
 export interface Task {
   id: string;
@@ -121,6 +131,22 @@ export interface CollegeApplication {
   contact_email?: string;
   checklists: Checklist[];
   progress: number;
+  created_at: string;
+  updated_at: string;
+}
+
+// Essay interface
+export interface Essay {
+  id: string;
+  title: string;
+  college_application_id: string;
+  college_name?: string; // Included in responses
+  status: EssayStatus;
+  prompt?: string;
+  content?: string;
+  ai_score?: number; // 0-10
+  ai_feedbacks?: string[];
+  ai_suggestion?: string;
   created_at: string;
   updated_at: string;
 }
@@ -233,6 +259,25 @@ export interface StandaloneUpdateTaskDTO {
   status?: TaskStatus;
   responsible?: TaskResponsible;
   notes?: string;
+}
+
+// Essay DTO interfaces
+export interface CreateEssayDTO {
+  title: string;
+  college_application_id: string;
+  status: EssayStatus;
+  prompt?: string;
+  content?: string;
+}
+
+export interface UpdateEssayDTO {
+  title?: string;
+  status?: EssayStatus;
+  prompt?: string;
+  content?: string;
+  ai_score?: number;
+  ai_feedbacks?: string[];
+  ai_suggestion?: string;
 }
 
 // API Response interfaces

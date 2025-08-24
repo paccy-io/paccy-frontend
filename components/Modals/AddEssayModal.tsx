@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   FaTimes,
   FaPen,
@@ -6,27 +6,18 @@ import {
   FaEdit,
   FaFileAlt,
 } from "react-icons/fa";
-
-interface Essay {
-  id: number;
-  title: string;
-  type: string;
-  college: string;
-  prompt: string;
-  content: string;
-  wordCount: number;
-  maxWords: number;
-  status: string;
-  aiScore: number;
-  lastEdited: string;
-}
+import {
+  Essay,
+  EssayStatus,
+  CreateEssayDTO,
+  CollegeApplication,
+} from "../../lib/types";
+import { collegeApplicationsApi } from "../../lib/api/college-applications";
 
 interface AddEssayModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (
-    essay: Omit<Essay, "id" | "wordCount" | "aiScore" | "lastEdited">
-  ) => void;
+  onSave: (essay: CreateEssayDTO) => void;
 }
 
 const essayTypes = [
@@ -40,43 +31,62 @@ const essayTypes = [
   "Transfer Essay",
 ];
 
-const colleges = [
-  "Stanford University",
-  "Harvard University",
-  "MIT",
-  "UC Berkeley",
-  "Princeton University",
-  "Yale University",
-  "Columbia University",
-  "University of Chicago",
-];
-
 export default function AddEssayModal({
   isOpen,
   onClose,
   onSave,
 }: AddEssayModalProps) {
-  const [formData, setFormData] = React.useState({
+  const [collegeApplications, setCollegeApplications] = useState<
+    CollegeApplication[]
+  >([]);
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
     title: "",
-    type: "Personal Statement",
-    college: "",
+    college_application_id: "",
     prompt: "",
     content: "",
-    maxWords: 650,
-    status: "Planning",
+    status: EssayStatus.NOT_STARTED,
   });
+
+  useEffect(() => {
+    if (isOpen) {
+      loadCollegeApplications();
+    }
+  }, [isOpen]);
+
+  const loadCollegeApplications = async () => {
+    setLoading(true);
+    try {
+      const applications = await collegeApplicationsApi.getAll();
+      setCollegeApplications(applications);
+    } catch (error) {
+      console.error("Error loading college applications:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave(formData);
+    if (!formData.college_application_id || !formData.title.trim()) {
+      return;
+    }
+
+    onSave({
+      title: formData.title,
+      college_application_id: formData.college_application_id,
+      status: formData.status,
+      prompt: formData.prompt || undefined,
+      content: formData.content || undefined,
+    });
+
+    // Reset form
     setFormData({
       title: "",
-      type: "Personal Statement",
-      college: "",
+      college_application_id: "",
       prompt: "",
       content: "",
-      maxWords: 650,
-      status: "Planning",
+      status: EssayStatus.NOT_STARTED,
     });
     onClose();
   };
@@ -135,57 +145,42 @@ export default function AddEssayModal({
 
             <div>
               <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
-                Essay Type
+                College Application *
               </label>
               <select
-                name="type"
-                value={formData.type}
+                name="college_application_id"
+                value={formData.college_application_id}
                 onChange={handleChange}
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                required
+                disabled={loading}
+                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8] disabled:opacity-50"
               >
-                {essayTypes.map((type) => (
-                  <option key={type} value={type}>
-                    {type}
-                  </option>
-                ))}
+                <option value="">Select a college application...</option>
+                {collegeApplications.map((app) => {
+                  // Check if there are multiple applications with the same college name
+                  const sameName = collegeApplications.filter(
+                    (c) => c.name === app.name
+                  );
+                  const displayName =
+                    sameName.length > 1 && app.major
+                      ? `${app.name} [${app.major}]`
+                      : app.name;
+
+                  return (
+                    <option key={app.id} value={app.id}>
+                      {displayName}
+                    </option>
+                  );
+                })}
               </select>
+              {loading && (
+                <p className="text-neutral-400 text-sm mt-1">
+                  Loading applications...
+                </p>
+              )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
-                Target College
-              </label>
-              <select
-                name="college"
-                value={formData.college}
-                onChange={handleChange}
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
-              >
-                <option value="">Select a college</option>
-                {colleges.map((college) => (
-                  <option key={college} value={college}>
-                    {college}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
-                Word Limit
-              </label>
-              <input
-                type="number"
-                name="maxWords"
-                value={formData.maxWords}
-                onChange={handleChange}
-                min="1"
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
-                placeholder="650"
-              />
-            </div>
-
-            <div className="md:col-span-2">
               <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
                 Status
               </label>
@@ -195,12 +190,12 @@ export default function AddEssayModal({
                 onChange={handleChange}
                 className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
               >
-                <option value="Planning">Planning</option>
-                <option value="Drafting">Drafting</option>
-                <option value="Reviewing">Reviewing</option>
-                <option value="Editing">Editing</option>
-                <option value="Final">Final</option>
-                <option value="Submitted">Submitted</option>
+                <option value={EssayStatus.NOT_STARTED}>Not Started</option>
+                <option value={EssayStatus.IN_PROGRESS}>In Progress</option>
+                <option value={EssayStatus.NOT_SUBMITTED}>Not Submitted</option>
+                <option value={EssayStatus.REVIEW_NEEDED}>Review Needed</option>
+                <option value={EssayStatus.SUBMITTED}>Submitted</option>
+                <option value={EssayStatus.COMPLETED}>Completed</option>
               </select>
             </div>
           </div>
@@ -238,8 +233,7 @@ export default function AddEssayModal({
               {
                 formData.content.split(" ").filter((word) => word.length > 0)
                   .length
-              }{" "}
-              / {formData.maxWords}
+              }
             </div>
           </div>
 

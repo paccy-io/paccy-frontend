@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   FaTimes,
   FaPen,
@@ -6,20 +6,13 @@ import {
   FaEdit,
   FaFileAlt,
 } from "react-icons/fa";
-
-interface Essay {
-  id: number;
-  title: string;
-  type: string;
-  college: string;
-  prompt: string;
-  content: string;
-  wordCount: number;
-  maxWords: number;
-  status: string;
-  aiScore: number;
-  lastEdited: string;
-}
+import {
+  Essay,
+  EssayStatus,
+  UpdateEssayDTO,
+  CollegeApplication,
+} from "../../lib/types";
+import { collegeApplicationsApi } from "../../lib/api/college-applications";
 
 interface EditEssayModalProps {
   isOpen: boolean;
@@ -28,62 +21,70 @@ interface EditEssayModalProps {
   essay: Essay | null;
 }
 
-const essayTypes = [
-  "Personal Statement",
-  "Supplemental Essay",
-  "Why This College",
-  "Why This Major",
-  "Activity Essay",
-  "Community Essay",
-  "Scholarship Essay",
-  "Transfer Essay",
-];
-
-const colleges = [
-  "Stanford University",
-  "Harvard University",
-  "MIT",
-  "UC Berkeley",
-  "Princeton University",
-  "Yale University",
-  "Columbia University",
-  "University of Chicago",
-];
-
 export default function EditEssayModal({
   isOpen,
   onClose,
   onSave,
   essay,
 }: EditEssayModalProps) {
-  const [formData, setFormData] = React.useState<Essay>({
-    id: 0,
+  const [collegeApplications, setCollegeApplications] = useState<
+    CollegeApplication[]
+  >([]);
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
     title: "",
-    type: "Personal Statement",
-    college: "",
+    college_application_id: "",
     prompt: "",
     content: "",
-    wordCount: 0,
-    maxWords: 650,
-    status: "Planning",
-    aiScore: 0,
-    lastEdited: "",
+    status: EssayStatus.NOT_STARTED,
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
+    if (isOpen) {
+      loadCollegeApplications();
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
     if (essay) {
-      setFormData(essay);
+      setFormData({
+        title: essay.title || "",
+        college_application_id: essay.college_application_id || "",
+        prompt: essay.prompt || "",
+        content: essay.content || "",
+        status: essay.status || EssayStatus.NOT_STARTED,
+      });
     }
   }, [essay]);
 
+  const loadCollegeApplications = async () => {
+    setLoading(true);
+    try {
+      const applications = await collegeApplicationsApi.getAll();
+      setCollegeApplications(applications);
+    } catch (error) {
+      console.error("Error loading college applications:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const updatedEssay = {
-      ...formData,
-      wordCount: formData.content.split(" ").filter((word) => word.length > 0)
-        .length,
-      lastEdited: new Date().toISOString().split("T")[0],
+    if (!essay || !formData.title.trim()) {
+      return;
+    }
+
+    const updatedEssay: Essay = {
+      ...essay,
+      title: formData.title,
+      college_application_id: formData.college_application_id,
+      prompt: formData.prompt || "",
+      content: formData.content || "",
+      status: formData.status,
+      updated_at: new Date().toISOString(),
     };
+
     onSave(updatedEssay);
     onClose();
   };
@@ -96,16 +97,15 @@ export default function EditEssayModal({
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: name === "maxWords" ? parseInt(value) || 0 : value,
+      [name]: value,
     }));
   };
 
   if (!isOpen || !essay) return null;
 
   const currentWordCount = formData.content
-    .split(" ")
-    .filter((word) => word.length > 0).length;
-  const isOverLimit = currentWordCount > formData.maxWords;
+    ? formData.content.split(" ").filter((word) => word.length > 0).length
+    : 0;
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -145,54 +145,26 @@ export default function EditEssayModal({
 
             <div>
               <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
-                Essay Type
+                College Application (Read-only)
               </label>
               <select
-                name="type"
-                value={formData.type}
+                name="college_application_id"
+                value={formData.college_application_id}
                 onChange={handleChange}
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                required
+                disabled={true}
+                className="w-full bg-neutral-700/50 border border-neutral-600 rounded-lg px-4 py-2 text-[#FEEBD8]/70 cursor-not-allowed opacity-75"
               >
-                {essayTypes.map((type) => (
-                  <option key={type} value={type}>
-                    {type}
+                <option value="">Select a college application...</option>
+                {collegeApplications.map((app) => (
+                  <option key={app.id} value={app.id}>
+                    {app.name}
                   </option>
                 ))}
               </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
-                Target College
-              </label>
-              <select
-                name="college"
-                value={formData.college}
-                onChange={handleChange}
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
-              >
-                <option value="">Select a college</option>
-                {colleges.map((college) => (
-                  <option key={college} value={college}>
-                    {college}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
-                Word Limit
-              </label>
-              <input
-                type="number"
-                name="maxWords"
-                value={formData.maxWords}
-                onChange={handleChange}
-                min="1"
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
-                placeholder="650"
-              />
+              <p className="text-neutral-400 text-xs mt-1">
+                College application cannot be changed when editing
+              </p>
             </div>
 
             <div className="md:col-span-2">
@@ -205,12 +177,12 @@ export default function EditEssayModal({
                 onChange={handleChange}
                 className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
               >
-                <option value="Planning">Planning</option>
-                <option value="Drafting">Drafting</option>
-                <option value="Reviewing">Reviewing</option>
-                <option value="Editing">Editing</option>
-                <option value="Final">Final</option>
-                <option value="Submitted">Submitted</option>
+                <option value={EssayStatus.NOT_STARTED}>Not Started</option>
+                <option value={EssayStatus.IN_PROGRESS}>In Progress</option>
+                <option value={EssayStatus.NOT_SUBMITTED}>Not Submitted</option>
+                <option value={EssayStatus.REVIEW_NEEDED}>Review Needed</option>
+                <option value={EssayStatus.SUBMITTED}>Submitted</option>
+                <option value={EssayStatus.COMPLETED}>Completed</option>
               </select>
             </div>
           </div>
@@ -243,22 +215,13 @@ export default function EditEssayModal({
               className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
               placeholder="Start writing your essay here..."
             />
-            <div
-              className={`mt-2 text-sm ${
-                isOverLimit ? "text-red-400" : "text-[#FEEBD8]/60"
-              }`}
-            >
-              Words: {currentWordCount} / {formData.maxWords}
-              {isOverLimit && (
-                <span className="ml-2 text-red-400">
-                  ({currentWordCount - formData.maxWords} over limit)
-                </span>
-              )}
+            <div className="mt-2 text-sm text-[#FEEBD8]/60">
+              Words: {currentWordCount}
             </div>
           </div>
 
           {/* AI Score Display */}
-          {formData.aiScore > 0 && (
+          {essay?.ai_score && (
             <div className="bg-neutral-800 rounded-lg p-4">
               <h4 className="text-[#FEEBD8] font-medium mb-2">
                 AI Feedback Score
@@ -267,11 +230,11 @@ export default function EditEssayModal({
                 <div className="flex-1 bg-neutral-700 rounded-full h-2">
                   <div
                     className="bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 h-2 rounded-full transition-all duration-300"
-                    style={{ width: `${formData.aiScore}%` }}
+                    style={{ width: `${(essay.ai_score / 10) * 100}%` }}
                   />
                 </div>
                 <span className="text-[#FEEBD8] font-semibold">
-                  {formData.aiScore}/100
+                  {essay.ai_score}/10
                 </span>
               </div>
             </div>

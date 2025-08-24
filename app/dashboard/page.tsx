@@ -6,6 +6,9 @@ import Link from "next/link";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import { useAuth } from "../../components/AuthProvider";
+import { collegeApplicationsApi } from "../../lib/api/college-applications";
+import { essaysApi } from "../../lib/api/essays";
+import { Essay, CollegeApplication, EssayStatus } from "../../lib/types";
 import {
   FaUniversity,
   FaPen,
@@ -67,73 +70,45 @@ const quickActions = [
   },
 ];
 
-// Dashboard sections
-const dashboardSections = [
-  {
-    title: "College Tracker",
-    description: "Manage your university applications",
-    icon: <FaUniversity className="w-8 h-8" />,
-    link: "/dashboard/colleges",
-    stats: "3 Active Applications",
-  },
-  {
-    title: "Essay Manager",
-    description: "Write and organize your essays",
-    icon: <FaPen className="w-8 h-8" />,
-    link: "/dashboard/essays",
-    stats: "5 Essays in Progress",
-  },
-  {
-    title: "Calendar & Deadlines",
-    description: "Never miss an important date",
-    icon: <FaCalendar className="w-8 h-8" />,
-    link: "/dashboard/calendar",
-    stats: "2 Upcoming Deadlines",
-  },
-  {
-    title: "Document Organizer",
-    description: "Keep all your files organized",
-    icon: <FaFile className="w-8 h-8" />,
-    link: "/dashboard/documents",
-    stats: "12 Documents Uploaded",
-  },
-  {
-    title: "Extracurriculars",
-    description: "Track your activities and achievements",
-    icon: <FaTrophy className="w-8 h-8" />,
-    link: "/dashboard/extracurriculars",
-    stats: "8 Activities Added",
-  },
-  {
-    title: "Academic Tracker",
-    description: "Monitor your academic progress",
-    icon: <FaGraduationCap className="w-8 h-8" />,
-    link: "/dashboard/academy",
-    stats: "GPA 3.85 • 4 Exams",
-  },
-  {
-    title: "Peer Network",
-    description: "Connect with fellow students worldwide",
-    icon: <FaUsers className="w-8 h-8" />,
-    link: "/dashboard/peers",
-    stats: "5 Connections • 8 Countries",
-  },
-  {
-    title: "Settings",
-    description: "Manage your account and preferences",
-    icon: <FaCog className="w-8 h-8" />,
-    link: "/dashboard/settings",
-    stats: "Profile 75% Complete",
-  },
-];
-
 export default function Dashboard() {
   const router = useRouter();
   const { isAuthenticated, user, loading, verifyTokenAndFetchUser } = useAuth();
 
+  // State for real data
+  const [applications, setApplications] = useState<CollegeApplication[]>([]);
+  const [essays, setEssays] = useState<Essay[]>([]);
+  const [dataLoading, setDataLoading] = useState(true);
+
   useEffect(() => {
     document.title = "Dashboard | Paccy";
   }, []);
+
+  // Load real data
+  const loadDashboardData = async () => {
+    try {
+      setDataLoading(true);
+      const [applicationsData, essaysData] = await Promise.all([
+        collegeApplicationsApi.getAll().catch(() => []),
+        essaysApi.getAll().catch(() => []),
+      ]);
+      setApplications(applicationsData);
+      setEssays(essaysData);
+    } catch (error) {
+      console.warn("Failed to load dashboard data:", error);
+      // Use empty arrays as fallback
+      setApplications([]);
+      setEssays([]);
+    } finally {
+      setDataLoading(false);
+    }
+  };
+
+  // Load data when authenticated
+  useEffect(() => {
+    if (!loading && isAuthenticated) {
+      loadDashboardData();
+    }
+  }, [loading, isAuthenticated]);
 
   // Simple auth check - redirect if not authenticated after loading is done
   useEffect(() => {
@@ -152,6 +127,26 @@ export default function Dashboard() {
       });
     }
   }, []); // Empty dependency array - only run once on mount
+
+  // Calculate real stats
+  const getActiveApplicationsCount = () => {
+    return applications.filter(
+      (app) => app.status !== "rejected" && app.status !== "withdrawn"
+    ).length;
+  };
+
+  const getEssaysInProgressCount = () => {
+    return essays.filter(
+      (essay) =>
+        essay.status === EssayStatus.IN_PROGRESS ||
+        essay.status === EssayStatus.NOT_STARTED ||
+        essay.status === EssayStatus.REVIEW_NEEDED
+    ).length;
+  };
+
+  const getTotalEssaysCount = () => {
+    return essays.length;
+  };
 
   // Calculate profile completion based on real user data
   const calculateProfileCompletion = (user: any) => {
@@ -201,7 +196,9 @@ export default function Dashboard() {
         email: user.email,
         profileCompletion,
         memberSince,
-        applications: 3, // Mock data - would come from API
+        applications: dataLoading ? "..." : getActiveApplicationsCount(),
+        essays: dataLoading ? "..." : getEssaysInProgressCount(),
+        totalEssays: dataLoading ? "..." : getTotalEssaysCount(),
         saved: 8, // Mock data - would come from API
         profileViews: 12, // Mock data - would come from API
         school: user.profile?.school || "Not specified",
@@ -211,7 +208,12 @@ export default function Dashboard() {
         verificationLevel: user.verification_level || 1,
       };
     }
-    return mockUser;
+    return {
+      ...mockUser,
+      applications: dataLoading ? "..." : getActiveApplicationsCount(),
+      essays: dataLoading ? "..." : getEssaysInProgressCount(),
+      totalEssays: dataLoading ? "..." : getTotalEssaysCount(),
+    };
   };
 
   // Show loading state - only while auth is loading
@@ -231,6 +233,70 @@ export default function Dashboard() {
   }
 
   const currentUser = getCurrentUser();
+
+  // Dynamic dashboard sections with real data
+  const getDashboardSections = () => [
+    {
+      title: "College Tracker",
+      description: "Manage your university applications",
+      icon: <FaUniversity className="w-8 h-8" />,
+      link: "/dashboard/colleges",
+      stats: dataLoading
+        ? "Loading..."
+        : `${getActiveApplicationsCount()} Active Applications`,
+    },
+    {
+      title: "Essay Manager",
+      description: "Write and organize your essays",
+      icon: <FaPen className="w-8 h-8" />,
+      link: "/dashboard/essays",
+      stats: dataLoading
+        ? "Loading..."
+        : `${getTotalEssaysCount()} Total • ${getEssaysInProgressCount()} in Progress`,
+    },
+    {
+      title: "Calendar & Deadlines",
+      description: "Never miss an important date",
+      icon: <FaCalendar className="w-8 h-8" />,
+      link: "/dashboard/calendar",
+      stats: "2 Upcoming Deadlines",
+    },
+    {
+      title: "Document Organizer",
+      description: "Keep all your files organized",
+      icon: <FaFile className="w-8 h-8" />,
+      link: "/dashboard/documents",
+      stats: "12 Documents Uploaded",
+    },
+    {
+      title: "Extracurriculars",
+      description: "Track your activities and achievements",
+      icon: <FaTrophy className="w-8 h-8" />,
+      link: "/dashboard/extracurriculars",
+      stats: "8 Activities Added",
+    },
+    {
+      title: "Academic Tracker",
+      description: "Monitor your academic progress",
+      icon: <FaGraduationCap className="w-8 h-8" />,
+      link: "/dashboard/academy",
+      stats: "GPA 3.85 • 4 Exams",
+    },
+    {
+      title: "Peer Network",
+      description: "Connect with fellow students worldwide",
+      icon: <FaUsers className="w-8 h-8" />,
+      link: "/dashboard/peers",
+      stats: "5 Connections • 8 Countries",
+    },
+    {
+      title: "Settings",
+      description: "Manage your account and preferences",
+      icon: <FaCog className="w-8 h-8" />,
+      link: "/dashboard/settings",
+      stats: `Profile ${currentUser.profileCompletion}% Complete`,
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-[#0a0a0a]">
@@ -258,16 +324,16 @@ export default function Dashboard() {
 
           <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6 hover:border-[#FEEBD8]/30 transition-colors">
             <div className="text-2xl font-bold text-[#FEEBD8] mb-1">
-              {currentUser.saved}
+              {currentUser.totalEssays}
             </div>
-            <div className="text-[#FEEBD8]/70 text-sm">Saved Universities</div>
+            <div className="text-[#FEEBD8]/70 text-sm">Total Essays</div>
           </div>
 
           <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6 hover:border-[#FEEBD8]/30 transition-colors">
             <div className="text-2xl font-bold text-[#FEEBD8] mb-1">
-              {currentUser.profileViews}
+              {currentUser.essays}
             </div>
-            <div className="text-[#FEEBD8]/70 text-sm">Profile Views</div>
+            <div className="text-[#FEEBD8]/70 text-sm">Essays in Progress</div>
           </div>
 
           <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6 hover:border-[#FEEBD8]/30 transition-colors">
@@ -312,7 +378,7 @@ export default function Dashboard() {
             Dashboard Sections
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {dashboardSections.map((section, index) => (
+            {getDashboardSections().map((section, index) => (
               <Link
                 key={index}
                 href={section.link}
