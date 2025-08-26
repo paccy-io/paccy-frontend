@@ -297,6 +297,58 @@ export interface ApiError {
 
 export type ApiResult<T> = ApiResponse<T> | ApiError;
 
+// Calendar Event Types
+export enum EventType {
+  DEADLINE = "deadline",
+  INTERVIEW = "interview",
+  VISIT = "visit",
+  REMINDER = "reminder",
+  TEST = "test",
+  OTHER = "other",
+}
+
+export enum EventPriority {
+  HIGH = "high",
+  MEDIUM = "medium",
+  LOW = "low",
+}
+
+export interface CalendarEvent {
+  id: string;
+  title: string;
+  description?: string;
+  date?: string; // ISO 8601 date string, null for undated events
+  time?: string; // HH:MM format
+  type: EventType;
+  priority: EventPriority;
+  college?: string;
+  category?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateEventDTO {
+  title: string;
+  description?: string;
+  date?: string;
+  time?: string;
+  type: EventType;
+  priority: EventPriority;
+  college?: string;
+  category?: string;
+}
+
+export interface UpdateEventDTO {
+  title?: string;
+  description?: string;
+  date?: string;
+  time?: string;
+  type?: EventType;
+  priority?: EventPriority;
+  college?: string;
+  category?: string;
+}
+
 // Custom error class for API errors
 export class ApiError extends Error {
   public code?: string;

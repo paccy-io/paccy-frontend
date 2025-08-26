@@ -7,53 +7,35 @@ import {
   FaUniversity,
   FaPen,
 } from "react-icons/fa";
-
-interface Event {
-  id: number;
-  title: string;
-  date: string;
-  time: string;
-  type: string;
-  priority: string;
-  description: string;
-  college?: string;
-}
+import {
+  CalendarEvent,
+  EventType,
+  EventPriority,
+  CreateEventDTO,
+  CollegeApplication,
+} from "../../lib/types";
+import { collegeApplicationsApi } from "../../lib/api/college-applications";
 
 interface AddEventModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (event: Omit<Event, "id">) => void;
+  onSave: (event: CreateEventDTO) => void;
   selectedDate?: string;
 }
 
 const eventTypes = [
-  "Application Deadline",
-  "Interview",
-  "Campus Visit",
-  "Test Date",
-  "Scholarship Deadline",
-  "Essay Due",
-  "Transcript Request",
-  "Recommendation Letter",
-  "Financial Aid",
-  "Other",
+  { value: EventType.DEADLINE, label: "Application Deadline" },
+  { value: EventType.INTERVIEW, label: "Interview" },
+  { value: EventType.VISIT, label: "Campus Visit" },
+  { value: EventType.TEST, label: "Test Date" },
+  { value: EventType.REMINDER, label: "Reminder" },
+  { value: EventType.OTHER, label: "Other" },
 ];
 
 const priorities = [
-  { value: "High", color: "text-red-400" },
-  { value: "Medium", color: "text-yellow-400" },
-  { value: "Low", color: "text-green-400" },
-];
-
-const colleges = [
-  "Stanford University",
-  "Harvard University",
-  "MIT",
-  "UC Berkeley",
-  "Princeton University",
-  "Yale University",
-  "Columbia University",
-  "University of Chicago",
+  { value: EventPriority.HIGH, label: "High", color: "text-red-400" },
+  { value: EventPriority.MEDIUM, label: "Medium", color: "text-yellow-400" },
+  { value: EventPriority.LOW, label: "Low", color: "text-green-400" },
 ];
 
 export default function AddEventModal({
@@ -62,31 +44,69 @@ export default function AddEventModal({
   onSave,
   selectedDate,
 }: AddEventModalProps) {
+  const [collegeApplications, setCollegeApplications] = React.useState<
+    CollegeApplication[]
+  >([]);
+  const [loading, setLoading] = React.useState(false);
+
+  // Get today's date in YYYY-MM-DD format
+  const today = new Date().toISOString().split("T")[0];
+
   const [formData, setFormData] = React.useState({
     title: "",
-    date: selectedDate || "",
-    time: "",
-    type: "Application Deadline",
-    priority: "Medium",
+    date: selectedDate || today,
+    time: "23:59",
+    type: EventType.DEADLINE,
+    priority: EventPriority.MEDIUM,
     description: "",
     college: "",
   });
 
   React.useEffect(() => {
-    if (selectedDate) {
-      setFormData((prev) => ({ ...prev, date: selectedDate }));
+    if (isOpen) {
+      loadCollegeApplications();
+      // Reset form with defaults when modal opens
+      setFormData({
+        title: "",
+        date: selectedDate || today,
+        time: "23:59",
+        type: EventType.DEADLINE,
+        priority: EventPriority.MEDIUM,
+        description: "",
+        college: "",
+      });
     }
-  }, [selectedDate]);
+  }, [isOpen, selectedDate, today]);
+
+  const loadCollegeApplications = async () => {
+    setLoading(true);
+    try {
+      const applications = await collegeApplicationsApi.getAll();
+      setCollegeApplications(applications);
+    } catch (error) {
+      console.error("Error loading college applications:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave(formData);
+
+    const eventData: CreateEventDTO = {
+      ...formData,
+      date: formData.date || undefined, // Convert empty string to undefined for undated events
+    };
+
+    onSave(eventData);
+
+    // Reset form with defaults
     setFormData({
       title: "",
-      date: "",
-      time: "",
-      type: "Application Deadline",
-      priority: "Medium",
+      date: today,
+      time: "23:59",
+      type: EventType.DEADLINE,
+      priority: EventPriority.MEDIUM,
       description: "",
       college: "",
     });
@@ -180,8 +200,8 @@ export default function AddEventModal({
                 className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
               >
                 {eventTypes.map((type) => (
-                  <option key={type} value={type}>
-                    {type}
+                  <option key={type.value} value={type.value}>
+                    {type.label}
                   </option>
                 ))}
               </select>
@@ -199,7 +219,7 @@ export default function AddEventModal({
               >
                 {priorities.map((priority) => (
                   <option key={priority.value} value={priority.value}>
-                    {priority.value} Priority
+                    {priority.label} Priority
                   </option>
                 ))}
               </select>
@@ -213,15 +233,32 @@ export default function AddEventModal({
                 name="college"
                 value={formData.college}
                 onChange={handleChange}
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                disabled={loading}
+                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8] disabled:opacity-50"
               >
                 <option value="">No specific college</option>
-                {colleges.map((college) => (
-                  <option key={college} value={college}>
-                    {college}
-                  </option>
-                ))}
+                {collegeApplications.map((app) => {
+                  // Check if there are multiple applications with the same college name
+                  const sameName = collegeApplications.filter(
+                    (c) => c.name === app.name
+                  );
+                  const displayName =
+                    sameName.length > 1 && app.major
+                      ? `${app.name} [${app.major}]`
+                      : app.name;
+
+                  return (
+                    <option key={app.id} value={displayName}>
+                      {displayName}
+                    </option>
+                  );
+                })}
               </select>
+              {loading && (
+                <p className="text-neutral-400 text-sm mt-1">
+                  Loading colleges...
+                </p>
+              )}
             </div>
           </div>
 
@@ -246,18 +283,18 @@ export default function AddEventModal({
             <div className="flex items-start gap-3">
               <div
                 className={`p-2 rounded-lg ${
-                  formData.priority === "High"
+                  formData.priority === EventPriority.HIGH
                     ? "bg-red-500/20"
-                    : formData.priority === "Medium"
+                    : formData.priority === EventPriority.MEDIUM
                     ? "bg-yellow-500/20"
                     : "bg-green-500/20"
                 }`}
               >
                 <FaFlag
                   className={
-                    formData.priority === "High"
+                    formData.priority === EventPriority.HIGH
                       ? "text-red-400"
-                      : formData.priority === "Medium"
+                      : formData.priority === EventPriority.MEDIUM
                       ? "text-yellow-400"
                       : "text-green-400"
                   }

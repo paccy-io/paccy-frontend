@@ -5,6 +5,9 @@ import Link from "next/link";
 import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
 import AddEventModal from "../../../components/Modals/AddEventModal";
+import EditEventModal from "../../../components/Modals/EditEventModal";
+import EventDetailsModal from "../../../components/Modals/EventDetailsModal";
+import { CalendarEvent, EventType, EventPriority } from "../../../lib/types";
 import {
   FaPlus,
   FaCalendar,
@@ -15,84 +18,159 @@ import {
   FaExclamationTriangle,
   FaUniversity,
   FaPen,
+  FaEdit,
+  FaInbox,
+  FaGripVertical,
+  FaList,
+  FaTh,
+  FaColumns,
 } from "react-icons/fa";
 
-// Mock events data
-const mockEvents = [
+// Mock events data - now using proper types
+const mockEvents: CalendarEvent[] = [
   {
-    id: 1,
+    id: "1",
     title: "Harvard Application Deadline",
     date: "2026-01-01",
     time: "23:59",
-    type: "deadline",
+    type: EventType.DEADLINE,
     college: "Harvard University",
-    category: "Application",
-    priority: "high",
+    priority: EventPriority.HIGH,
+    description: "Final deadline for Harvard Early Action application",
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z",
   },
   {
-    id: 2,
+    id: "2",
     title: "Stanford Essay Due",
     date: "2025-12-15",
     time: "23:59",
-    type: "deadline",
+    type: EventType.DEADLINE,
     college: "Stanford University",
-    category: "Essay",
-    priority: "high",
+    priority: EventPriority.HIGH,
+    description: "Submit all supplemental essays for Stanford",
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z",
   },
   {
-    id: 3,
+    id: "3",
     title: "MIT Interview",
     date: "2025-11-20",
     time: "14:00",
-    type: "interview",
+    type: EventType.INTERVIEW,
     college: "MIT",
-    category: "Interview",
-    priority: "medium",
+    priority: EventPriority.MEDIUM,
+    description: "Alumni interview with John Smith",
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z",
   },
   {
-    id: 4,
+    id: "4",
     title: "Personal Statement Review",
     date: "2025-11-15",
     time: "10:00",
-    type: "reminder",
+    type: EventType.REMINDER,
     college: "Multiple",
-    category: "Essay",
-    priority: "medium",
+    priority: EventPriority.MEDIUM,
+    description: "Final review session with counselor",
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z",
   },
   {
-    id: 5,
+    id: "5",
     title: "SAT Registration Deadline",
     date: "2025-11-30",
     time: "23:59",
-    type: "deadline",
+    type: EventType.DEADLINE,
     college: "General",
-    category: "Testing",
-    priority: "high",
+    priority: EventPriority.HIGH,
+    description: "Register for December SAT test",
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z",
   },
   {
-    id: 6,
+    id: "6",
     title: "NYU Campus Visit",
     date: "2025-12-05",
     time: "09:00",
-    type: "visit",
+    type: EventType.VISIT,
     college: "New York University",
-    category: "Visit",
-    priority: "low",
+    priority: EventPriority.LOW,
+    description: "Campus tour and information session",
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z",
+  },
+  // Undated events for inbox
+  {
+    id: "7",
+    title: "Research scholarship opportunities",
+    type: EventType.REMINDER,
+    priority: EventPriority.MEDIUM,
+    description: "Look into merit-based scholarships",
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z",
+  },
+  {
+    id: "8",
+    title: "Schedule mock interview practice",
+    type: EventType.REMINDER,
+    priority: EventPriority.LOW,
+    description: "Practice with family or friends",
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z",
+  },
+  // Additional events for the same date to test "+X more" functionality
+  {
+    id: "9",
+    title: "Submit FAFSA Application",
+    date: "2025-12-15",
+    time: "16:00",
+    type: EventType.DEADLINE,
+    college: "Federal",
+    priority: EventPriority.HIGH,
+    description: "Complete and submit FAFSA for financial aid",
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z",
+  },
+  {
+    id: "10",
+    title: "Review Stanford Supplemental Essays",
+    date: "2025-12-15",
+    time: "09:00",
+    type: EventType.REMINDER,
+    college: "Stanford University",
+    priority: EventPriority.MEDIUM,
+    description: "Final review before submission",
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z",
+  },
+  {
+    id: "11",
+    title: "Parent Signature on Forms",
+    date: "2025-12-15",
+    time: "20:00",
+    type: EventType.REMINDER,
+    college: "Stanford University",
+    priority: EventPriority.LOW,
+    description: "Get parent signatures on required forms",
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z",
   },
 ];
 
-const eventTypeColors: Record<string, string> = {
-  deadline: "bg-red-500",
-  interview: "bg-blue-500",
-  reminder: "bg-yellow-500",
-  visit: "bg-green-500",
-  test: "bg-purple-500",
+const eventTypeColors: Record<EventType, string> = {
+  [EventType.DEADLINE]: "bg-red-500",
+  [EventType.INTERVIEW]: "bg-blue-500",
+  [EventType.REMINDER]: "bg-yellow-500",
+  [EventType.VISIT]: "bg-green-500",
+  [EventType.TEST]: "bg-purple-500",
+  [EventType.OTHER]: "bg-gray-500",
 };
 
-const priorityColors: Record<string, string> = {
-  high: "border-red-500",
-  medium: "border-yellow-500",
-  low: "border-green-500",
+const priorityColors: Record<EventPriority, string> = {
+  [EventPriority.HIGH]: "border-red-500",
+  [EventPriority.MEDIUM]: "border-yellow-500",
+  [EventPriority.LOW]: "border-green-500",
 };
 
 export default function Calendar() {
@@ -100,10 +178,33 @@ export default function Calendar() {
   const [viewMode, setViewMode] = useState<"month" | "week" | "list">("month");
   const [events, setEvents] = useState(mockEvents);
   const [isAddEventModalOpen, setIsAddEventModalOpen] = useState(false);
+  const [isEditEventModalOpen, setIsEditEventModalOpen] = useState(false);
+  const [isEventDetailsModalOpen, setIsEventDetailsModalOpen] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(
+    null
+  );
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [draggedEvent, setDraggedEvent] = useState<CalendarEvent | null>(null);
+  const [dragOverTarget, setDragOverTarget] = useState<string | null>(null);
+  const [expandedDateEvents, setExpandedDateEvents] = useState<string | null>(
+    null
+  );
+  const [showDateEventsModal, setShowDateEventsModal] = useState(false);
 
   useEffect(() => {
     document.title = "Calendar & Deadlines | Paccy";
   }, []);
+
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && showDateEventsModal) {
+        handleCloseDateEventsModal();
+      }
+    };
+
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [showDateEventsModal]);
 
   const today = new Date();
   const currentMonth = currentDate.getMonth();
@@ -149,17 +250,223 @@ export default function Calendar() {
 
   const getUpcomingEvents = () => {
     return events
-      .filter((event) => new Date(event.date) >= today)
-      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+      .filter((event) => event.date && new Date(event.date) >= today)
+      .sort((a, b) => {
+        if (!a.date || !b.date) return 0;
+        return new Date(a.date).getTime() - new Date(b.date).getTime();
+      })
       .slice(0, 5);
+  };
+
+  // Week view helpers
+  const getWeekStart = (date: Date) => {
+    const start = new Date(date);
+    start.setDate(date.getDate() - date.getDay());
+    return start;
+  };
+
+  const getWeekEnd = (date: Date) => {
+    const end = new Date(date);
+    end.setDate(date.getDate() - date.getDay() + 6);
+    return end;
+  };
+
+  const getWeekDays = () => {
+    const start = getWeekStart(currentDate);
+    const days = [];
+    for (let i = 0; i < 7; i++) {
+      const day = new Date(start);
+      day.setDate(start.getDate() + i);
+      days.push(day);
+    }
+    return days;
+  };
+
+  const navigateWeek = (direction: "prev" | "next") => {
+    const newDate = new Date(currentDate);
+    newDate.setDate(currentDate.getDate() + (direction === "next" ? 7 : -7));
+    setCurrentDate(newDate);
+  };
+
+  const getAllEventsSorted = () => {
+    return [...events].sort((a, b) => {
+      // Sort by date first, then by time
+      if (!a.date && !b.date) return 0;
+      if (!a.date) return 1;
+      if (!b.date) return -1;
+
+      const dateComparison =
+        new Date(a.date).getTime() - new Date(b.date).getTime();
+      if (dateComparison !== 0) return dateComparison;
+
+      // If same date, sort by time
+      if (!a.time && !b.time) return 0;
+      if (!a.time) return 1;
+      if (!b.time) return -1;
+
+      return a.time.localeCompare(b.time);
+    });
+  };
+
+  // Helper function to format date as YYYY-MM-DD without timezone issues
+  const formatDateString = (date: Date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
+  // Helper function to get today's date string
+  const getTodayString = () => {
+    return formatDateString(new Date());
+  };
+
+  const getUndatedEvents = () => {
+    return events.filter((event) => !event.date);
   };
 
   const handleAddEvent = (newEvent: any) => {
     const eventWithId = {
       ...newEvent,
-      id: events.length + 1,
+      id: (events.length + 1).toString(),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      // If we have a selected date, use it as the default date
+      date: newEvent.date || selectedDate || undefined,
     };
     setEvents((prev) => [...prev, eventWithId]);
+    // Clear selected date after adding
+    setSelectedDate(null);
+  };
+
+  const handleEditEvent = (eventId: string, updatedEvent: any) => {
+    setEvents((prev) =>
+      prev.map((event) =>
+        event.id === eventId
+          ? { ...event, ...updatedEvent, updated_at: new Date().toISOString() }
+          : event
+      )
+    );
+  };
+
+  const handleDeleteEvent = (eventId: string) => {
+    setEvents((prev) => prev.filter((event) => event.id !== eventId));
+  };
+
+  const handleEventClick = (event: CalendarEvent) => {
+    setSelectedEvent(event);
+    setIsEventDetailsModalOpen(true);
+  };
+
+  const handleEditFromDetails = () => {
+    setIsEventDetailsModalOpen(false);
+    setIsEditEventModalOpen(true);
+  };
+
+  const handleDateClick = (dateString: string) => {
+    setSelectedDate(dateString);
+    setCurrentDate(new Date(dateString));
+  };
+
+  const handleShowAllEvents = (dateString: string) => {
+    setExpandedDateEvents(dateString);
+    setShowDateEventsModal(true);
+  };
+
+  const handleCloseDateEventsModal = () => {
+    setShowDateEventsModal(false);
+    setExpandedDateEvents(null);
+  };
+
+  const handleDragStart = (e: React.DragEvent, event: CalendarEvent) => {
+    setDraggedEvent(event);
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", event.id);
+
+    // Create a custom drag image
+    const dragElement = e.currentTarget.cloneNode(true) as HTMLElement;
+    dragElement.style.transform = "rotate(5deg)";
+    dragElement.style.opacity = "0.8";
+    document.body.appendChild(dragElement);
+    e.dataTransfer.setDragImage(dragElement, 50, 20);
+
+    // Clean up the temporary element after a short delay
+    setTimeout(() => {
+      document.body.removeChild(dragElement);
+    }, 0);
+
+    // Add visual feedback to original element
+    e.currentTarget.classList.add("opacity-50", "scale-95");
+  };
+
+  const handleDragEnd = (e: React.DragEvent) => {
+    setDraggedEvent(null);
+    setDragOverTarget(null);
+    e.currentTarget.classList.remove("opacity-50", "scale-95");
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  };
+
+  const handleDateDragOver = (e: React.DragEvent, dateString: string) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    setDragOverTarget(dateString);
+  };
+
+  const handleDateDrop = (e: React.DragEvent, targetDate: string) => {
+    e.preventDefault();
+    setDragOverTarget(null);
+
+    if (!draggedEvent) return;
+
+    // Update the event with new date
+    handleEditEvent(draggedEvent.id, {
+      ...draggedEvent,
+      date: targetDate,
+      // Keep existing time or set to undefined if moving from inbox
+      time: draggedEvent.time || undefined,
+    });
+
+    // Show a brief visual confirmation
+    const targetElement = e.currentTarget;
+    targetElement.classList.add("ring-2", "ring-green-500");
+    setTimeout(() => {
+      targetElement.classList.remove("ring-2", "ring-green-500");
+    }, 1000);
+
+    setDraggedEvent(null);
+  };
+
+  const handleInboxDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    setDragOverTarget("inbox");
+  };
+
+  const handleInboxDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOverTarget(null);
+
+    if (!draggedEvent) return;
+
+    // Remove date and time to move to inbox
+    handleEditEvent(draggedEvent.id, {
+      ...draggedEvent,
+      date: undefined,
+      time: undefined,
+    });
+
+    // Show a brief visual confirmation
+    const targetElement = e.currentTarget;
+    targetElement.classList.add("ring-2", "ring-blue-500");
+    setTimeout(() => {
+      targetElement.classList.remove("ring-2", "ring-blue-500");
+    }, 1000);
+
+    setDraggedEvent(null);
   };
 
   const renderCalendarDays = () => {
@@ -190,11 +497,19 @@ export default function Calendar() {
       days.push(
         <div
           key={day}
-          className={`h-24 border border-neutral-700/30 p-1 ${
+          className={`h-24 border border-neutral-700/30 p-1 cursor-pointer transition-colors ${
             isToday
               ? "bg-[#FEEBD8]/10 border-[#FEEBD8]/50"
               : "hover:bg-neutral-800/30"
+          } ${
+            dragOverTarget === dateString
+              ? "bg-blue-500/20 border-blue-500/50"
+              : ""
           }`}
+          onClick={() => handleDateClick(dateString)}
+          onDragOver={(e) => handleDateDragOver(e, dateString)}
+          onDrop={(e) => handleDateDrop(e, dateString)}
+          onDragLeave={() => setDragOverTarget(null)}
         >
           <div
             className={`text-sm font-medium mb-1 ${
@@ -207,18 +522,33 @@ export default function Calendar() {
             {dayEvents.slice(0, 2).map((event) => (
               <div
                 key={event.id}
-                className={`text-xs px-1 py-0.5 rounded text-white truncate ${
+                draggable
+                onDragStart={(e) => handleDragStart(e, event)}
+                onDragEnd={handleDragEnd}
+                className={`text-xs px-1 py-0.5 rounded text-white truncate cursor-move hover:opacity-80 transition-opacity ${
                   eventTypeColors[event.type]
-                }`}
+                } relative group`}
                 title={event.title}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleEventClick(event);
+                }}
               >
-                {event.title}
+                <FaGripVertical className="absolute left-0 top-0.5 text-white/50 text-xs opacity-0 group-hover:opacity-100 transition-opacity" />
+                <span className="ml-2">{event.title}</span>
               </div>
             ))}
             {dayEvents.length > 2 && (
-              <div className="text-xs text-[#FEEBD8]/50">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleShowAllEvents(dateString);
+                }}
+                className="text-xs text-[#FEEBD8]/50 hover:text-[#FEEBD8] hover:bg-neutral-700/30 transition-all duration-200 cursor-pointer underline rounded px-1 py-0.5"
+                title={`View all ${dayEvents.length} events`}
+              >
                 +{dayEvents.length - 2} more
-              </div>
+              </button>
             )}
           </div>
         </div>
@@ -248,16 +578,61 @@ export default function Calendar() {
               </h1>
               <p className="text-[#FEEBD8]/70 mt-2">
                 Never miss an important date
+                {draggedEvent && (
+                  <span className="ml-2 text-blue-400 text-sm">
+                    • Drag to calendar date or inbox to reschedule
+                  </span>
+                )}
               </p>
             </div>
           </div>
-          <button
-            onClick={() => setIsAddEventModalOpen(true)}
-            className="bg-[#FEEBD8] text-[#141414] px-6 py-3 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors flex items-center space-x-2"
-          >
-            <FaPlus />
-            <span>Add Event</span>
-          </button>
+
+          <div className="flex items-center space-x-4">
+            {/* View Mode Selector */}
+            <div className="flex items-center bg-neutral-800 rounded-lg p-1">
+              <button
+                onClick={() => setViewMode("month")}
+                className={`flex items-center space-x-2 px-3 py-2 rounded-md transition-colors ${
+                  viewMode === "month"
+                    ? "bg-[#FEEBD8] text-[#141414]"
+                    : "text-[#FEEBD8]/70 hover:text-[#FEEBD8] hover:bg-neutral-700"
+                }`}
+              >
+                <FaTh size={14} />
+                <span className="hidden sm:inline text-sm">Month</span>
+              </button>
+              <button
+                onClick={() => setViewMode("week")}
+                className={`flex items-center space-x-2 px-3 py-2 rounded-md transition-colors ${
+                  viewMode === "week"
+                    ? "bg-[#FEEBD8] text-[#141414]"
+                    : "text-[#FEEBD8]/70 hover:text-[#FEEBD8] hover:bg-neutral-700"
+                }`}
+              >
+                <FaColumns size={14} />
+                <span className="hidden sm:inline text-sm">Week</span>
+              </button>
+              <button
+                onClick={() => setViewMode("list")}
+                className={`flex items-center space-x-2 px-3 py-2 rounded-md transition-colors ${
+                  viewMode === "list"
+                    ? "bg-[#FEEBD8] text-[#141414]"
+                    : "text-[#FEEBD8]/70 hover:text-[#FEEBD8] hover:bg-neutral-700"
+                }`}
+              >
+                <FaList size={14} />
+                <span className="hidden sm:inline text-sm">List</span>
+              </button>
+            </div>
+
+            <button
+              onClick={() => setIsAddEventModalOpen(true)}
+              className="bg-[#FEEBD8] text-[#141414] px-6 py-3 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors flex items-center space-x-2"
+            >
+              <FaPlus />
+              <span>Add Event</span>
+            </button>
+          </div>
         </div>
 
         {/* Stats Cards */}
@@ -274,6 +649,7 @@ export default function Calendar() {
               {
                 events.filter(
                   (e) =>
+                    e.date &&
                     getDaysUntilEvent(e.date) <= 7 &&
                     getDaysUntilEvent(e.date) > 0
                 ).length
@@ -284,68 +660,501 @@ export default function Calendar() {
 
           <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
             <div className="text-2xl font-bold text-yellow-400 mb-1">
-              {events.filter((e) => e.type === "deadline").length}
+              {events.filter((e) => e.type === EventType.DEADLINE).length}
             </div>
             <div className="text-[#FEEBD8]/70 text-sm">Deadlines</div>
           </div>
 
           <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
             <div className="text-2xl font-bold text-blue-400 mb-1">
-              {events.filter((e) => e.type === "interview").length}
+              {events.filter((e) => e.type === EventType.INTERVIEW).length}
             </div>
             <div className="text-[#FEEBD8]/70 text-sm">Interviews</div>
           </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Calendar */}
+          {/* Calendar Views */}
           <div className="lg:col-span-2">
-            <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
-              {/* Calendar Header */}
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-semibold text-[#FEEBD8]">
-                  {monthNames[currentMonth]} {currentYear}
-                </h2>
-                <div className="flex items-center space-x-2">
-                  <button
-                    onClick={() => navigateMonth("prev")}
-                    className="p-2 hover:bg-neutral-700/30 rounded-lg transition-colors"
-                  >
-                    <FaChevronLeft className="text-[#FEEBD8]" />
-                  </button>
-                  <button
-                    onClick={() => setCurrentDate(new Date())}
-                    className="px-4 py-2 text-sm bg-neutral-700/30 hover:bg-neutral-700/50 rounded-lg transition-colors text-[#FEEBD8]"
-                  >
-                    Today
-                  </button>
-                  <button
-                    onClick={() => navigateMonth("next")}
-                    className="p-2 hover:bg-neutral-700/30 rounded-lg transition-colors"
-                  >
-                    <FaChevronRight className="text-[#FEEBD8]" />
-                  </button>
+            {viewMode === "month" && (
+              <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
+                {/* Calendar Header */}
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-semibold text-[#FEEBD8]">
+                    {monthNames[currentMonth]} {currentYear}
+                  </h2>
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={() => navigateMonth("prev")}
+                      className="p-2 hover:bg-neutral-700/30 rounded-lg transition-colors"
+                    >
+                      <FaChevronLeft className="text-[#FEEBD8]" />
+                    </button>
+                    <button
+                      onClick={() => setCurrentDate(new Date())}
+                      className="px-4 py-2 text-sm bg-neutral-700/30 hover:bg-neutral-700/50 rounded-lg transition-colors text-[#FEEBD8]"
+                    >
+                      Today
+                    </button>
+                    <button
+                      onClick={() => navigateMonth("next")}
+                      className="p-2 hover:bg-neutral-700/30 rounded-lg transition-colors"
+                    >
+                      <FaChevronRight className="text-[#FEEBD8]" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Calendar Grid */}
+                <div className="grid grid-cols-7 gap-0 border border-neutral-700/50 rounded-lg overflow-hidden">
+                  {/* Day headers */}
+                  {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(
+                    (day) => (
+                      <div
+                        key={day}
+                        className="bg-neutral-800 p-3 text-center text-sm font-medium text-[#FEEBD8]/70 border-b border-neutral-700/30"
+                      >
+                        {day}
+                      </div>
+                    )
+                  )}
+
+                  {/* Calendar days */}
+                  {renderCalendarDays()}
                 </div>
               </div>
+            )}
 
-              {/* Calendar Grid */}
-              <div className="grid grid-cols-7 gap-0 border border-neutral-700/50 rounded-lg overflow-hidden">
-                {/* Day headers */}
-                {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(
-                  (day) => (
-                    <div
-                      key={day}
-                      className="bg-neutral-800 p-3 text-center text-sm font-medium text-[#FEEBD8]/70 border-b border-neutral-700/30"
+            {viewMode === "week" && (
+              <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
+                {/* Week Header */}
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-semibold text-[#FEEBD8]">
+                    {getWeekStart(currentDate).toLocaleDateString("en-US", {
+                      month: "long",
+                      day: "numeric",
+                    })}{" "}
+                    -{" "}
+                    {getWeekEnd(currentDate).toLocaleDateString("en-US", {
+                      month: "long",
+                      day: "numeric",
+                      year: "numeric",
+                    })}
+                  </h2>
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={() => navigateWeek("prev")}
+                      className="p-2 hover:bg-neutral-700/30 rounded-lg transition-colors"
                     >
-                      {day}
-                    </div>
-                  )
-                )}
+                      <FaChevronLeft className="text-[#FEEBD8]" />
+                    </button>
+                    <button
+                      onClick={() => setCurrentDate(new Date())}
+                      className="px-4 py-2 text-sm bg-neutral-700/30 hover:bg-neutral-700/50 rounded-lg transition-colors text-[#FEEBD8]"
+                    >
+                      Today
+                    </button>
+                    <button
+                      onClick={() => navigateWeek("next")}
+                      className="p-2 hover:bg-neutral-700/30 rounded-lg transition-colors"
+                    >
+                      <FaChevronRight className="text-[#FEEBD8]" />
+                    </button>
+                  </div>
+                </div>
 
-                {/* Calendar days */}
-                {renderCalendarDays()}
+                {/* Week View Container */}
+                <div className="overflow-x-auto">
+                  <div className="min-w-[800px]">
+                    {/* Day Headers */}
+                    <div className="grid grid-cols-8 gap-0 mb-4">
+                      <div className="p-3"></div>{" "}
+                      {/* Empty space for time column */}
+                      {getWeekDays().map((day, index) => {
+                        const dateString = formatDateString(day);
+                        const isToday = dateString === getTodayString();
+                        const dayEvents = getEventsForDate(dateString);
+
+                        return (
+                          <div
+                            key={index}
+                            className={`p-3 text-center border-b-2 ${
+                              isToday
+                                ? "border-blue-500"
+                                : "border-neutral-700/30"
+                            }`}
+                          >
+                            <div
+                              className={`text-sm font-medium ${
+                                isToday ? "text-blue-400" : "text-[#FEEBD8]/70"
+                              }`}
+                            >
+                              {day.toLocaleDateString("en-US", {
+                                weekday: "short",
+                              })}
+                            </div>
+                            <div
+                              className={`text-xl font-bold mt-1 ${
+                                isToday ? "text-blue-400" : "text-[#FEEBD8]"
+                              }`}
+                            >
+                              {day.getDate()}
+                            </div>
+                            <div className="text-xs text-[#FEEBD8]/50 mt-1">
+                              {dayEvents.length} event
+                              {dayEvents.length !== 1 ? "s" : ""}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Time Grid */}
+                    <div className="grid grid-cols-8 gap-0 border border-neutral-700/30 rounded-lg overflow-hidden">
+                      {/* All-day events row */}
+                      <div className="bg-neutral-800/50 p-3 border-r border-neutral-700/30 flex items-center">
+                        <span className="text-xs font-medium text-[#FEEBD8]/70">
+                          All Day
+                        </span>
+                      </div>
+                      {getWeekDays().map((day, dayIndex) => {
+                        const dateString = formatDateString(day);
+                        const dayEvents = getEventsForDate(dateString);
+                        const allDayEvents = dayEvents.filter(
+                          (event) => !event.time
+                        );
+                        const isToday = dateString === getTodayString();
+
+                        return (
+                          <div
+                            key={dayIndex}
+                            className={`p-2 min-h-[60px] border-r border-neutral-700/30 ${
+                              isToday ? "bg-blue-500/10" : "bg-neutral-900/30"
+                            } ${
+                              dragOverTarget === dateString
+                                ? "bg-blue-500/20 border-blue-500"
+                                : ""
+                            }`}
+                            onDragOver={(e) =>
+                              handleDateDragOver(e, dateString)
+                            }
+                            onDragLeave={() => setDragOverTarget(null)}
+                            onDrop={(e) => handleDateDrop(e, dateString)}
+                          >
+                            <div className="space-y-1">
+                              {allDayEvents.map((event) => (
+                                <div
+                                  key={event.id}
+                                  draggable
+                                  onDragStart={(e) => handleDragStart(e, event)}
+                                  onDragEnd={handleDragEnd}
+                                  onClick={() => handleEventClick(event)}
+                                  className={`p-1.5 rounded text-xs cursor-pointer hover:opacity-80 transition-opacity ${
+                                    eventTypeColors[event.type]
+                                  } text-white`}
+                                >
+                                  <div className="font-medium truncate">
+                                    {event.title}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      })}
+
+                      {/* Time slots */}
+                      {Array.from({ length: 24 }, (_, hour) => {
+                        const timeSlots = [];
+
+                        // Hour row
+                        timeSlots.push(
+                          <div
+                            key={`hour-${hour}`}
+                            className="bg-neutral-800/50 p-3 border-r border-neutral-700/30 border-t border-neutral-700/30 flex items-start"
+                          >
+                            <span className="text-xs font-medium text-[#FEEBD8]/70">
+                              {hour === 0
+                                ? "12 AM"
+                                : hour < 12
+                                ? `${hour} AM`
+                                : hour === 12
+                                ? "12 PM"
+                                : `${hour - 12} PM`}
+                            </span>
+                          </div>
+                        );
+
+                        // Day columns for this hour
+                        getWeekDays().forEach((day, dayIndex) => {
+                          const dateString = formatDateString(day);
+                          const dayEvents = getEventsForDate(dateString);
+                          const hourEvents = dayEvents.filter((event) => {
+                            if (!event.time) return false;
+                            const eventHour = parseInt(
+                              event.time.split(":")[0]
+                            );
+                            return eventHour === hour;
+                          });
+                          const isToday = dateString === getTodayString();
+
+                          timeSlots.push(
+                            <div
+                              key={`${hour}-${dayIndex}`}
+                              className={`p-2 min-h-[60px] border-r border-neutral-700/30 border-t border-neutral-700/30 relative ${
+                                isToday
+                                  ? "bg-blue-500/5"
+                                  : "hover:bg-neutral-800/30"
+                              } ${
+                                dragOverTarget === dateString
+                                  ? "bg-blue-500/20"
+                                  : ""
+                              }`}
+                              onDragOver={(e) =>
+                                handleDateDragOver(e, dateString)
+                              }
+                              onDragLeave={() => setDragOverTarget(null)}
+                              onDrop={(e) => handleDateDrop(e, dateString)}
+                              onClick={() => {
+                                setSelectedDate(dateString);
+                                setIsAddEventModalOpen(true);
+                              }}
+                            >
+                              <div className="space-y-1">
+                                {hourEvents.map((event) => (
+                                  <div
+                                    key={event.id}
+                                    draggable
+                                    onDragStart={(e) =>
+                                      handleDragStart(e, event)
+                                    }
+                                    onDragEnd={handleDragEnd}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleEventClick(event);
+                                    }}
+                                    className={`p-1.5 rounded text-xs cursor-pointer hover:opacity-80 transition-opacity relative z-10 ${
+                                      eventTypeColors[event.type]
+                                    } text-white`}
+                                  >
+                                    <div className="font-medium truncate">
+                                      {event.title}
+                                    </div>
+                                    <div className="text-xs opacity-90">
+                                      {event.time}
+                                    </div>
+                                    {event.college && (
+                                      <div className="text-xs opacity-75 truncate">
+                                        {event.college}
+                                      </div>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+
+                              {/* Hover indicator for adding events */}
+                              <div className="absolute inset-0 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <FaPlus className="text-[#FEEBD8]/30 text-xs" />
+                              </div>
+                            </div>
+                          );
+                        });
+
+                        return timeSlots;
+                      }).flat()}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Week Summary */}
+                <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="bg-neutral-800/30 rounded-lg p-4">
+                    <h4 className="text-sm font-medium text-[#FEEBD8]/70 mb-2">
+                      This Week
+                    </h4>
+                    <div className="text-2xl font-bold text-[#FEEBD8]">
+                      {getWeekDays().reduce((total, day) => {
+                        const dateString = formatDateString(day);
+                        return total + getEventsForDate(dateString).length;
+                      }, 0)}
+                    </div>
+                    <div className="text-xs text-[#FEEBD8]/60">
+                      Total Events
+                    </div>
+                  </div>
+
+                  <div className="bg-neutral-800/30 rounded-lg p-4">
+                    <h4 className="text-sm font-medium text-[#FEEBD8]/70 mb-2">
+                      Deadlines
+                    </h4>
+                    <div className="text-2xl font-bold text-red-400">
+                      {getWeekDays().reduce((total, day) => {
+                        const dateString = formatDateString(day);
+                        return (
+                          total +
+                          getEventsForDate(dateString).filter(
+                            (e) => e.type === EventType.DEADLINE
+                          ).length
+                        );
+                      }, 0)}
+                    </div>
+                    <div className="text-xs text-[#FEEBD8]/60">This Week</div>
+                  </div>
+
+                  <div className="bg-neutral-800/30 rounded-lg p-4">
+                    <h4 className="text-sm font-medium text-[#FEEBD8]/70 mb-2">
+                      Interviews
+                    </h4>
+                    <div className="text-2xl font-bold text-blue-400">
+                      {getWeekDays().reduce((total, day) => {
+                        const dateString = formatDateString(day);
+                        return (
+                          total +
+                          getEventsForDate(dateString).filter(
+                            (e) => e.type === EventType.INTERVIEW
+                          ).length
+                        );
+                      }, 0)}
+                    </div>
+                    <div className="text-xs text-[#FEEBD8]/60">This Week</div>
+                  </div>
+                </div>
               </div>
-            </div>
+            )}
+
+            {viewMode === "list" && (
+              <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
+                {/* List Header */}
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-semibold text-[#FEEBD8]">
+                    All Events
+                  </h2>
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={() => setCurrentDate(new Date())}
+                      className="px-4 py-2 text-sm bg-neutral-700/30 hover:bg-neutral-700/50 rounded-lg transition-colors text-[#FEEBD8]"
+                    >
+                      Today
+                    </button>
+                  </div>
+                </div>
+
+                {/* Events List */}
+                <div className="space-y-4 max-h-[600px] overflow-y-auto">
+                  {getAllEventsSorted().map((event) => {
+                    const daysUntil = event.date
+                      ? getDaysUntilEvent(event.date)
+                      : -1;
+                    const isUrgent = daysUntil <= 3 && daysUntil >= 0;
+                    const isPast = daysUntil < 0;
+
+                    return (
+                      <div
+                        key={event.id}
+                        draggable
+                        onDragStart={(e) => handleDragStart(e, event)}
+                        onDragEnd={handleDragEnd}
+                        onClick={() => handleEventClick(event)}
+                        className={`p-4 border rounded-lg cursor-pointer hover:bg-neutral-800/50 transition-colors ${
+                          isUrgent
+                            ? "border-red-500/50 bg-red-500/10"
+                            : isPast
+                            ? "border-neutral-700/30 opacity-60"
+                            : "border-neutral-700/50"
+                        }`}
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-2">
+                              <div
+                                className={`w-3 h-3 rounded-full ${
+                                  eventTypeColors[event.type]
+                                }`}
+                              ></div>
+                              <h3 className="font-semibold text-[#FEEBD8]">
+                                {event.title}
+                              </h3>
+                              <span
+                                className={`px-2 py-1 rounded-full text-xs ${
+                                  event.priority === EventPriority.HIGH
+                                    ? "bg-red-500/20 text-red-400"
+                                    : event.priority === EventPriority.MEDIUM
+                                    ? "bg-yellow-500/20 text-yellow-400"
+                                    : "bg-green-500/20 text-green-400"
+                                }`}
+                              >
+                                {event.priority}
+                              </span>
+                            </div>
+
+                            <div className="flex items-center gap-4 text-sm text-[#FEEBD8]/70 mb-2">
+                              {event.date ? (
+                                <div className="flex items-center gap-1">
+                                  <FaCalendar size={12} />
+                                  {new Date(event.date).toLocaleDateString()}
+                                </div>
+                              ) : (
+                                <div className="flex items-center gap-1">
+                                  <FaInbox size={12} />
+                                  No date set
+                                </div>
+                              )}
+
+                              {event.time && (
+                                <div className="flex items-center gap-1">
+                                  <FaClock size={12} />
+                                  {event.time}
+                                </div>
+                              )}
+
+                              {event.college && (
+                                <div className="flex items-center gap-1">
+                                  <FaUniversity size={12} />
+                                  {event.college}
+                                </div>
+                              )}
+                            </div>
+
+                            {event.description && (
+                              <p className="text-sm text-[#FEEBD8]/60 line-clamp-2">
+                                {event.description}
+                              </p>
+                            )}
+                          </div>
+
+                          <div className="flex items-center gap-2 ml-4">
+                            {isUrgent && (
+                              <div className="flex items-center gap-1 text-red-400 text-xs">
+                                <FaExclamationTriangle size={12} />
+                                {daysUntil === 0
+                                  ? "Today"
+                                  : `${daysUntil} days`}
+                              </div>
+                            )}
+                            <FaGripVertical
+                              className="text-[#FEEBD8]/30"
+                              size={12}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+
+                  {events.length === 0 && (
+                    <div className="text-center py-12">
+                      <FaCalendar className="mx-auto text-4xl text-[#FEEBD8]/30 mb-4" />
+                      <h3 className="text-lg font-medium text-[#FEEBD8]/70 mb-2">
+                        No events yet
+                      </h3>
+                      <p className="text-[#FEEBD8]/50">
+                        Create your first event to get started
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Upcoming Events Sidebar */}
@@ -356,51 +1165,73 @@ export default function Calendar() {
               </h3>
               <div className="space-y-3">
                 {getUpcomingEvents().map((event) => {
-                  const daysUntil = getDaysUntilEvent(event.date);
+                  const daysUntil = event.date
+                    ? getDaysUntilEvent(event.date)
+                    : -1;
                   const isUrgent = daysUntil <= 3 && daysUntil >= 0;
 
                   return (
                     <div
                       key={event.id}
+                      draggable
+                      onDragStart={(e) => handleDragStart(e, event)}
+                      onDragEnd={handleDragEnd}
                       className={`p-3 rounded-lg border-l-4 ${
                         priorityColors[event.priority]
                       } bg-neutral-800/30 ${
                         isUrgent ? "ring-1 ring-red-500/30" : ""
-                      }`}
+                      } cursor-move hover:bg-neutral-800/50 transition-colors group`}
+                      onClick={() => handleEventClick(event)}
                     >
                       <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            {event.type === "deadline" && (
-                              <FaClock className="text-red-400 text-sm" />
-                            )}
-                            {event.type === "interview" && (
-                              <FaUniversity className="text-blue-400 text-sm" />
-                            )}
-                            {event.type === "reminder" && (
-                              <FaPen className="text-yellow-400 text-sm" />
-                            )}
-                            <h4 className="font-medium text-[#FEEBD8] text-sm">
-                              {event.title}
-                            </h4>
-                          </div>
-                          <p className="text-[#FEEBD8]/60 text-xs">
-                            {event.college}
-                          </p>
-                          <div className="flex items-center gap-2 mt-1">
-                            <span className="text-[#FEEBD8]/70 text-xs">
-                              {new Date(event.date).toLocaleDateString()}
-                            </span>
-                            {event.time && (
+                        <div className="flex items-center gap-2 flex-1">
+                          <FaGripVertical className="text-[#FEEBD8]/30 group-hover:text-[#FEEBD8]/60 transition-colors" />
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              {event.type === EventType.DEADLINE && (
+                                <FaClock className="text-red-400 text-sm" />
+                              )}
+                              {event.type === EventType.INTERVIEW && (
+                                <FaUniversity className="text-blue-400 text-sm" />
+                              )}
+                              {event.type === EventType.REMINDER && (
+                                <FaPen className="text-yellow-400 text-sm" />
+                              )}
+                              <h4 className="font-medium text-[#FEEBD8] text-sm">
+                                {event.title}
+                              </h4>
+                            </div>
+                            <p className="text-[#FEEBD8]/60 text-xs">
+                              {event.college}
+                            </p>
+                            <div className="flex items-center gap-2 mt-1">
                               <span className="text-[#FEEBD8]/70 text-xs">
-                                at {event.time}
+                                {event.date
+                                  ? new Date(event.date).toLocaleDateString()
+                                  : "No date"}
                               </span>
-                            )}
+                              {event.time && (
+                                <span className="text-[#FEEBD8]/70 text-xs">
+                                  at {event.time}
+                                </span>
+                              )}
+                            </div>
                           </div>
                         </div>
-                        {isUrgent && (
-                          <FaExclamationTriangle className="text-red-400 text-sm" />
-                        )}
+                        <div className="flex items-center gap-2">
+                          {isUrgent && (
+                            <FaExclamationTriangle className="text-red-400 text-sm" />
+                          )}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleEventClick(event);
+                            }}
+                            className="text-[#FEEBD8]/50 hover:text-[#FEEBD8] transition-colors"
+                          >
+                            <FaEdit size={12} />
+                          </button>
+                        </div>
                       </div>
                       {daysUntil >= 0 && (
                         <div className="mt-2">
@@ -427,6 +1258,92 @@ export default function Calendar() {
               </div>
             </div>
 
+            {/* Inbox Section */}
+            <div
+              className={`bg-[#141414] border border-neutral-700/50 rounded-lg p-6 transition-colors ${
+                dragOverTarget === "inbox"
+                  ? "bg-green-500/10 border-green-500/50"
+                  : ""
+              }`}
+              onDragOver={handleInboxDragOver}
+              onDrop={handleInboxDrop}
+              onDragLeave={() => setDragOverTarget(null)}
+            >
+              <div className="flex items-center gap-2 mb-4">
+                <FaInbox className="text-[#FEEBD8]" />
+                <h3 className="text-xl font-semibold text-[#FEEBD8]">Inbox</h3>
+                <span className="text-sm text-[#FEEBD8]/50">
+                  ({getUndatedEvents().length} undated)
+                </span>
+                {dragOverTarget === "inbox" && (
+                  <span className="text-xs text-green-400 ml-2">
+                    Drop here to remove date
+                  </span>
+                )}
+              </div>
+              <div className="space-y-3">
+                {getUndatedEvents().length === 0 ? (
+                  <p className="text-[#FEEBD8]/50 text-sm italic">
+                    {draggedEvent
+                      ? "Drop events here to remove their dates"
+                      : "No undated events"}
+                  </p>
+                ) : (
+                  getUndatedEvents().map((event) => (
+                    <div
+                      key={event.id}
+                      draggable
+                      onDragStart={(e) => handleDragStart(e, event)}
+                      onDragEnd={handleDragEnd}
+                      className={`p-3 rounded-lg border-l-4 ${
+                        priorityColors[event.priority]
+                      } bg-neutral-800/30 cursor-move hover:bg-neutral-800/50 transition-colors group`}
+                      onClick={() => handleEventClick(event)}
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-2 flex-1">
+                          <FaGripVertical className="text-[#FEEBD8]/30 group-hover:text-[#FEEBD8]/60 transition-colors" />
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              {event.type === EventType.DEADLINE && (
+                                <FaClock className="text-red-400 text-sm" />
+                              )}
+                              {event.type === EventType.INTERVIEW && (
+                                <FaUniversity className="text-blue-400 text-sm" />
+                              )}
+                              {event.type === EventType.REMINDER && (
+                                <FaPen className="text-yellow-400 text-sm" />
+                              )}
+                              <h4 className="font-medium text-[#FEEBD8] text-sm">
+                                {event.title}
+                              </h4>
+                            </div>
+                            {event.college && (
+                              <p className="text-[#FEEBD8]/60 text-xs">
+                                {event.college}
+                              </p>
+                            )}
+                            <p className="text-[#FEEBD8]/50 text-xs mt-1">
+                              {event.description}
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEventClick(event);
+                          }}
+                          className="text-[#FEEBD8]/50 hover:text-[#FEEBD8] transition-colors"
+                        >
+                          <FaEdit size={12} />
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+
             {/* Legend */}
             <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
               <h3 className="text-lg font-semibold text-[#FEEBD8] mb-4">
@@ -437,7 +1354,7 @@ export default function Calendar() {
                   <div key={type} className="flex items-center gap-2">
                     <div className={`w-3 h-3 rounded ${color}`}></div>
                     <span className="text-[#FEEBD8]/70 text-sm capitalize">
-                      {type}
+                      {type.toLowerCase().replace("_", " ")}
                     </span>
                   </div>
                 ))}
@@ -449,11 +1366,213 @@ export default function Calendar() {
 
       <Footer />
 
+      {/* Date Events Modal */}
+      {showDateEventsModal && expandedDateEvents && (
+        <div
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 animate-in fade-in duration-200"
+          onClick={handleCloseDateEventsModal}
+        >
+          <div
+            className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6 max-w-md w-full max-h-[80vh] overflow-y-auto animate-in slide-in-from-bottom-4 duration-300"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="text-xl font-semibold text-[#FEEBD8]">
+                  Events for{" "}
+                  {new Date(expandedDateEvents).toLocaleDateString("en-US", {
+                    weekday: "long",
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </h3>
+                <p className="text-sm text-[#FEEBD8]/60 mt-1">
+                  {getEventsForDate(expandedDateEvents).length} event
+                  {getEventsForDate(expandedDateEvents).length !== 1 ? "s" : ""}
+                </p>
+              </div>
+              <button
+                onClick={handleCloseDateEventsModal}
+                className="text-[#FEEBD8]/70 hover:text-[#FEEBD8] transition-colors text-xl"
+              >
+                ×
+              </button>
+            </div>
+            <div className="space-y-3">
+              {getEventsForDate(expandedDateEvents)
+                .sort((a, b) => {
+                  // Sort by time if both have time, otherwise by priority
+                  if (a.time && b.time) {
+                    return a.time.localeCompare(b.time);
+                  }
+                  if (a.time && !b.time) return -1;
+                  if (!a.time && b.time) return 1;
+
+                  // Sort by priority: HIGH -> MEDIUM -> LOW
+                  const priorityOrder = {
+                    [EventPriority.HIGH]: 0,
+                    [EventPriority.MEDIUM]: 1,
+                    [EventPriority.LOW]: 2,
+                  };
+                  return priorityOrder[a.priority] - priorityOrder[b.priority];
+                })
+                .map((event) => {
+                  const isToday =
+                    expandedDateEvents ===
+                    new Date().toISOString().split("T")[0];
+                  const eventDateTime = event.time
+                    ? new Date(`${expandedDateEvents}T${event.time}`)
+                    : null;
+                  const isUpcoming =
+                    eventDateTime && eventDateTime > new Date();
+                  const isPast = eventDateTime && eventDateTime < new Date();
+
+                  return (
+                    <div
+                      key={event.id}
+                      draggable
+                      onDragStart={(e) => handleDragStart(e, event)}
+                      onDragEnd={handleDragEnd}
+                      className={`p-3 rounded-lg border-l-4 ${
+                        priorityColors[event.priority]
+                      } bg-neutral-800/30 cursor-move hover:bg-neutral-800/50 transition-colors group ${
+                        isPast && isToday ? "opacity-60" : ""
+                      }`}
+                      onClick={() => {
+                        handleEventClick(event);
+                        handleCloseDateEventsModal();
+                      }}
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-2 flex-1">
+                          <FaGripVertical className="text-[#FEEBD8]/30 group-hover:text-[#FEEBD8]/60 transition-colors" />
+                          <div
+                            className={`w-3 h-3 rounded ${
+                              eventTypeColors[event.type]
+                            } flex-shrink-0`}
+                          ></div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              {event.type === EventType.DEADLINE && (
+                                <FaClock className="text-red-400 text-sm" />
+                              )}
+                              {event.type === EventType.INTERVIEW && (
+                                <FaUniversity className="text-blue-400 text-sm" />
+                              )}
+                              {event.type === EventType.REMINDER && (
+                                <FaPen className="text-yellow-400 text-sm" />
+                              )}
+                              {event.type === EventType.VISIT && (
+                                <FaUniversity className="text-green-400 text-sm" />
+                              )}
+                              <h4 className="font-medium text-[#FEEBD8] text-sm truncate">
+                                {event.title}
+                              </h4>
+                            </div>
+                            {event.college && (
+                              <p className="text-[#FEEBD8]/60 text-xs truncate">
+                                {event.college}
+                              </p>
+                            )}
+                            <div className="flex items-center gap-2 mt-1">
+                              {event.time && (
+                                <span className="text-[#FEEBD8]/70 text-xs">
+                                  {event.time}
+                                  {isPast && isToday && (
+                                    <span className="text-red-400 ml-1">
+                                      (past)
+                                    </span>
+                                  )}
+                                  {isUpcoming && isToday && (
+                                    <span className="text-green-400 ml-1">
+                                      (upcoming)
+                                    </span>
+                                  )}
+                                </span>
+                              )}
+                              <span
+                                className={`text-xs px-2 py-0.5 rounded-full ${
+                                  event.priority === EventPriority.HIGH
+                                    ? "bg-red-500/20 text-red-400"
+                                    : event.priority === EventPriority.MEDIUM
+                                    ? "bg-yellow-500/20 text-yellow-400"
+                                    : "bg-green-500/20 text-green-400"
+                                }`}
+                              >
+                                {event.priority.toLowerCase()}
+                              </span>
+                            </div>
+                            {event.description && (
+                              <p className="text-[#FEEBD8]/50 text-xs mt-1 line-clamp-2">
+                                {event.description}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEventClick(event);
+                            handleCloseDateEventsModal();
+                          }}
+                          className="text-[#FEEBD8]/50 hover:text-[#FEEBD8] transition-colors ml-2"
+                        >
+                          <FaEdit size={12} />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+            </div>{" "}
+            <div className="mt-4 pt-4 border-t border-neutral-700/50">
+              <button
+                onClick={() => {
+                  setSelectedDate(expandedDateEvents);
+                  setIsAddEventModalOpen(true);
+                  handleCloseDateEventsModal();
+                }}
+                className="w-full bg-[#FEEBD8] text-[#141414] px-4 py-2 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors flex items-center justify-center gap-2"
+              >
+                <FaPlus size={12} />
+                Add Event for This Date
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Modals */}
       <AddEventModal
         isOpen={isAddEventModalOpen}
-        onClose={() => setIsAddEventModalOpen(false)}
+        onClose={() => {
+          setIsAddEventModalOpen(false);
+          setSelectedDate(null);
+        }}
         onSave={handleAddEvent}
+        selectedDate={selectedDate || undefined}
+      />
+
+      <EditEventModal
+        isOpen={isEditEventModalOpen}
+        onClose={() => {
+          setIsEditEventModalOpen(false);
+          setSelectedEvent(null);
+        }}
+        event={selectedEvent}
+        onSave={handleEditEvent}
+        onDelete={handleDeleteEvent}
+      />
+
+      <EventDetailsModal
+        isOpen={isEventDetailsModalOpen}
+        onClose={() => {
+          setIsEventDetailsModalOpen(false);
+          setSelectedEvent(null);
+        }}
+        event={selectedEvent}
+        onEdit={handleEditFromDetails}
+        onDelete={handleDeleteEvent}
       />
     </div>
   );
