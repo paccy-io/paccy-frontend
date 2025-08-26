@@ -401,18 +401,22 @@ function EssayManagerContent() {
             >
               <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
                 <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
                     <h3 className="text-xl font-semibold text-[#FEEBD8]">
                       {essay.title}
                     </h3>
-                    {getStatusIcon(essay.status)}
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs text-white ${
-                        statusColors[essay.status]
-                      }`}
-                    >
-                      {essay.status}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <div className="text-lg sm:text-base">
+                        {getStatusIcon(essay.status)}
+                      </div>
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs text-white ${
+                          statusColors[essay.status]
+                        }`}
+                      >
+                        {getStatusDisplayName(essay.status)}
+                      </span>
+                    </div>
                   </div>
 
                   <p className="text-[#FEEBD8]/70 text-sm mb-3">
@@ -429,7 +433,7 @@ function EssayManagerContent() {
                     </p>
                   </div>
 
-                  <div className="flex flex-wrap gap-4 mb-3">
+                  <div className="flex flex-col sm:flex-row gap-4 mb-3">
                     {/* Content Length */}
                     <div className="text-sm">
                       <span className="text-[#FEEBD8]/70">Word Count: </span>
@@ -460,24 +464,24 @@ function EssayManagerContent() {
                   )}
                 </div>
 
-                <div className="flex lg:flex-col gap-2">
+                <div className="flex flex-col sm:flex-row sm:justify-end gap-2">
                   <button
                     onClick={() => handleEditClick(essay)}
-                    className="bg-[#FEEBD8] text-[#141414] px-4 py-2 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors flex items-center gap-2"
+                    className="bg-[#FEEBD8] text-[#141414] px-4 py-2 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors flex items-center justify-center gap-2"
                   >
                     <FaEdit />
                     <span>Edit</span>
                   </button>
                   <button
                     onClick={() => handlePreviewClick(essay)}
-                    className="bg-blue-500/20 text-blue-400 px-4 py-2 rounded-lg font-medium hover:bg-blue-500/30 transition-colors flex items-center gap-2"
+                    className="bg-blue-500/20 text-blue-400 px-4 py-2 rounded-lg font-medium hover:bg-blue-500/30 transition-colors flex items-center justify-center gap-2"
                   >
                     <FaEye />
                     <span>Preview</span>
                   </button>
                   <button
                     onClick={() => handleDeleteEssay(essay.id)}
-                    className="bg-red-500/20 text-red-400 px-4 py-2 rounded-lg font-medium hover:bg-red-500/30 transition-colors flex items-center gap-2"
+                    className="bg-red-500/20 text-red-400 px-4 py-2 rounded-lg font-medium hover:bg-red-500/30 transition-colors flex items-center justify-center gap-2"
                   >
                     <FaTrash />
                     <span>Delete</span>

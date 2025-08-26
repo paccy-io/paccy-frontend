@@ -72,9 +72,20 @@ export default function EditEventModal({
       // Extract date and time from ISO string if event has a date
       if (event.date) {
         try {
+          // If the date includes timezone info, parse it accordingly
+          // If it's in UTC format (ending with Z), convert to local time
+          // If it's in local timezone format (with offset), parse as is
           const date = new Date(event.date);
-          dateStr = date.toISOString().split("T")[0]; // YYYY-MM-DD
-          timeStr = date.toTimeString().slice(0, 5); // HH:MM
+
+          // Extract the components from the parsed date (which will be in local time after parsing)
+          const year = date.getFullYear();
+          const month = String(date.getMonth() + 1).padStart(2, "0");
+          const day = String(date.getDate()).padStart(2, "0");
+          const hours = String(date.getHours()).padStart(2, "0");
+          const minutes = String(date.getMinutes()).padStart(2, "0");
+
+          dateStr = `${year}-${month}-${day}`; // YYYY-MM-DD
+          timeStr = `${hours}:${minutes}`; // HH:MM
         } catch {
           // If date parsing fails, leave fields empty
         }
@@ -95,6 +106,11 @@ export default function EditEventModal({
   React.useEffect(() => {
     if (isOpen) {
       loadCollegeApplications();
+      // Disable body scroll when modal is open
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = "unset";
+      };
     }
   }, [isOpen]);
 
@@ -114,21 +130,31 @@ export default function EditEventModal({
     e.preventDefault();
     if (!event) return;
 
-    // Format date and time into ISO 8601 format (YYYY-MM-DDTHH:mm:ssZ)
+    // Format date and time into ISO 8601 format with local timezone
     let formattedDate: string | undefined = undefined;
 
     if (formData.date) {
       const dateStr = formData.date; // YYYY-MM-DD format
       const timeStr = formData.time || "00:00"; // HH:MM format, default to midnight
 
-      // Combine date and time into ISO 8601 format
-      formattedDate = `${dateStr}T${timeStr}:00Z`;
+      // Create a temporary date to get timezone offset
+      const tempDate = new Date();
+      const timezoneOffset = tempDate.getTimezoneOffset();
+      const offsetHours = Math.floor(Math.abs(timezoneOffset) / 60);
+      const offsetMinutes = Math.abs(timezoneOffset) % 60;
+      const offsetSign = timezoneOffset <= 0 ? "+" : "-";
+      const offsetString = `${offsetSign}${offsetHours
+        .toString()
+        .padStart(2, "0")}:${offsetMinutes.toString().padStart(2, "0")}`;
+
+      // Combine date and time with local timezone offset
+      formattedDate = `${dateStr}T${timeStr}:00${offsetString}`;
     }
 
     const updateData: UpdateEventDTO = {
       title: formData.title,
       description: formData.description,
-      date: formattedDate, // ISO 8601 format or undefined for undated events
+      date: formattedDate, // ISO 8601 format with timezone information
       type: formData.type,
       priority: formData.priority,
       college_id: formData.college_id === "" ? null : formData.college_id,

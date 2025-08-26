@@ -43,6 +43,16 @@ export default function EventDetailsModal({
 }: EventDetailsModalProps) {
   const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false);
 
+  // Disable body scroll when modal is open
+  React.useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = "unset";
+      };
+    }
+  }, [isOpen]);
+
   const handleDelete = () => {
     if (!event) return;
     onDelete(event.id);

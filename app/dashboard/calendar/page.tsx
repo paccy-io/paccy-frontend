@@ -83,6 +83,7 @@ export default function Calendar() {
     null
   );
   const [showDateEventsModal, setShowDateEventsModal] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const toast = useToast();
 
   // Helper function to get formatted college name with major if needed
@@ -107,6 +108,20 @@ export default function Calendar() {
   // Load events and colleges from API on component mount
   useEffect(() => {
     loadData();
+  }, []);
+
+  // Handle mobile detection
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+
+    // Check initially
+    checkMobile();
+
+    // Add resize listener
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
   const loadData = async () => {
@@ -471,7 +486,7 @@ export default function Calendar() {
       days.push(
         <div
           key={`empty-${i}`}
-          className="h-24 border border-neutral-700/30"
+          className="h-16 sm:h-20 md:h-24 border border-neutral-700/30"
         ></div>
       );
     }
@@ -491,7 +506,7 @@ export default function Calendar() {
       days.push(
         <div
           key={day}
-          className={`h-24 border border-neutral-700/30 p-1 cursor-pointer transition-colors ${
+          className={`h-16 sm:h-20 md:h-24 border border-neutral-700/30 p-1 cursor-pointer transition-colors ${
             isToday
               ? "bg-[#FEEBD8]/10 border-[#FEEBD8]/50"
               : "hover:bg-neutral-800/30"
@@ -506,14 +521,15 @@ export default function Calendar() {
           onDragLeave={() => setDragOverTarget(null)}
         >
           <div
-            className={`text-sm font-medium mb-1 ${
+            className={`text-xs sm:text-sm font-medium mb-1 ${
               isToday ? "text-[#FEEBD8]" : "text-[#FEEBD8]/70"
             }`}
           >
             {day}
           </div>
-          <div className="space-y-1">
-            {dayEvents.slice(0, 2).map((event) => (
+          <div className="space-y-0.5 sm:space-y-1 overflow-hidden">
+            {/* Show fewer events on mobile, more on larger screens */}
+            {dayEvents.slice(0, isMobile ? 1 : 2).map((event) => (
               <div
                 key={event.id}
                 draggable
@@ -522,26 +538,31 @@ export default function Calendar() {
                 className={`text-xs px-1 py-0.5 rounded text-white truncate cursor-move hover:opacity-80 transition-opacity ${
                   eventTypeColors[event.type]
                 } relative group`}
-                title={event.title}
+                title={`${event.title} - ${getFormattedCollegeName(event)}`}
                 onClick={(e) => {
                   e.stopPropagation();
                   handleEventClick(event);
                 }}
               >
                 <FaGripVertical className="absolute left-0 top-0.5 text-white/50 text-xs opacity-0 group-hover:opacity-100 transition-opacity" />
-                <span className="ml-2">{event.title}</span>
+                <span className="ml-2 block truncate">
+                  {/* Show shorter titles on mobile */}
+                  {isMobile && event.title.length > 8
+                    ? `${event.title.substring(0, 8)}...`
+                    : event.title}
+                </span>
               </div>
             ))}
-            {dayEvents.length > 2 && (
+            {dayEvents.length > (isMobile ? 1 : 2) && (
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   handleShowAllEvents(dateString);
                 }}
-                className="text-xs text-[#FEEBD8]/50 hover:text-[#FEEBD8] hover:bg-neutral-700/30 transition-all duration-200 cursor-pointer underline rounded px-1 py-0.5"
+                className="text-xs text-[#FEEBD8]/50 hover:text-[#FEEBD8] hover:bg-neutral-700/30 transition-all duration-200 cursor-pointer underline rounded px-1 py-0.5 w-full text-left"
                 title={`View all ${dayEvents.length} events`}
               >
-                +{dayEvents.length - 2} more
+                +{dayEvents.length - (isMobile ? 1 : 2)} more
               </button>
             )}
           </div>
@@ -558,7 +579,7 @@ export default function Calendar() {
 
       <div className="max-w-screen-2xl mx-auto px-4 md:px-10 py-8 pt-28">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-8">
           <div className="flex items-center space-x-4">
             <Link
               href="/dashboard"
@@ -566,11 +587,11 @@ export default function Calendar() {
             >
               <FaArrowLeft size={20} />
             </Link>
-            <div>
-              <h1 className="text-4xl font-bold text-[#FEEBD8]">
+            <div className="flex-1 min-w-0">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#FEEBD8]">
                 Calendar & Deadlines
               </h1>
-              <p className="text-[#FEEBD8]/70 mt-2">
+              <p className="text-[#FEEBD8]/70 mt-2 text-sm sm:text-base">
                 Never miss an important date
                 {draggedEvent && (
                   <span className="ml-2 text-blue-400 text-sm">
@@ -581,47 +602,47 @@ export default function Calendar() {
             </div>
           </div>
 
-          <div className="flex items-center space-x-4">
+          <div className="flex flex-col sm:flex-row lg:flex-row items-stretch sm:items-center lg:items-center gap-3 sm:gap-4">
             {/* View Mode Selector */}
             <div className="flex items-center bg-neutral-800 rounded-lg p-1">
               <button
                 onClick={() => setViewMode("month")}
-                className={`flex items-center space-x-2 px-3 py-2 rounded-md transition-colors ${
+                className={`flex items-center justify-center space-x-2 px-3 py-2 rounded-md transition-colors flex-1 sm:flex-initial ${
                   viewMode === "month"
                     ? "bg-[#FEEBD8] text-[#141414]"
                     : "text-[#FEEBD8]/70 hover:text-[#FEEBD8] hover:bg-neutral-700"
                 }`}
               >
                 <FaTh size={14} />
-                <span className="hidden sm:inline text-sm">Month</span>
+                <span className="text-sm">Month</span>
               </button>
               <button
                 onClick={() => setViewMode("week")}
-                className={`flex items-center space-x-2 px-3 py-2 rounded-md transition-colors ${
+                className={`flex items-center justify-center space-x-2 px-3 py-2 rounded-md transition-colors flex-1 sm:flex-initial ${
                   viewMode === "week"
                     ? "bg-[#FEEBD8] text-[#141414]"
                     : "text-[#FEEBD8]/70 hover:text-[#FEEBD8] hover:bg-neutral-700"
                 }`}
               >
                 <FaColumns size={14} />
-                <span className="hidden sm:inline text-sm">Week</span>
+                <span className="text-sm">Week</span>
               </button>
               <button
                 onClick={() => setViewMode("list")}
-                className={`flex items-center space-x-2 px-3 py-2 rounded-md transition-colors ${
+                className={`flex items-center justify-center space-x-2 px-3 py-2 rounded-md transition-colors flex-1 sm:flex-initial ${
                   viewMode === "list"
                     ? "bg-[#FEEBD8] text-[#141414]"
                     : "text-[#FEEBD8]/70 hover:text-[#FEEBD8] hover:bg-neutral-700"
                 }`}
               >
                 <FaList size={14} />
-                <span className="hidden sm:inline text-sm">List</span>
+                <span className="text-sm">List</span>
               </button>
             </div>
 
             <button
               onClick={() => setIsAddEventModalOpen(true)}
-              className="bg-[#FEEBD8] text-[#141414] px-6 py-3 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors flex items-center space-x-2"
+              className="bg-[#FEEBD8] text-[#141414] px-4 sm:px-6 py-3 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors flex items-center justify-center space-x-2 whitespace-nowrap"
             >
               <FaPlus />
               <span>Add Event</span>
@@ -670,17 +691,17 @@ export default function Calendar() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
           {/* Calendar Views */}
           <div className="lg:col-span-2">
             {viewMode === "month" && (
-              <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
+              <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-4 sm:p-6">
                 {/* Calendar Header */}
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-semibold text-[#FEEBD8]">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-0 mb-6">
+                  <h2 className="text-xl sm:text-2xl font-semibold text-[#FEEBD8] text-center sm:text-left">
                     {monthNames[currentMonth]} {currentYear}
                   </h2>
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center justify-center space-x-2">
                     <button
                       onClick={() => navigateMonth("prev")}
                       className="p-2 hover:bg-neutral-700/30 rounded-lg transition-colors"
@@ -689,7 +710,7 @@ export default function Calendar() {
                     </button>
                     <button
                       onClick={() => setCurrentDate(new Date())}
-                      className="px-4 py-2 text-sm bg-neutral-700/30 hover:bg-neutral-700/50 rounded-lg transition-colors text-[#FEEBD8]"
+                      className="px-3 sm:px-4 py-2 text-sm bg-neutral-700/30 hover:bg-neutral-700/50 rounded-lg transition-colors text-[#FEEBD8]"
                     >
                       Today
                     </button>
@@ -706,12 +727,13 @@ export default function Calendar() {
                 <div className="grid grid-cols-7 gap-0 border border-neutral-700/50 rounded-lg overflow-hidden">
                   {/* Day headers */}
                   {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(
-                    (day) => (
+                    (day, index) => (
                       <div
                         key={day}
-                        className="bg-neutral-800 p-3 text-center text-sm font-medium text-[#FEEBD8]/70 border-b border-neutral-700/30"
+                        className="bg-neutral-800 p-2 sm:p-3 text-center text-xs sm:text-sm font-medium text-[#FEEBD8]/70 border-b border-neutral-700/30"
                       >
-                        {day}
+                        <span className="hidden sm:inline">{day}</span>
+                        <span className="sm:hidden">{day.charAt(0)}</span>
                       </div>
                     )
                   )}
@@ -860,44 +882,60 @@ export default function Calendar() {
                         );
                       })}
 
-                      {/* Time slots */}
-                      {Array.from({ length: 24 }, (_, hour) => {
+                      {/* Time slots - 2-hour intervals */}
+                      {Array.from({ length: 12 }, (_, timeSlot) => {
+                        const startHour = timeSlot * 2;
+                        const endHour = startHour + 2;
                         const timeSlots = [];
 
                         // Hour row
                         timeSlots.push(
                           <div
-                            key={`hour-${hour}`}
+                            key={`hour-${startHour}`}
                             className="bg-neutral-800/50 p-3 border-r border-t border-neutral-700/30 flex items-start"
                           >
-                            <span className="text-xs font-medium text-[#FEEBD8]/70">
-                              {hour === 0
-                                ? "12 AM"
-                                : hour < 12
-                                ? `${hour} AM`
-                                : hour === 12
-                                ? "12 PM"
-                                : `${hour - 12} PM`}
-                            </span>
+                            <div className="text-xs font-medium text-[#FEEBD8]/70">
+                              <div>
+                                {startHour === 0
+                                  ? "12 AM"
+                                  : startHour < 12
+                                  ? `${startHour} AM`
+                                  : startHour === 12
+                                  ? "12 PM"
+                                  : `${startHour - 12} PM`}
+                              </div>
+                              <div className="text-[#FEEBD8]/50 text-xs">
+                                {endHour === 0
+                                  ? "12 AM"
+                                  : endHour < 12
+                                  ? `${endHour} AM`
+                                  : endHour === 12
+                                  ? "12 PM"
+                                  : `${endHour - 12} PM`}
+                              </div>
+                            </div>
                           </div>
                         );
 
-                        // Day columns for this hour
+                        // Day columns for this time slot
                         getWeekDays().forEach((day, dayIndex) => {
                           const dateString = formatDateString(day);
                           const dayEvents = getEventsForDate(dateString);
-                          const hourEvents = dayEvents.filter((event) => {
+                          // Get events within this 2-hour window
+                          const timeSlotEvents = dayEvents.filter((event) => {
                             const eventTime = getTimeFromDate(event.date);
                             if (!eventTime) return false;
                             const eventHour = parseInt(eventTime.split(":")[0]);
-                            return eventHour === hour;
+                            return (
+                              eventHour >= startHour && eventHour < endHour
+                            );
                           });
                           const isToday = dateString === getTodayString();
 
                           timeSlots.push(
                             <div
-                              key={`${hour}-${dayIndex}`}
-                              className={`p-2 min-h-[60px] border-r border-t border-neutral-700/30 relative ${
+                              key={`${startHour}-${dayIndex}`}
+                              className={`p-2 min-h-[80px] border-r border-t border-neutral-700/30 relative ${
                                 isToday
                                   ? "bg-blue-500/5"
                                   : "hover:bg-neutral-800/30"
@@ -911,18 +949,18 @@ export default function Calendar() {
                               }
                               onDragLeave={() => setDragOverTarget(null)}
                               onDrop={(e) =>
-                                handleDateDrop(e, dateString, hour)
+                                handleDateDrop(e, dateString, startHour)
                               }
                               onClick={() => {
                                 setSelectedDate(dateString);
                                 setSelectedTime(
-                                  `${hour.toString().padStart(2, "0")}:00`
+                                  `${startHour.toString().padStart(2, "0")}:00`
                                 );
                                 setIsAddEventModalOpen(true);
                               }}
                             >
                               <div className="space-y-1">
-                                {hourEvents.map((event) => (
+                                {timeSlotEvents.map((event) => (
                                   <div
                                     key={event.id}
                                     draggable

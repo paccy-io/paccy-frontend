@@ -77,6 +77,12 @@ export default function AddEventModal({
         description: "",
         college_id: "",
       });
+
+      // Disable body scroll when modal is open
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = "unset";
+      };
     }
   }, [isOpen, selectedDate, today]);
 
@@ -95,21 +101,31 @@ export default function AddEventModal({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Format date and time into ISO 8601 format (YYYY-MM-DDTHH:mm:ssZ)
+    // Format date and time into ISO 8601 format with local timezone
     let formattedDate: string | undefined = undefined;
 
     if (formData.date) {
       const dateStr = formData.date; // YYYY-MM-DD format
       const timeStr = formData.time || "00:00"; // HH:MM format, default to midnight
 
-      // Combine date and time into ISO 8601 format
-      formattedDate = `${dateStr}T${timeStr}:00Z`;
+      // Create a temporary date to get timezone offset
+      const tempDate = new Date();
+      const timezoneOffset = tempDate.getTimezoneOffset();
+      const offsetHours = Math.floor(Math.abs(timezoneOffset) / 60);
+      const offsetMinutes = Math.abs(timezoneOffset) % 60;
+      const offsetSign = timezoneOffset <= 0 ? "+" : "-";
+      const offsetString = `${offsetSign}${offsetHours
+        .toString()
+        .padStart(2, "0")}:${offsetMinutes.toString().padStart(2, "0")}`;
+
+      // Combine date and time with local timezone offset
+      formattedDate = `${dateStr}T${timeStr}:00${offsetString}`;
     }
 
     const eventData: CreateEventDTO = {
       title: formData.title,
       description: formData.description,
-      date: formattedDate, // ISO 8601 format or undefined for undated events
+      date: formattedDate, // ISO 8601 format with timezone information
       type: formData.type,
       priority: formData.priority,
       college_id: formData.college_id === "" ? null : formData.college_id,
