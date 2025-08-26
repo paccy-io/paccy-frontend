@@ -20,10 +20,10 @@ interface EventDetailsModalProps {
 }
 
 const eventTypeLabels = {
-  [EventType.DEADLINE]: "Application Deadline",
+  [EventType.APPLICATION_DEADLINE]: "Application Deadline",
   [EventType.INTERVIEW]: "Interview",
-  [EventType.VISIT]: "Campus Visit",
-  [EventType.TEST]: "Test Date",
+  [EventType.CAMPUS_VISIT]: "Campus Visit",
+  [EventType.TEST_DATE]: "Test Date",
   [EventType.REMINDER]: "Reminder",
   [EventType.OTHER]: "Other",
 };
@@ -67,6 +67,16 @@ export default function EventDetailsModal({
       minute: "2-digit",
       hour12: true,
     });
+  };
+
+  const getTimeFromDate = (isoDate?: string): string | null => {
+    if (!isoDate) return null;
+    try {
+      const date = new Date(isoDate);
+      return date.toTimeString().slice(0, 5); // Returns HH:MM format
+    } catch {
+      return null;
+    }
   };
 
   const getPriorityColor = (priority: EventPriority) => {
@@ -173,12 +183,12 @@ export default function EventDetailsModal({
                 </div>
               )}
 
-              {event.time && (
+              {getTimeFromDate(event.date) && (
                 <div className="flex items-center gap-3">
                   <FaClock className="text-blue-400" />
                   <div>
                     <p className="text-[#FEEBD8] font-medium">
-                      {formatTime(event.time)}
+                      {formatTime(getTimeFromDate(event.date)!)}
                     </p>
                     <p className="text-[#FEEBD8]/60 text-sm">Time</p>
                   </div>

@@ -18,4 +18,13 @@ export const API_ENDPOINTS = {
 
   // Essays
   ESSAYS: "/essays",
+
+  // Calendar
+  CALENDAR: "/calendar",
+  CALENDAR_INBOX: "/calendar/inbox",
+  CALENDAR_DATE_RANGE: "/calendar/date-range",
+  CALENDAR_TYPE: "/calendar/type",
+  CALENDAR_PRIORITY: "/calendar/priority",
+  CALENDAR_UPCOMING: "/calendar/upcoming",
+  CALENDAR_COUNT: "/calendar/count",
 } as const;

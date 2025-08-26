@@ -297,13 +297,13 @@ export interface ApiError {
 
 export type ApiResult<T> = ApiResponse<T> | ApiError;
 
-// Calendar Event Types
+// Calendar Event Types - matching backend API
 export enum EventType {
-  DEADLINE = "deadline",
+  APPLICATION_DEADLINE = "application_deadline",
   INTERVIEW = "interview",
-  VISIT = "visit",
+  CAMPUS_VISIT = "campus_visit",
+  TEST_DATE = "test_date",
   REMINDER = "reminder",
-  TEST = "test",
   OTHER = "other",
 }
 
@@ -317,12 +317,11 @@ export interface CalendarEvent {
   id: string;
   title: string;
   description?: string;
-  date?: string; // ISO 8601 date string, null for undated events
-  time?: string; // HH:MM format
+  date?: string; // ISO 8601 format: YYYY-MM-DDTHH:mm:ssZ, undefined for undated events
   type: EventType;
   priority: EventPriority;
-  college?: string;
-  category?: string;
+  college?: string; // College name for display
+  college_id?: string; // College application ID for backend
   created_at: string;
   updated_at: string;
 }
@@ -330,23 +329,21 @@ export interface CalendarEvent {
 export interface CreateEventDTO {
   title: string;
   description?: string;
-  date?: string;
-  time?: string;
+  date?: string; // ISO 8601 format: YYYY-MM-DDTHH:mm:ssZ, undefined for undated events
   type: EventType;
   priority: EventPriority;
-  college?: string;
-  category?: string;
+  college?: string; // For display
+  college_id?: string | null; // For backend linking
 }
 
 export interface UpdateEventDTO {
   title?: string;
   description?: string;
-  date?: string;
-  time?: string;
+  date?: string | null | undefined; // ISO 8601 format: YYYY-MM-DDTHH:mm:ssZ, null/undefined to move to inbox
   type?: EventType;
   priority?: EventPriority;
-  college?: string;
-  category?: string;
+  college?: string; // For display
+  college_id?: string | null; // For backend linking
 }
 
 // Custom error class for API errors

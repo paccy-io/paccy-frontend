@@ -21,13 +21,14 @@ interface AddEventModalProps {
   onClose: () => void;
   onSave: (event: CreateEventDTO) => void;
   selectedDate?: string;
+  selectedTime?: string;
 }
 
 const eventTypes = [
-  { value: EventType.DEADLINE, label: "Application Deadline" },
+  { value: EventType.APPLICATION_DEADLINE, label: "Application Deadline" },
   { value: EventType.INTERVIEW, label: "Interview" },
-  { value: EventType.VISIT, label: "Campus Visit" },
-  { value: EventType.TEST, label: "Test Date" },
+  { value: EventType.CAMPUS_VISIT, label: "Campus Visit" },
+  { value: EventType.TEST_DATE, label: "Test Date" },
   { value: EventType.REMINDER, label: "Reminder" },
   { value: EventType.OTHER, label: "Other" },
 ];
@@ -43,6 +44,7 @@ export default function AddEventModal({
   onClose,
   onSave,
   selectedDate,
+  selectedTime,
 }: AddEventModalProps) {
   const [collegeApplications, setCollegeApplications] = React.useState<
     CollegeApplication[]
@@ -55,11 +57,11 @@ export default function AddEventModal({
   const [formData, setFormData] = React.useState({
     title: "",
     date: selectedDate || today,
-    time: "23:59",
-    type: EventType.DEADLINE,
+    time: selectedTime || "23:59",
+    type: EventType.APPLICATION_DEADLINE,
     priority: EventPriority.MEDIUM,
     description: "",
-    college: "",
+    college_id: "",
   });
 
   React.useEffect(() => {
@@ -69,11 +71,11 @@ export default function AddEventModal({
       setFormData({
         title: "",
         date: selectedDate || today,
-        time: "23:59",
-        type: EventType.DEADLINE,
+        time: selectedTime || "23:59",
+        type: EventType.APPLICATION_DEADLINE,
         priority: EventPriority.MEDIUM,
         description: "",
-        college: "",
+        college_id: "",
       });
     }
   }, [isOpen, selectedDate, today]);
@@ -93,9 +95,24 @@ export default function AddEventModal({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Format date and time into ISO 8601 format (YYYY-MM-DDTHH:mm:ssZ)
+    let formattedDate: string | undefined = undefined;
+
+    if (formData.date) {
+      const dateStr = formData.date; // YYYY-MM-DD format
+      const timeStr = formData.time || "00:00"; // HH:MM format, default to midnight
+
+      // Combine date and time into ISO 8601 format
+      formattedDate = `${dateStr}T${timeStr}:00Z`;
+    }
+
     const eventData: CreateEventDTO = {
-      ...formData,
-      date: formData.date || undefined, // Convert empty string to undefined for undated events
+      title: formData.title,
+      description: formData.description,
+      date: formattedDate, // ISO 8601 format or undefined for undated events
+      type: formData.type,
+      priority: formData.priority,
+      college_id: formData.college_id === "" ? null : formData.college_id,
     };
 
     onSave(eventData);
@@ -105,10 +122,10 @@ export default function AddEventModal({
       title: "",
       date: today,
       time: "23:59",
-      type: EventType.DEADLINE,
+      type: EventType.APPLICATION_DEADLINE,
       priority: EventPriority.MEDIUM,
       description: "",
-      college: "",
+      college_id: "",
     });
     onClose();
   };
@@ -230,8 +247,8 @@ export default function AddEventModal({
                 Related College (Optional)
               </label>
               <select
-                name="college"
-                value={formData.college}
+                name="college_id"
+                value={formData.college_id}
                 onChange={handleChange}
                 disabled={loading}
                 className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8] disabled:opacity-50"
@@ -246,9 +263,8 @@ export default function AddEventModal({
                     sameName.length > 1 && app.major
                       ? `${app.name} [${app.major}]`
                       : app.name;
-
                   return (
-                    <option key={app.id} value={displayName}>
+                    <option key={app.id} value={app.id}>
                       {displayName}
                     </option>
                   );
@@ -306,7 +322,7 @@ export default function AddEventModal({
                 </h5>
                 <p className="text-[#FEEBD8]/60 text-sm">
                   {formData.type}
-                  {formData.college && ` • ${formData.college}`}
+                  {/* College preview removed, as college_id is now used */}
                 </p>
                 <p className="text-[#FEEBD8]/60 text-sm">
                   {formData.date

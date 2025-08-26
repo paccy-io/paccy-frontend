@@ -26,10 +26,10 @@ interface EditEventModalProps {
 }
 
 const eventTypes = [
-  { value: EventType.DEADLINE, label: "Application Deadline" },
+  { value: EventType.APPLICATION_DEADLINE, label: "Application Deadline" },
   { value: EventType.INTERVIEW, label: "Interview" },
-  { value: EventType.VISIT, label: "Campus Visit" },
-  { value: EventType.TEST, label: "Test Date" },
+  { value: EventType.CAMPUS_VISIT, label: "Campus Visit" },
+  { value: EventType.TEST_DATE, label: "Test Date" },
   { value: EventType.REMINDER, label: "Reminder" },
   { value: EventType.OTHER, label: "Other" },
 ];
@@ -56,24 +56,38 @@ export default function EditEventModal({
     title: "",
     date: "",
     time: "",
-    type: EventType.DEADLINE,
+    type: EventType.APPLICATION_DEADLINE,
     priority: EventPriority.MEDIUM,
     description: "",
-    college: "",
+    college_id: "",
   });
 
   const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false);
 
   React.useEffect(() => {
     if (event) {
+      let dateStr = "";
+      let timeStr = "";
+
+      // Extract date and time from ISO string if event has a date
+      if (event.date) {
+        try {
+          const date = new Date(event.date);
+          dateStr = date.toISOString().split("T")[0]; // YYYY-MM-DD
+          timeStr = date.toTimeString().slice(0, 5); // HH:MM
+        } catch {
+          // If date parsing fails, leave fields empty
+        }
+      }
+
       setFormData({
         title: event.title || "",
-        date: event.date || "",
-        time: event.time || "",
-        type: event.type || EventType.DEADLINE,
+        date: dateStr,
+        time: timeStr,
+        type: event.type || EventType.APPLICATION_DEADLINE,
         priority: event.priority || EventPriority.MEDIUM,
         description: event.description || "",
-        college: event.college || "",
+        college_id: event.college_id || "",
       });
     }
   }, [event]);
@@ -100,9 +114,24 @@ export default function EditEventModal({
     e.preventDefault();
     if (!event) return;
 
+    // Format date and time into ISO 8601 format (YYYY-MM-DDTHH:mm:ssZ)
+    let formattedDate: string | undefined = undefined;
+
+    if (formData.date) {
+      const dateStr = formData.date; // YYYY-MM-DD format
+      const timeStr = formData.time || "00:00"; // HH:MM format, default to midnight
+
+      // Combine date and time into ISO 8601 format
+      formattedDate = `${dateStr}T${timeStr}:00Z`;
+    }
+
     const updateData: UpdateEventDTO = {
-      ...formData,
-      date: formData.date || undefined, // Convert empty string to undefined for undated events
+      title: formData.title,
+      description: formData.description,
+      date: formattedDate, // ISO 8601 format or undefined for undated events
+      type: formData.type,
+      priority: formData.priority,
+      college_id: formData.college_id === "" ? null : formData.college_id,
     };
 
     onSave(event.id, updateData);
@@ -242,8 +271,8 @@ export default function EditEventModal({
                 Related College (Optional)
               </label>
               <select
-                name="college"
-                value={formData.college}
+                name="college_id"
+                value={formData.college_id}
                 onChange={handleChange}
                 disabled={loading}
                 className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8] disabled:opacity-50"
@@ -258,9 +287,8 @@ export default function EditEventModal({
                     sameName.length > 1 && app.major
                       ? `${app.name} [${app.major}]`
                       : app.name;
-
                   return (
-                    <option key={app.id} value={displayName}>
+                    <option key={app.id} value={app.id}>
                       {displayName}
                     </option>
                   );

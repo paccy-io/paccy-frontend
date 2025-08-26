@@ -7,7 +7,17 @@ import Footer from "../../../components/Footer";
 import AddEventModal from "../../../components/Modals/AddEventModal";
 import EditEventModal from "../../../components/Modals/EditEventModal";
 import EventDetailsModal from "../../../components/Modals/EventDetailsModal";
-import { CalendarEvent, EventType, EventPriority } from "../../../lib/types";
+import {
+  CalendarEvent,
+  EventType,
+  EventPriority,
+  CreateEventDTO,
+  UpdateEventDTO,
+  CollegeApplication,
+} from "../../../lib/types";
+import { calendarApi } from "../../../lib/api/calendar";
+import { collegeApplicationsApi } from "../../../lib/api/college-applications";
+import { useToast } from "../../../lib/hooks/useToast";
 import {
   FaPlus,
   FaCalendar,
@@ -26,144 +36,12 @@ import {
   FaColumns,
 } from "react-icons/fa";
 
-// Mock events data - now using proper types
-const mockEvents: CalendarEvent[] = [
-  {
-    id: "1",
-    title: "Harvard Application Deadline",
-    date: "2026-01-01",
-    time: "23:59",
-    type: EventType.DEADLINE,
-    college: "Harvard University",
-    priority: EventPriority.HIGH,
-    description: "Final deadline for Harvard Early Action application",
-    created_at: "2024-01-01T00:00:00Z",
-    updated_at: "2024-01-01T00:00:00Z",
-  },
-  {
-    id: "2",
-    title: "Stanford Essay Due",
-    date: "2025-12-15",
-    time: "23:59",
-    type: EventType.DEADLINE,
-    college: "Stanford University",
-    priority: EventPriority.HIGH,
-    description: "Submit all supplemental essays for Stanford",
-    created_at: "2024-01-01T00:00:00Z",
-    updated_at: "2024-01-01T00:00:00Z",
-  },
-  {
-    id: "3",
-    title: "MIT Interview",
-    date: "2025-11-20",
-    time: "14:00",
-    type: EventType.INTERVIEW,
-    college: "MIT",
-    priority: EventPriority.MEDIUM,
-    description: "Alumni interview with John Smith",
-    created_at: "2024-01-01T00:00:00Z",
-    updated_at: "2024-01-01T00:00:00Z",
-  },
-  {
-    id: "4",
-    title: "Personal Statement Review",
-    date: "2025-11-15",
-    time: "10:00",
-    type: EventType.REMINDER,
-    college: "Multiple",
-    priority: EventPriority.MEDIUM,
-    description: "Final review session with counselor",
-    created_at: "2024-01-01T00:00:00Z",
-    updated_at: "2024-01-01T00:00:00Z",
-  },
-  {
-    id: "5",
-    title: "SAT Registration Deadline",
-    date: "2025-11-30",
-    time: "23:59",
-    type: EventType.DEADLINE,
-    college: "General",
-    priority: EventPriority.HIGH,
-    description: "Register for December SAT test",
-    created_at: "2024-01-01T00:00:00Z",
-    updated_at: "2024-01-01T00:00:00Z",
-  },
-  {
-    id: "6",
-    title: "NYU Campus Visit",
-    date: "2025-12-05",
-    time: "09:00",
-    type: EventType.VISIT,
-    college: "New York University",
-    priority: EventPriority.LOW,
-    description: "Campus tour and information session",
-    created_at: "2024-01-01T00:00:00Z",
-    updated_at: "2024-01-01T00:00:00Z",
-  },
-  // Undated events for inbox
-  {
-    id: "7",
-    title: "Research scholarship opportunities",
-    type: EventType.REMINDER,
-    priority: EventPriority.MEDIUM,
-    description: "Look into merit-based scholarships",
-    created_at: "2024-01-01T00:00:00Z",
-    updated_at: "2024-01-01T00:00:00Z",
-  },
-  {
-    id: "8",
-    title: "Schedule mock interview practice",
-    type: EventType.REMINDER,
-    priority: EventPriority.LOW,
-    description: "Practice with family or friends",
-    created_at: "2024-01-01T00:00:00Z",
-    updated_at: "2024-01-01T00:00:00Z",
-  },
-  // Additional events for the same date to test "+X more" functionality
-  {
-    id: "9",
-    title: "Submit FAFSA Application",
-    date: "2025-12-15",
-    time: "16:00",
-    type: EventType.DEADLINE,
-    college: "Federal",
-    priority: EventPriority.HIGH,
-    description: "Complete and submit FAFSA for financial aid",
-    created_at: "2024-01-01T00:00:00Z",
-    updated_at: "2024-01-01T00:00:00Z",
-  },
-  {
-    id: "10",
-    title: "Review Stanford Supplemental Essays",
-    date: "2025-12-15",
-    time: "09:00",
-    type: EventType.REMINDER,
-    college: "Stanford University",
-    priority: EventPriority.MEDIUM,
-    description: "Final review before submission",
-    created_at: "2024-01-01T00:00:00Z",
-    updated_at: "2024-01-01T00:00:00Z",
-  },
-  {
-    id: "11",
-    title: "Parent Signature on Forms",
-    date: "2025-12-15",
-    time: "20:00",
-    type: EventType.REMINDER,
-    college: "Stanford University",
-    priority: EventPriority.LOW,
-    description: "Get parent signatures on required forms",
-    created_at: "2024-01-01T00:00:00Z",
-    updated_at: "2024-01-01T00:00:00Z",
-  },
-];
-
 const eventTypeColors: Record<EventType, string> = {
-  [EventType.DEADLINE]: "bg-red-500",
+  [EventType.APPLICATION_DEADLINE]: "bg-red-500",
   [EventType.INTERVIEW]: "bg-blue-500",
   [EventType.REMINDER]: "bg-yellow-500",
-  [EventType.VISIT]: "bg-green-500",
-  [EventType.TEST]: "bg-purple-500",
+  [EventType.CAMPUS_VISIT]: "bg-green-500",
+  [EventType.TEST_DATE]: "bg-purple-500",
   [EventType.OTHER]: "bg-gray-500",
 };
 
@@ -173,10 +51,24 @@ const priorityColors: Record<EventPriority, string> = {
   [EventPriority.LOW]: "border-green-500",
 };
 
+// Helper function to extract time from ISO 8601 date string
+const getTimeFromDate = (isoDate?: string): string | null => {
+  if (!isoDate) return null;
+  try {
+    const date = new Date(isoDate);
+    return date.toTimeString().slice(0, 5); // Returns HH:MM format
+  } catch {
+    return null;
+  }
+};
+
 export default function Calendar() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [viewMode, setViewMode] = useState<"month" | "week" | "list">("month");
-  const [events, setEvents] = useState(mockEvents);
+  const [events, setEvents] = useState<CalendarEvent[]>([]);
+  const [colleges, setColleges] = useState<CollegeApplication[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [isAddEventModalOpen, setIsAddEventModalOpen] = useState(false);
   const [isEditEventModalOpen, setIsEditEventModalOpen] = useState(false);
   const [isEventDetailsModalOpen, setIsEventDetailsModalOpen] = useState(false);
@@ -184,12 +76,57 @@ export default function Calendar() {
     null
   );
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [draggedEvent, setDraggedEvent] = useState<CalendarEvent | null>(null);
   const [dragOverTarget, setDragOverTarget] = useState<string | null>(null);
   const [expandedDateEvents, setExpandedDateEvents] = useState<string | null>(
     null
   );
   const [showDateEventsModal, setShowDateEventsModal] = useState(false);
+  const toast = useToast();
+
+  // Helper function to get formatted college name with major if needed
+  const getFormattedCollegeName = (event: CalendarEvent): string => {
+    if (!event.college) return "";
+
+    // Find college application by college_id if available
+    const collegeApp = event.college_id
+      ? colleges.find((c) => c.id === event.college_id)
+      : null;
+
+    // Check if there are multiple applications with the same college name
+    const sameName = colleges.filter((c) => c.name === event.college);
+
+    if (sameName.length > 1 && collegeApp?.major) {
+      return `${event.college} [${collegeApp.major}]`;
+    }
+
+    return event.college;
+  };
+
+  // Load events and colleges from API on component mount
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const [eventsData, collegesData] = await Promise.all([
+        calendarApi.getAll(),
+        collegeApplicationsApi.getAll(),
+      ]);
+      setEvents(eventsData);
+      setColleges(collegesData);
+    } catch (err) {
+      console.error("Failed to load data:", err);
+      setError("Failed to load calendar data");
+      toast.error("Failed to load calendar data");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     document.title = "Calendar & Deadlines | Paccy";
@@ -238,7 +175,12 @@ export default function Calendar() {
   };
 
   const getEventsForDate = (date: string) => {
-    return events.filter((event) => event.date === date);
+    return events.filter((event) => {
+      if (!event.date) return false;
+      // Extract date part from ISO string (YYYY-MM-DD) and compare
+      const eventDatePart = event.date.split("T")[0];
+      return eventDatePart === date;
+    });
   };
 
   const getDaysUntilEvent = (eventDate: string) => {
@@ -300,11 +242,13 @@ export default function Calendar() {
       if (dateComparison !== 0) return dateComparison;
 
       // If same date, sort by time
-      if (!a.time && !b.time) return 0;
-      if (!a.time) return 1;
-      if (!b.time) return -1;
+      const aTime = getTimeFromDate(a.date);
+      const bTime = getTimeFromDate(b.date);
+      if (!aTime && !bTime) return 0;
+      if (!aTime) return 1;
+      if (!bTime) return -1;
 
-      return a.time.localeCompare(b.time);
+      return aTime.localeCompare(bTime);
     });
   };
 
@@ -325,32 +269,58 @@ export default function Calendar() {
     return events.filter((event) => !event.date);
   };
 
-  const handleAddEvent = (newEvent: any) => {
-    const eventWithId = {
-      ...newEvent,
-      id: (events.length + 1).toString(),
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      // If we have a selected date, use it as the default date
-      date: newEvent.date || selectedDate || undefined,
-    };
-    setEvents((prev) => [...prev, eventWithId]);
-    // Clear selected date after adding
-    setSelectedDate(null);
+  const handleAddEvent = async (newEvent: CreateEventDTO) => {
+    try {
+      const eventToCreate = { ...newEvent };
+
+      // If no date is provided but we have a selected date, use it with default time
+      if (!eventToCreate.date && selectedDate) {
+        eventToCreate.date = `${selectedDate}T12:00:00Z`;
+      }
+
+      const createdEvent = await calendarApi.create(eventToCreate);
+
+      setEvents((prev) => [...prev, createdEvent]);
+      toast.success("Event created successfully");
+
+      // Clear selected date after adding
+      setSelectedDate(null);
+
+      // Reload data to get updated college information if needed
+      loadData();
+    } catch (err) {
+      console.error("Failed to create event:", err);
+      toast.error("Failed to create event");
+    }
   };
 
-  const handleEditEvent = (eventId: string, updatedEvent: any) => {
-    setEvents((prev) =>
-      prev.map((event) =>
-        event.id === eventId
-          ? { ...event, ...updatedEvent, updated_at: new Date().toISOString() }
-          : event
-      )
-    );
+  const handleEditEvent = async (
+    eventId: string,
+    updatedEvent: UpdateEventDTO
+  ) => {
+    try {
+      const updated = await calendarApi.update(eventId, updatedEvent);
+
+      setEvents((prev) =>
+        prev.map((event) => (event.id === eventId ? updated : event))
+      );
+      toast.success("Event updated successfully");
+    } catch (err) {
+      console.error("Failed to update event:", err);
+      toast.error("Failed to update event");
+    }
   };
 
-  const handleDeleteEvent = (eventId: string) => {
-    setEvents((prev) => prev.filter((event) => event.id !== eventId));
+  const handleDeleteEvent = async (eventId: string) => {
+    try {
+      await calendarApi.delete(eventId);
+
+      setEvents((prev) => prev.filter((event) => event.id !== eventId));
+      toast.success("Event deleted successfully");
+    } catch (err) {
+      console.error("Failed to delete event:", err);
+      toast.error("Failed to delete event");
+    }
   };
 
   const handleEventClick = (event: CalendarEvent) => {
@@ -416,18 +386,43 @@ export default function Calendar() {
     setDragOverTarget(dateString);
   };
 
-  const handleDateDrop = (e: React.DragEvent, targetDate: string) => {
+  const handleDateDrop = (
+    e: React.DragEvent,
+    targetDate: string,
+    targetHour?: number
+  ) => {
     e.preventDefault();
     setDragOverTarget(null);
 
     if (!draggedEvent) return;
 
-    // Update the event with new date
+    // Update the event with new date, preserving time if it exists
+    let newDate: string;
+    if (typeof targetHour === "number") {
+      // Use the target hour for the new time
+      newDate = `${targetDate}T${targetHour
+        .toString()
+        .padStart(2, "0")}:00:00Z`;
+    } else if (draggedEvent.date) {
+      try {
+        // Parse the existing date to extract time
+        const existingDate = new Date(draggedEvent.date);
+        const hours = existingDate.getHours().toString().padStart(2, "0");
+        const minutes = existingDate.getMinutes().toString().padStart(2, "0");
+        const seconds = existingDate.getSeconds().toString().padStart(2, "0");
+        newDate = `${targetDate}T${hours}:${minutes}:${seconds}Z`;
+      } catch {
+        // If parsing fails, use noon as default
+        newDate = `${targetDate}T12:00:00Z`;
+      }
+    } else {
+      // If no existing date, use noon as default
+      newDate = `${targetDate}T12:00:00Z`;
+    }
+
     handleEditEvent(draggedEvent.id, {
       ...draggedEvent,
-      date: targetDate,
-      // Keep existing time or set to undefined if moving from inbox
-      time: draggedEvent.time || undefined,
+      date: newDate,
     });
 
     // Show a brief visual confirmation
@@ -452,11 +447,10 @@ export default function Calendar() {
 
     if (!draggedEvent) return;
 
-    // Remove date and time to move to inbox
+    // Remove date to move to inbox
     handleEditEvent(draggedEvent.id, {
       ...draggedEvent,
-      date: undefined,
-      time: undefined,
+      date: null,
     });
 
     // Show a brief visual confirmation
@@ -660,7 +654,10 @@ export default function Calendar() {
 
           <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
             <div className="text-2xl font-bold text-yellow-400 mb-1">
-              {events.filter((e) => e.type === EventType.DEADLINE).length}
+              {
+                events.filter((e) => e.type === EventType.APPLICATION_DEADLINE)
+                  .length
+              }
             </div>
             <div className="text-[#FEEBD8]/70 text-sm">Deadlines</div>
           </div>
@@ -821,7 +818,7 @@ export default function Calendar() {
                         const dateString = formatDateString(day);
                         const dayEvents = getEventsForDate(dateString);
                         const allDayEvents = dayEvents.filter(
-                          (event) => !event.time
+                          (event) => !getTimeFromDate(event.date)
                         );
                         const isToday = dateString === getTodayString();
 
@@ -871,7 +868,7 @@ export default function Calendar() {
                         timeSlots.push(
                           <div
                             key={`hour-${hour}`}
-                            className="bg-neutral-800/50 p-3 border-r border-neutral-700/30 border-t border-neutral-700/30 flex items-start"
+                            className="bg-neutral-800/50 p-3 border-r border-t border-neutral-700/30 flex items-start"
                           >
                             <span className="text-xs font-medium text-[#FEEBD8]/70">
                               {hour === 0
@@ -890,10 +887,9 @@ export default function Calendar() {
                           const dateString = formatDateString(day);
                           const dayEvents = getEventsForDate(dateString);
                           const hourEvents = dayEvents.filter((event) => {
-                            if (!event.time) return false;
-                            const eventHour = parseInt(
-                              event.time.split(":")[0]
-                            );
+                            const eventTime = getTimeFromDate(event.date);
+                            if (!eventTime) return false;
+                            const eventHour = parseInt(eventTime.split(":")[0]);
                             return eventHour === hour;
                           });
                           const isToday = dateString === getTodayString();
@@ -901,7 +897,7 @@ export default function Calendar() {
                           timeSlots.push(
                             <div
                               key={`${hour}-${dayIndex}`}
-                              className={`p-2 min-h-[60px] border-r border-neutral-700/30 border-t border-neutral-700/30 relative ${
+                              className={`p-2 min-h-[60px] border-r border-t border-neutral-700/30 relative ${
                                 isToday
                                   ? "bg-blue-500/5"
                                   : "hover:bg-neutral-800/30"
@@ -914,9 +910,14 @@ export default function Calendar() {
                                 handleDateDragOver(e, dateString)
                               }
                               onDragLeave={() => setDragOverTarget(null)}
-                              onDrop={(e) => handleDateDrop(e, dateString)}
+                              onDrop={(e) =>
+                                handleDateDrop(e, dateString, hour)
+                              }
                               onClick={() => {
                                 setSelectedDate(dateString);
+                                setSelectedTime(
+                                  `${hour.toString().padStart(2, "0")}:00`
+                                );
                                 setIsAddEventModalOpen(true);
                               }}
                             >
@@ -941,11 +942,11 @@ export default function Calendar() {
                                       {event.title}
                                     </div>
                                     <div className="text-xs opacity-90">
-                                      {event.time}
+                                      {getTimeFromDate(event.date)}
                                     </div>
                                     {event.college && (
                                       <div className="text-xs opacity-75 truncate">
-                                        {event.college}
+                                        {getFormattedCollegeName(event)}
                                       </div>
                                     )}
                                   </div>
@@ -993,7 +994,7 @@ export default function Calendar() {
                         return (
                           total +
                           getEventsForDate(dateString).filter(
-                            (e) => e.type === EventType.DEADLINE
+                            (e) => e.type === EventType.APPLICATION_DEADLINE
                           ).length
                         );
                       }, 0)}
@@ -1100,17 +1101,17 @@ export default function Calendar() {
                                 </div>
                               )}
 
-                              {event.time && (
+                              {getTimeFromDate(event.date) && (
                                 <div className="flex items-center gap-1">
                                   <FaClock size={12} />
-                                  {event.time}
+                                  {getTimeFromDate(event.date)}
                                 </div>
                               )}
 
                               {event.college && (
                                 <div className="flex items-center gap-1">
                                   <FaUniversity size={12} />
-                                  {event.college}
+                                  {getFormattedCollegeName(event)}
                                 </div>
                               )}
                             </div>
@@ -1188,7 +1189,8 @@ export default function Calendar() {
                           <FaGripVertical className="text-[#FEEBD8]/30 group-hover:text-[#FEEBD8]/60 transition-colors" />
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-1">
-                              {event.type === EventType.DEADLINE && (
+                              {event.type ===
+                                EventType.APPLICATION_DEADLINE && (
                                 <FaClock className="text-red-400 text-sm" />
                               )}
                               {event.type === EventType.INTERVIEW && (
@@ -1202,7 +1204,7 @@ export default function Calendar() {
                               </h4>
                             </div>
                             <p className="text-[#FEEBD8]/60 text-xs">
-                              {event.college}
+                              {getFormattedCollegeName(event)}
                             </p>
                             <div className="flex items-center gap-2 mt-1">
                               <span className="text-[#FEEBD8]/70 text-xs">
@@ -1210,9 +1212,9 @@ export default function Calendar() {
                                   ? new Date(event.date).toLocaleDateString()
                                   : "No date"}
                               </span>
-                              {event.time && (
+                              {getTimeFromDate(event.date) && (
                                 <span className="text-[#FEEBD8]/70 text-xs">
-                                  at {event.time}
+                                  at {getTimeFromDate(event.date)}
                                 </span>
                               )}
                             </div>
@@ -1225,7 +1227,8 @@ export default function Calendar() {
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleEventClick(event);
+                              setSelectedEvent(event);
+                              setIsEditEventModalOpen(true);
                             }}
                             className="text-[#FEEBD8]/50 hover:text-[#FEEBD8] transition-colors"
                           >
@@ -1305,7 +1308,8 @@ export default function Calendar() {
                           <FaGripVertical className="text-[#FEEBD8]/30 group-hover:text-[#FEEBD8]/60 transition-colors" />
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-1">
-                              {event.type === EventType.DEADLINE && (
+                              {event.type ===
+                                EventType.APPLICATION_DEADLINE && (
                                 <FaClock className="text-red-400 text-sm" />
                               )}
                               {event.type === EventType.INTERVIEW && (
@@ -1320,7 +1324,7 @@ export default function Calendar() {
                             </div>
                             {event.college && (
                               <p className="text-[#FEEBD8]/60 text-xs">
-                                {event.college}
+                                {getFormattedCollegeName(event)}
                               </p>
                             )}
                             <p className="text-[#FEEBD8]/50 text-xs mt-1">
@@ -1331,7 +1335,8 @@ export default function Calendar() {
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleEventClick(event);
+                            setSelectedEvent(event);
+                            setIsEditEventModalOpen(true);
                           }}
                           className="text-[#FEEBD8]/50 hover:text-[#FEEBD8] transition-colors"
                         >
@@ -1403,11 +1408,13 @@ export default function Calendar() {
               {getEventsForDate(expandedDateEvents)
                 .sort((a, b) => {
                   // Sort by time if both have time, otherwise by priority
-                  if (a.time && b.time) {
-                    return a.time.localeCompare(b.time);
+                  const aTime = getTimeFromDate(a.date);
+                  const bTime = getTimeFromDate(b.date);
+                  if (aTime && bTime) {
+                    return aTime.localeCompare(bTime);
                   }
-                  if (a.time && !b.time) return -1;
-                  if (!a.time && b.time) return 1;
+                  if (aTime && !bTime) return -1;
+                  if (!aTime && bTime) return 1;
 
                   // Sort by priority: HIGH -> MEDIUM -> LOW
                   const priorityOrder = {
@@ -1421,8 +1428,8 @@ export default function Calendar() {
                   const isToday =
                     expandedDateEvents ===
                     new Date().toISOString().split("T")[0];
-                  const eventDateTime = event.time
-                    ? new Date(`${expandedDateEvents}T${event.time}`)
+                  const eventDateTime = event.date
+                    ? new Date(event.date)
                     : null;
                   const isUpcoming =
                     eventDateTime && eventDateTime > new Date();
@@ -1454,7 +1461,8 @@ export default function Calendar() {
                           ></div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1">
-                              {event.type === EventType.DEADLINE && (
+                              {event.type ===
+                                EventType.APPLICATION_DEADLINE && (
                                 <FaClock className="text-red-400 text-sm" />
                               )}
                               {event.type === EventType.INTERVIEW && (
@@ -1463,7 +1471,7 @@ export default function Calendar() {
                               {event.type === EventType.REMINDER && (
                                 <FaPen className="text-yellow-400 text-sm" />
                               )}
-                              {event.type === EventType.VISIT && (
+                              {event.type === EventType.CAMPUS_VISIT && (
                                 <FaUniversity className="text-green-400 text-sm" />
                               )}
                               <h4 className="font-medium text-[#FEEBD8] text-sm truncate">
@@ -1472,13 +1480,13 @@ export default function Calendar() {
                             </div>
                             {event.college && (
                               <p className="text-[#FEEBD8]/60 text-xs truncate">
-                                {event.college}
+                                {getFormattedCollegeName(event)}
                               </p>
                             )}
                             <div className="flex items-center gap-2 mt-1">
-                              {event.time && (
+                              {getTimeFromDate(event.date) && (
                                 <span className="text-[#FEEBD8]/70 text-xs">
-                                  {event.time}
+                                  {getTimeFromDate(event.date)}
                                   {isPast && isToday && (
                                     <span className="text-red-400 ml-1">
                                       (past)
@@ -1513,7 +1521,8 @@ export default function Calendar() {
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleEventClick(event);
+                            setSelectedEvent(event);
+                            setIsEditEventModalOpen(true);
                             handleCloseDateEventsModal();
                           }}
                           className="text-[#FEEBD8]/50 hover:text-[#FEEBD8] transition-colors ml-2"
@@ -1551,6 +1560,7 @@ export default function Calendar() {
         }}
         onSave={handleAddEvent}
         selectedDate={selectedDate || undefined}
+        selectedTime={selectedTime || undefined}
       />
 
       <EditEventModal
