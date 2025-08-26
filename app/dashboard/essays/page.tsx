@@ -63,11 +63,13 @@ const getStatusDisplayName = (status: string) => {
 
 export default function EssayManager() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
-        <div className="text-[#FEEBD8] text-lg">Loading essays...</div>
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+          <div className="text-[#FEEBD8] text-lg">Loading essays...</div>
+        </div>
+      }
+    >
       <EssayManagerContent />
     </Suspense>
   );
