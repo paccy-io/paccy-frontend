@@ -478,6 +478,165 @@ export default function Calendar() {
     setDraggedEvent(null);
   };
 
+  // Touch event handlers for mobile drag and drop
+  const [touchStartPos, setTouchStartPos] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
+  const [touchOffset, setTouchOffset] = useState<{ x: number; y: number }>({
+    x: 0,
+    y: 0,
+  });
+  const [touchMoved, setTouchMoved] = useState(false);
+
+  const handleTouchStart = (e: React.TouchEvent, event: CalendarEvent) => {
+    if (!isMobile) return;
+
+    const touch = e.touches[0];
+    const rect = e.currentTarget.getBoundingClientRect();
+
+    setTouchStartPos({ x: touch.clientX, y: touch.clientY });
+    setTouchOffset({
+      x: touch.clientX - rect.left,
+      y: touch.clientY - rect.top,
+    });
+    setDraggedEvent(event);
+    setTouchMoved(false);
+
+    // Add visual feedback
+    e.currentTarget.classList.add("opacity-50", "scale-95", "z-50");
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isMobile || !draggedEvent || !touchStartPos) return;
+
+    const touch = e.touches[0];
+    const moveDistance = Math.sqrt(
+      Math.pow(touch.clientX - touchStartPos.x, 2) +
+        Math.pow(touch.clientY - touchStartPos.y, 2)
+    );
+
+    // Consider it a drag if moved more than 10 pixels
+    if (moveDistance > 10) {
+      setTouchMoved(true);
+      e.preventDefault(); // Prevent scrolling only when actually dragging
+    }
+
+    const elementUnderTouch = document.elementFromPoint(
+      touch.clientX,
+      touch.clientY
+    );
+
+    // Check if we're over a drop target
+    if (elementUnderTouch) {
+      const dateTarget = elementUnderTouch.closest("[data-date]");
+      const inboxTarget = elementUnderTouch.closest(
+        '[data-drop-target="inbox"]'
+      );
+
+      if (dateTarget) {
+        const dateString = dateTarget.getAttribute("data-date");
+        setDragOverTarget(dateString);
+      } else if (inboxTarget) {
+        setDragOverTarget("inbox");
+      } else {
+        setDragOverTarget(null);
+      }
+    }
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (!isMobile || !draggedEvent) return;
+
+    const touch = e.changedTouches[0];
+    const elementUnderTouch = document.elementFromPoint(
+      touch.clientX,
+      touch.clientY
+    );
+
+    // Remove visual feedback
+    e.currentTarget.classList.remove("opacity-50", "scale-95", "z-50");
+
+    // If it was just a tap (not moved), trigger click event
+    if (!touchMoved) {
+      handleEventClick(draggedEvent);
+    } else if (elementUnderTouch) {
+      // Handle the drop
+      const dateTarget = elementUnderTouch.closest("[data-date]");
+      const inboxTarget = elementUnderTouch.closest(
+        '[data-drop-target="inbox"]'
+      );
+
+      if (dateTarget && draggedEvent) {
+        const targetDate = dateTarget.getAttribute("data-date");
+        const hourTarget = elementUnderTouch.closest("[data-hour]");
+        const targetHour = hourTarget
+          ? parseInt(hourTarget.getAttribute("data-hour") || "12")
+          : undefined;
+
+        if (targetDate) {
+          // Same logic as handleDateDrop
+          let newDate: string;
+          if (typeof targetHour === "number") {
+            newDate = `${targetDate}T${targetHour
+              .toString()
+              .padStart(2, "0")}:00:00Z`;
+          } else if (draggedEvent.date) {
+            try {
+              const existingDate = new Date(draggedEvent.date);
+              const hours = existingDate.getHours().toString().padStart(2, "0");
+              const minutes = existingDate
+                .getMinutes()
+                .toString()
+                .padStart(2, "0");
+              const seconds = existingDate
+                .getSeconds()
+                .toString()
+                .padStart(2, "0");
+              newDate = `${targetDate}T${hours}:${minutes}:${seconds}Z`;
+            } catch {
+              newDate = `${targetDate}T12:00:00Z`;
+            }
+          } else {
+            newDate = `${targetDate}T12:00:00Z`;
+          }
+
+          handleEditEvent(draggedEvent.id, {
+            ...draggedEvent,
+            date: newDate,
+          });
+
+          // Visual feedback
+          if (dateTarget) {
+            dateTarget.classList.add("ring-2", "ring-green-500");
+            setTimeout(() => {
+              dateTarget.classList.remove("ring-2", "ring-green-500");
+            }, 1000);
+          }
+        }
+      } else if (inboxTarget && draggedEvent) {
+        // Same logic as handleInboxDrop
+        handleEditEvent(draggedEvent.id, {
+          ...draggedEvent,
+          date: null,
+        });
+
+        // Visual feedback
+        inboxTarget.classList.add("ring-2", "ring-blue-500");
+        setTimeout(() => {
+          inboxTarget.classList.remove("ring-2", "ring-blue-500");
+        }, 1000);
+      }
+    }
+
+    // Reset states
+    setDraggedEvent(null);
+    setDragOverTarget(null);
+    setTouchStartPos(null);
+    setTouchOffset({ x: 0, y: 0 });
+    setTouchMoved(false);
+  };
+
   const renderCalendarDays = () => {
     const days: React.ReactElement[] = [];
 
@@ -506,6 +665,7 @@ export default function Calendar() {
       days.push(
         <div
           key={day}
+          data-date={dateString}
           className={`h-16 sm:h-20 md:h-24 border border-neutral-700/30 p-1 cursor-pointer transition-colors ${
             isToday
               ? "bg-[#FEEBD8]/10 border-[#FEEBD8]/50"
@@ -535,13 +695,18 @@ export default function Calendar() {
                 draggable
                 onDragStart={(e) => handleDragStart(e, event)}
                 onDragEnd={handleDragEnd}
+                onTouchStart={(e) => handleTouchStart(e, event)}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
                 className={`text-xs px-1 py-0.5 rounded text-white truncate cursor-move hover:opacity-80 transition-opacity ${
                   eventTypeColors[event.type]
                 } relative group`}
                 title={`${event.title} - ${getFormattedCollegeName(event)}`}
                 onClick={(e) => {
-                  e.stopPropagation();
-                  handleEventClick(event);
+                  if (!isMobile) {
+                    e.stopPropagation();
+                    handleEventClick(event);
+                  }
                 }}
               >
                 <FaGripVertical className="absolute left-0 top-0.5 text-white/50 text-xs opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -847,6 +1012,7 @@ export default function Calendar() {
                         return (
                           <div
                             key={dayIndex}
+                            data-date={dateString}
                             className={`p-2 min-h-[60px] border-r border-neutral-700/30 ${
                               isToday ? "bg-blue-500/10" : "bg-neutral-900/30"
                             } ${
@@ -867,6 +1033,11 @@ export default function Calendar() {
                                   draggable
                                   onDragStart={(e) => handleDragStart(e, event)}
                                   onDragEnd={handleDragEnd}
+                                  onTouchStart={(e) =>
+                                    handleTouchStart(e, event)
+                                  }
+                                  onTouchMove={handleTouchMove}
+                                  onTouchEnd={handleTouchEnd}
                                   onClick={() => handleEventClick(event)}
                                   className={`p-1.5 rounded text-xs cursor-pointer hover:opacity-80 transition-opacity ${
                                     eventTypeColors[event.type]
@@ -935,6 +1106,8 @@ export default function Calendar() {
                           timeSlots.push(
                             <div
                               key={`${startHour}-${dayIndex}`}
+                              data-date={dateString}
+                              data-hour={startHour}
                               className={`p-2 min-h-[80px] border-r border-t border-neutral-700/30 relative ${
                                 isToday
                                   ? "bg-blue-500/5"
@@ -1093,6 +1266,9 @@ export default function Calendar() {
                         draggable
                         onDragStart={(e) => handleDragStart(e, event)}
                         onDragEnd={handleDragEnd}
+                        onTouchStart={(e) => handleTouchStart(e, event)}
+                        onTouchMove={handleTouchMove}
+                        onTouchEnd={handleTouchEnd}
                         onClick={() => handleEventClick(event)}
                         className={`p-4 border rounded-lg cursor-pointer hover:bg-neutral-800/50 transition-colors ${
                           isUrgent
@@ -1215,6 +1391,9 @@ export default function Calendar() {
                       draggable
                       onDragStart={(e) => handleDragStart(e, event)}
                       onDragEnd={handleDragEnd}
+                      onTouchStart={(e) => handleTouchStart(e, event)}
+                      onTouchMove={handleTouchMove}
+                      onTouchEnd={handleTouchEnd}
                       className={`p-3 rounded-lg border-l-4 ${
                         priorityColors[event.priority]
                       } bg-neutral-800/30 ${
@@ -1301,6 +1480,7 @@ export default function Calendar() {
 
             {/* Inbox Section */}
             <div
+              data-drop-target="inbox"
               className={`bg-[#141414] border border-neutral-700/50 rounded-lg p-6 transition-colors ${
                 dragOverTarget === "inbox"
                   ? "bg-green-500/10 border-green-500/50"
@@ -1336,6 +1516,9 @@ export default function Calendar() {
                       draggable
                       onDragStart={(e) => handleDragStart(e, event)}
                       onDragEnd={handleDragEnd}
+                      onTouchStart={(e) => handleTouchStart(e, event)}
+                      onTouchMove={handleTouchMove}
+                      onTouchEnd={handleTouchEnd}
                       className={`p-3 rounded-lg border-l-4 ${
                         priorityColors[event.priority]
                       } bg-neutral-800/30 cursor-move hover:bg-neutral-800/50 transition-colors group`}
@@ -1479,6 +1662,9 @@ export default function Calendar() {
                       draggable
                       onDragStart={(e) => handleDragStart(e, event)}
                       onDragEnd={handleDragEnd}
+                      onTouchStart={(e) => handleTouchStart(e, event)}
+                      onTouchMove={handleTouchMove}
+                      onTouchEnd={handleTouchEnd}
                       className={`p-3 rounded-lg border-l-4 ${
                         priorityColors[event.priority]
                       } bg-neutral-800/30 cursor-move hover:bg-neutral-800/50 transition-colors group ${

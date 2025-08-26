@@ -130,12 +130,14 @@ export default function Dashboard() {
 
   // Calculate real stats
   const getActiveApplicationsCount = () => {
+    if (!applications || !Array.isArray(applications)) return 0;
     return applications.filter(
       (app) => app.status !== "rejected" && app.status !== "withdrawn"
     ).length;
   };
 
   const getEssaysInProgressCount = () => {
+    if (!essays || !Array.isArray(essays)) return 0;
     return essays.filter(
       (essay) =>
         essay.status === EssayStatus.IN_PROGRESS ||
@@ -145,6 +147,7 @@ export default function Dashboard() {
   };
 
   const getTotalEssaysCount = () => {
+    if (!essays || !Array.isArray(essays)) return 0;
     return essays.length;
   };
 
