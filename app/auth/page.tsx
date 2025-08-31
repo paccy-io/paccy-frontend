@@ -363,10 +363,10 @@ function AuthContent() {
         <div className="max-w-4xl mx-auto px-6 mb-8">
           <div className="bg-gradient-to-r from-orange-500/20 to-yellow-500/20 border border-orange-400/30 rounded-lg p-4 text-center">
             <p className="text-orange-300 text-sm">
-              <span className="font-semibold">🚀 Coming Soon:</span> We’re
-              actively building our authentication system! This interface is
-              here to give you a first look — sign-up and login features will be
-              live very soon.
+              <span className="font-semibold">🚀 Coming Soon:</span> A few
+              features are still under active development! Most of the interface
+              is ready for you to explore, with the remaining updates coming
+              very soon.
             </p>
           </div>
         </div>
