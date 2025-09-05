@@ -7,6 +7,8 @@ import Footer from "../../../components/Footer";
 import AddCourseModal from "../../../components/Modals/AddCourseModal";
 import AddTermModal from "../../../components/Modals/AddTermModal";
 import AddExamScoreModal from "../../../components/Modals/AddExamScoreModal";
+import { calendarApi } from "../../../lib/api/calendar";
+import { CalendarEvent, EventType } from "../../../lib/types";
 import {
   FaArrowLeft,
   FaGraduationCap,
@@ -18,6 +20,8 @@ import {
   FaTrophy,
   FaCalendarAlt,
   FaStar,
+  FaChevronDown,
+  FaChevronUp,
 } from "react-icons/fa";
 
 // Mock academic data
@@ -143,6 +147,149 @@ export default function AcademyPage() {
   const [showAddCourseModal, setShowAddCourseModal] = useState(false);
   const [showAddTermModal, setShowAddTermModal] = useState(false);
   const [showAddExamScoreModal, setShowAddExamScoreModal] = useState(false);
+  const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([]);
+  const [calendarLoading, setCalendarLoading] = useState(true);
+  const [courseListExpanded, setCourseListExpanded] = useState(true); // Add state for course list expansion
+
+  // Helper functions to process calendar events
+  const getTestDateEvents = () => {
+    return calendarEvents.filter(
+      (event) => event.type === EventType.TEST_DATE && event.date
+    );
+  };
+
+  const getFinalExamDate = () => {
+    const testEvents = getTestDateEvents();
+    if (testEvents.length === 0) return null;
+
+    // Filter out SAT, AP, IB events - only get generic final exams
+    // Also filter out past dates
+    const finalExamEvents = testEvents.filter((event) => {
+      const title = event.title.toLowerCase();
+      const eventDate = new Date(event.date!);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Reset time to compare only dates
+
+      return (
+        !title.includes("sat") &&
+        !title.includes("ap") &&
+        !title.includes("ib") &&
+        eventDate >= today
+      ); // Only future or today's events
+    });
+
+    if (finalExamEvents.length === 0) return null;
+
+    // Find the earliest upcoming final exam
+    const sortedByDate = finalExamEvents.sort(
+      (a, b) => new Date(a.date!).getTime() - new Date(b.date!).getTime()
+    );
+
+    return sortedByDate[0];
+  };
+
+  const getSATExamDate = () => {
+    const testEvents = getTestDateEvents();
+    const satEvents = testEvents.filter((event) => {
+      const title = event.title.toLowerCase();
+      const eventDate = new Date(event.date!);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      return title.includes("sat") && eventDate >= today; // Only future or today's events
+    });
+
+    if (satEvents.length === 0) return null;
+
+    // Get the earliest future SAT date
+    const futureSATs = satEvents.sort(
+      (a, b) => new Date(a.date!).getTime() - new Date(b.date!).getTime()
+    );
+
+    return futureSATs[0];
+  };
+
+  const getAPExamDates = () => {
+    const testEvents = getTestDateEvents();
+    const apEvents = testEvents.filter((event) => {
+      const title = event.title.toLowerCase();
+      const eventDate = new Date(event.date!);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      return title.includes("ap") && eventDate >= today; // Only future or today's events
+    });
+
+    if (apEvents.length === 0) return [];
+
+    // Return all future AP exams, sorted by date (earliest first)
+    return apEvents.sort(
+      (a, b) => new Date(a.date!).getTime() - new Date(b.date!).getTime()
+    );
+  };
+
+  const getIBExamDate = () => {
+    const testEvents = getTestDateEvents();
+    const ibEvents = testEvents.filter((event) => {
+      const title = event.title.toLowerCase();
+      const eventDate = new Date(event.date!);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      return title.includes("ib") && eventDate >= today; // Only future or today's events
+    });
+
+    if (ibEvents.length === 0) return null;
+
+    // Get the earliest future IB date
+    const futureIBs = ibEvents.sort(
+      (a, b) => new Date(a.date!).getTime() - new Date(b.date!).getTime()
+    );
+
+    return futureIBs[0];
+  };
+
+  const getDaysUntil = (dateString: string) => {
+    const targetDate = new Date(dateString);
+    const today = new Date();
+    const diffTime = targetDate.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+  };
+
+  const formatTimeLeft = (days: number) => {
+    if (days < 0) return "Past due";
+    if (days === 0) return "Today";
+    if (days === 1) return "1 day left";
+    if (days < 7) return `${days} days left`;
+    if (days < 30) return `${Math.ceil(days / 7)} weeks left`;
+    return `${Math.ceil(days / 30)} months left`;
+  };
+
+  const getTimeLeftColor = (days: number) => {
+    if (days < 0) return "text-gray-400";
+    if (days <= 3) return "text-red-400";
+    if (days <= 14) return "text-yellow-400";
+    return "text-green-400";
+  };
+
+  // Load calendar events
+  useEffect(() => {
+    const loadCalendarEvents = async () => {
+      try {
+        setCalendarLoading(true);
+        const events = await calendarApi.getAll();
+        setCalendarEvents(events);
+      } catch (error) {
+        console.error("Failed to load calendar events:", error);
+        setCalendarEvents([]);
+      } finally {
+        setCalendarLoading(false);
+      }
+    };
+
+    loadCalendarEvents();
+  }, []);
 
   useEffect(() => {
     document.title = "Academic Tracker | Paccy";
@@ -170,6 +317,12 @@ export default function AcademyPage() {
   const getExamProgress = (exam: any) => {
     return (exam.score / exam.maxScore) * 100;
   };
+
+  // Memoize exam dates to avoid multiple function calls
+  const satExamDate = getSATExamDate();
+  const apExamDates = getAPExamDates(); // Changed to plural for multiple APs
+  const ibExamDate = getIBExamDate();
+  const finalExamDate = getFinalExamDate();
 
   return (
     <div className="min-h-screen bg-[#0a0a0a]">
@@ -199,10 +352,15 @@ export default function AcademyPage() {
           {/* GPA Overview */}
           <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-semibold text-[#FEEBD8] flex items-center gap-2">
-                <FaChartLine className="text-blue-400" />
-                GPA Tracker
-              </h3>
+              <div>
+                <h3 className="text-xl font-semibold text-[#FEEBD8] flex items-center gap-2">
+                  <FaChartLine className="text-blue-400" />
+                  GPA Tracker
+                </h3>
+                <p className="text-[#FEEBD8]/60 text-sm mt-1">
+                  Track your cumulative GPA progress toward your target goals
+                </p>
+              </div>
               <button
                 onClick={handleAddTerm}
                 className="bg-[#FEEBD8] text-[#141414] px-4 py-2 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors flex items-center gap-2"
@@ -276,10 +434,32 @@ export default function AcademyPage() {
           {/* Courses */}
           <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-semibold text-[#FEEBD8] flex items-center gap-2">
-                <FaBookOpen className="text-purple-400" />
-                Course List
-              </h3>
+              <div className="flex items-center gap-2">
+                <div>
+                  <h3 className="text-xl font-semibold text-[#FEEBD8] flex items-center gap-2">
+                    <FaBookOpen className="text-purple-400" />
+                    Course List
+                  </h3>
+                  <p className="text-[#FEEBD8]/60 text-sm mt-1">
+                    Manage all your current and completed courses with grades
+                  </p>
+                </div>
+                <button
+                  onClick={() => setCourseListExpanded(!courseListExpanded)}
+                  className="text-[#FEEBD8]/60 hover:text-[#FEEBD8] transition-colors ml-2"
+                  aria-label={
+                    courseListExpanded
+                      ? "Collapse course list"
+                      : "Expand course list"
+                  }
+                >
+                  {courseListExpanded ? (
+                    <FaChevronDown size={16} />
+                  ) : (
+                    <FaChevronUp size={16} />
+                  )}
+                </button>
+              </div>
               <button
                 onClick={handleAddCourse}
                 className="bg-[#FEEBD8] text-[#141414] px-4 py-2 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors flex items-center gap-2"
@@ -289,59 +469,75 @@ export default function AcademyPage() {
               </button>
             </div>
 
-            <div className="space-y-3">
-              {academicData.courses.map((course) => (
-                <div key={course.id} className="bg-neutral-800 rounded-lg p-4">
-                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h4 className="text-[#FEEBD8] font-medium">
-                          {course.name}
-                        </h4>
+            {courseListExpanded && (
+              <div className="space-y-3">
+                {academicData.courses.map((course) => (
+                  <div
+                    key={course.id}
+                    className="bg-neutral-800 rounded-lg p-4"
+                  >
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-2">
+                          <h4 className="text-[#FEEBD8] font-medium">
+                            {course.name}
+                          </h4>
+                          <span
+                            className={`px-2 py-1 rounded-full text-xs ${
+                              courseTypeColors[course.type]
+                            }`}
+                          >
+                            {course.type}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-4 text-sm text-[#FEEBD8]/70">
+                          <span>{course.term}</span>
+                          <span>{course.credits} credits</span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-3">
                         <span
-                          className={`px-2 py-1 rounded-full text-xs ${
-                            courseTypeColors[course.type]
+                          className={`text-lg font-semibold ${
+                            gradeColors[course.grade]
                           }`}
                         >
-                          {course.type}
+                          {course.grade}
                         </span>
-                      </div>
-                      <div className="flex items-center gap-4 text-sm text-[#FEEBD8]/70">
-                        <span>{course.term}</span>
-                        <span>{course.credits} credits</span>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                      <span
-                        className={`text-lg font-semibold ${
-                          gradeColors[course.grade]
-                        }`}
-                      >
-                        {course.grade}
-                      </span>
-                      <div className="flex gap-2">
-                        <button className="text-[#FEEBD8]/60 hover:text-[#FEEBD8] transition-colors">
-                          <FaEdit />
-                        </button>
-                        <button className="text-red-400 hover:text-red-300 transition-colors">
-                          <FaTrash />
-                        </button>
+                        <div className="flex gap-2">
+                          <button className="text-[#FEEBD8]/60 hover:text-[#FEEBD8] transition-colors">
+                            <FaEdit />
+                          </button>
+                          <button className="text-red-400 hover:text-red-300 transition-colors">
+                            <FaTrash />
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
+
+            {!courseListExpanded && (
+              <div className="text-center py-2">
+                {/* Fully collapsed - no text */}
+              </div>
+            )}
           </div>
 
           {/* Exam Scores */}
           <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-semibold text-[#FEEBD8] flex items-center gap-2">
-                <FaTrophy className="text-yellow-400" />
-                Exam Scores
-              </h3>
+              <div>
+                <h3 className="text-xl font-semibold text-[#FEEBD8] flex items-center gap-2">
+                  <FaTrophy className="text-yellow-400" />
+                  Exam Scores
+                </h3>
+                <p className="text-[#FEEBD8]/60 text-sm mt-1">
+                  Record and track standardized test scores and AP exam results
+                </p>
+              </div>
               <button
                 onClick={handleAddExamScore}
                 className="bg-[#FEEBD8] text-[#141414] px-4 py-2 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors flex items-center gap-2"
@@ -396,10 +592,15 @@ export default function AcademyPage() {
 
           {/* Academic Goals */}
           <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
-            <h3 className="text-xl font-semibold text-[#FEEBD8] flex items-center gap-2 mb-4">
-              <FaStar className="text-yellow-400" />
-              Academic Goals & Motivation
-            </h3>
+            <div className="mb-4">
+              <h3 className="text-xl font-semibold text-[#FEEBD8] flex items-center gap-2">
+                <FaStar className="text-yellow-400" />
+                Academic Goals & Motivation
+              </h3>
+              <p className="text-[#FEEBD8]/60 text-sm mt-1">
+                Stay motivated with upcoming deadlines and achievement reminders
+              </p>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="bg-neutral-800 rounded-lg p-4">
@@ -407,26 +608,90 @@ export default function AcademyPage() {
                   Upcoming Deadlines
                 </h4>
                 <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-[#FEEBD8]/70 text-sm">
-                      SAT Registration
-                    </span>
-                    <span className="text-red-400 text-sm">3 days left</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-[#FEEBD8]/70 text-sm">
-                      AP Exam Registration
-                    </span>
-                    <span className="text-yellow-400 text-sm">
-                      2 weeks left
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-[#FEEBD8]/70 text-sm">
-                      Final Exams
-                    </span>
-                    <span className="text-green-400 text-sm">1 month left</span>
-                  </div>
+                  {calendarLoading ? (
+                    <div className="text-[#FEEBD8]/70 text-sm">Loading...</div>
+                  ) : (
+                    <>
+                      {/* SAT Registration */}
+                      {satExamDate && (
+                        <div className="flex justify-between items-center">
+                          <span className="text-[#FEEBD8]/70 text-sm">
+                            {satExamDate.title}
+                          </span>
+                          <span
+                            className={`text-sm ${getTimeLeftColor(
+                              getDaysUntil(satExamDate.date!)
+                            )}`}
+                          >
+                            {formatTimeLeft(getDaysUntil(satExamDate.date!))}
+                          </span>
+                        </div>
+                      )}
+
+                      {/* AP Exam Registration - Multiple APs allowed */}
+                      {apExamDates.map((apExam, index) => (
+                        <div
+                          key={`ap-${index}`}
+                          className="flex justify-between items-center"
+                        >
+                          <span className="text-[#FEEBD8]/70 text-sm">
+                            {apExam.title}
+                          </span>
+                          <span
+                            className={`text-sm ${getTimeLeftColor(
+                              getDaysUntil(apExam.date!)
+                            )}`}
+                          >
+                            {formatTimeLeft(getDaysUntil(apExam.date!))}
+                          </span>
+                        </div>
+                      ))}
+
+                      {/* IB Exam Registration */}
+                      {ibExamDate && (
+                        <div className="flex justify-between items-center">
+                          <span className="text-[#FEEBD8]/70 text-sm">
+                            {ibExamDate.title}
+                          </span>
+                          <span
+                            className={`text-sm ${getTimeLeftColor(
+                              getDaysUntil(ibExamDate.date!)
+                            )}`}
+                          >
+                            {formatTimeLeft(getDaysUntil(ibExamDate.date!))}
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Final Exams */}
+                      {finalExamDate && (
+                        <div className="flex justify-between items-center">
+                          <span className="text-[#FEEBD8]/70 text-sm">
+                            Final Exam: {finalExamDate.title}
+                          </span>
+                          <span
+                            className={`text-sm ${getTimeLeftColor(
+                              getDaysUntil(finalExamDate.date!)
+                            )}`}
+                          >
+                            {formatTimeLeft(getDaysUntil(finalExamDate.date!))}
+                          </span>
+                        </div>
+                      )}
+
+                      {/* No deadlines message */}
+                      {!calendarLoading &&
+                        !satExamDate &&
+                        apExamDates.length === 0 &&
+                        !ibExamDate &&
+                        !finalExamDate && (
+                          <div className="text-[#FEEBD8]/50 text-sm">
+                            No upcoming test dates found. Add them to your
+                            calendar to track deadlines.
+                          </div>
+                        )}
+                    </>
+                  )}
                 </div>
               </div>
 

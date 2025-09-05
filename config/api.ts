@@ -19,6 +19,9 @@ export const API_ENDPOINTS = {
   // Essays
   ESSAYS: "/essays",
 
+  // Extracurriculars
+  EXTRACURRICULARS: "/extracurriculars",
+
   // Calendar
   CALENDAR: "/calendar",
   CALENDAR_INBOX: "/calendar/inbox",

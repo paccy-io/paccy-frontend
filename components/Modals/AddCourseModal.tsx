@@ -71,8 +71,71 @@ export default function AddCourseModal({
     status: "In Progress",
   });
 
+  // Validation states for number inputs
+  const [creditsInputValue, setCreditsInputValue] = React.useState("3");
+  const [creditsError, setCreditsError] = React.useState("");
+  const [yearInputValue, setYearInputValue] = React.useState(
+    new Date().getFullYear().toString()
+  );
+  const [yearError, setYearError] = React.useState("");
+
+  // Validation handlers
+  const handleCreditsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setCreditsInputValue(value);
+
+    if (value === "") {
+      setCreditsError("Credits is required");
+      return;
+    }
+
+    const num = parseInt(value, 10);
+    if (isNaN(num)) {
+      setCreditsError("Please enter a valid number of credits");
+      return;
+    }
+
+    if (num < 1 || num > 12) {
+      setCreditsError("Credits must be between 1 and 12");
+      return;
+    }
+
+    setCreditsError("");
+    setFormData((prev) => ({ ...prev, credits: num }));
+  };
+
+  const handleYearChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setYearInputValue(value);
+
+    if (value === "") {
+      setYearError("Year is required");
+      return;
+    }
+
+    const num = parseInt(value, 10);
+    if (isNaN(num)) {
+      setYearError("Please enter a valid year");
+      return;
+    }
+
+    if (num < 2020 || num > 2030) {
+      setYearError("Year must be between 2020 and 2030");
+      return;
+    }
+
+    setYearError("");
+    setFormData((prev) => ({ ...prev, year: num }));
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Check for validation errors before submitting
+    if (creditsError || yearError) {
+      return;
+    }
+
     onSave(formData);
 
     // Reset form
@@ -86,6 +149,13 @@ export default function AddCourseModal({
       grade: "",
       status: "In Progress",
     });
+
+    // Reset validation states
+    setCreditsInputValue("3");
+    setCreditsError("");
+    setYearInputValue(new Date().getFullYear().toString());
+    setYearError("");
+
     onClose();
   };
 
@@ -179,14 +249,23 @@ export default function AddCourseModal({
                 Credits
               </label>
               <input
-                type="number"
+                type="text"
                 name="credits"
-                value={formData.credits}
-                onChange={handleChange}
-                min="1"
-                max="12"
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                value={creditsInputValue}
+                onChange={handleCreditsChange}
+                className={`w-full bg-neutral-800 border rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none transition-colors ${
+                  creditsError
+                    ? "border-red-500 focus:border-red-500"
+                    : "border-neutral-700 focus:border-[#FEEBD8]"
+                }`}
+                placeholder="1 - 12"
               />
+              {creditsError && (
+                <p className="text-red-400 text-xs mt-1 flex items-center gap-1">
+                  <span>⚠️</span>
+                  {creditsError}
+                </p>
+              )}
             </div>
 
             <div className="md:col-span-2">
@@ -226,14 +305,23 @@ export default function AddCourseModal({
                 Year
               </label>
               <input
-                type="number"
+                type="text"
                 name="year"
-                value={formData.year}
-                onChange={handleChange}
-                min="2020"
-                max="2030"
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                value={yearInputValue}
+                onChange={handleYearChange}
+                className={`w-full bg-neutral-800 border rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none transition-colors ${
+                  yearError
+                    ? "border-red-500 focus:border-red-500"
+                    : "border-neutral-700 focus:border-[#FEEBD8]"
+                }`}
+                placeholder="2020 - 2030"
               />
+              {yearError && (
+                <p className="text-red-400 text-xs mt-1 flex items-center gap-1">
+                  <span>⚠️</span>
+                  {yearError}
+                </p>
+              )}
             </div>
 
             <div>
@@ -360,7 +448,8 @@ export default function AddCourseModal({
             </button>
             <button
               type="submit"
-              className="flex-1 bg-[#FEEBD8] text-[#141414] px-6 py-3 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors"
+              disabled={!!(creditsError || yearError)}
+              className="flex-1 bg-[#FEEBD8] text-[#141414] px-6 py-3 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Add Course
             </button>

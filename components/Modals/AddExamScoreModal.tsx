@@ -113,8 +113,130 @@ export default function AddExamScoreModal({
     status: "Completed",
   });
 
+  // Add validation states for number inputs
+  const [scoreInputValue, setScoreInputValue] = React.useState("0");
+  const [scoreError, setScoreError] = React.useState("");
+  const [maxScoreInputValue, setMaxScoreInputValue] = React.useState("1600");
+  const [maxScoreError, setMaxScoreError] = React.useState("");
+  const [percentileInputValue, setPercentileInputValue] = React.useState("");
+  const [percentileError, setPercentileError] = React.useState("");
+
+  // Validation handler for score
+  const handleScoreChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setScoreInputValue(value);
+    setScoreError("");
+
+    if (value === "") {
+      setScoreError("Score is required");
+      return;
+    }
+
+    const numValue = parseFloat(value);
+    if (isNaN(numValue)) {
+      setScoreError("Please enter a valid number");
+      return;
+    }
+
+    if (numValue < 0) {
+      setScoreError("Score cannot be negative");
+      return;
+    }
+
+    if (numValue > formData.maxScore) {
+      setScoreError(`Score cannot exceed ${formData.maxScore}`);
+      return;
+    }
+
+    setFormData((prev) => ({ ...prev, score: numValue }));
+  };
+
+  // Validation handler for max score
+  const handleMaxScoreChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setMaxScoreInputValue(value);
+    setMaxScoreError("");
+
+    if (value === "") {
+      setMaxScoreError("Max score is required");
+      return;
+    }
+
+    const numValue = parseFloat(value);
+    if (isNaN(numValue)) {
+      setMaxScoreError("Please enter a valid number");
+      return;
+    }
+
+    if (numValue <= 0) {
+      setMaxScoreError("Max score must be greater than 0");
+      return;
+    }
+
+    if (numValue > 10000) {
+      setMaxScoreError("Max score seems unreasonably high");
+      return;
+    }
+
+    setFormData((prev) => ({ ...prev, maxScore: numValue }));
+
+    // Also validate current score against new max
+    if (formData.score > numValue) {
+      setScoreError(`Score cannot exceed ${numValue}`);
+    } else if (scoreError.includes("cannot exceed")) {
+      setScoreError(""); // Clear score error if it was about exceeding max
+    }
+  };
+
+  // Validation handler for percentile (optional)
+  const handlePercentileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setPercentileInputValue(value);
+    setPercentileError("");
+
+    if (value === "") {
+      setFormData((prev) => ({ ...prev, percentile: 0 }));
+      return;
+    }
+
+    const numValue = parseFloat(value);
+    if (isNaN(numValue)) {
+      setPercentileError("Please enter a valid number");
+      return;
+    }
+
+    if (numValue < 0) {
+      setPercentileError("Percentile cannot be negative");
+      return;
+    }
+
+    if (numValue > 100) {
+      setPercentileError("Percentile cannot exceed 100");
+      return;
+    }
+
+    setFormData((prev) => ({ ...prev, percentile: numValue }));
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validate all number fields before submitting
+    if (scoreError || maxScoreError || percentileError) {
+      alert("Please fix the validation errors before submitting");
+      return;
+    }
+
+    if (!scoreInputValue.trim()) {
+      alert("Score is required");
+      return;
+    }
+
+    if (!maxScoreInputValue.trim()) {
+      alert("Max score is required");
+      return;
+    }
+
     onSave(formData);
 
     // Reset form
@@ -129,6 +251,15 @@ export default function AddExamScoreModal({
       notes: "",
       status: "Completed",
     });
+
+    // Reset validation states
+    setScoreInputValue("0");
+    setScoreError("");
+    setMaxScoreInputValue("1600");
+    setMaxScoreError("");
+    setPercentileInputValue("");
+    setPercentileError("");
+
     onClose();
   };
 
@@ -298,30 +429,48 @@ export default function AddExamScoreModal({
                 Score *
               </label>
               <input
-                type="number"
+                type="text"
                 name="score"
-                value={formData.score || ""}
-                onChange={handleChange}
+                value={scoreInputValue}
+                onChange={handleScoreChange}
                 required
-                min="0"
-                max={formData.maxScore}
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                className={`w-full bg-neutral-800 border rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none transition-colors ${
+                  scoreError
+                    ? "border-red-500 focus:border-red-500"
+                    : "border-neutral-700 focus:border-[#FEEBD8]"
+                }`}
                 placeholder={`0 - ${formData.maxScore}`}
               />
+              {scoreError && (
+                <p className="text-red-400 text-xs mt-1 flex items-center gap-1">
+                  <span>⚠️</span>
+                  {scoreError}
+                </p>
+              )}
             </div>
 
             <div>
               <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
-                Max Score
+                Max Score *
               </label>
               <input
-                type="number"
+                type="text"
                 name="maxScore"
-                value={formData.maxScore}
-                onChange={handleChange}
-                min="1"
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                value={maxScoreInputValue}
+                onChange={handleMaxScoreChange}
+                className={`w-full bg-neutral-800 border rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none transition-colors ${
+                  maxScoreError
+                    ? "border-red-500 focus:border-red-500"
+                    : "border-neutral-700 focus:border-[#FEEBD8]"
+                }`}
+                placeholder="e.g., 1600, 36, 800"
               />
+              {maxScoreError && (
+                <p className="text-red-400 text-xs mt-1 flex items-center gap-1">
+                  <span>⚠️</span>
+                  {maxScoreError}
+                </p>
+              )}
             </div>
 
             <div>
@@ -329,15 +478,23 @@ export default function AddExamScoreModal({
                 Percentile (Optional)
               </label>
               <input
-                type="number"
+                type="text"
                 name="percentile"
-                value={formData.percentile || ""}
-                onChange={handleChange}
-                min="1"
-                max="99"
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
-                placeholder="e.g., 95"
+                value={percentileInputValue}
+                onChange={handlePercentileChange}
+                className={`w-full bg-neutral-800 border rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none transition-colors ${
+                  percentileError
+                    ? "border-red-500 focus:border-red-500"
+                    : "border-neutral-700 focus:border-[#FEEBD8]"
+                }`}
+                placeholder="1 - 99"
               />
+              {percentileError && (
+                <p className="text-red-400 text-xs mt-1 flex items-center gap-1">
+                  <span>⚠️</span>
+                  {percentileError}
+                </p>
+              )}
             </div>
 
             <div>

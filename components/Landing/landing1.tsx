@@ -264,7 +264,7 @@ export default function Home() {
 
         <div className="z-10 text-center px-6">
           <h1 className="text-6xl md:text-7xl font-bold bg-gradient-to-r from-[#FEEBD8] via-blue-300 to-purple-500 bg-clip-text text-transparent mb-6 font-climate-crisis text-content animate-hero-fade-in">
-            Paccy
+            paccy
           </h1>
           <p className="text-2xl md:text-3xl text-white/90 mb-6 font-bold tracking-wide text-content animate-hero-fade-in delay-200">
             Smart, AI-Powered College Application Platform

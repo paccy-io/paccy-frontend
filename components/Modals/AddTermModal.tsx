@@ -44,6 +44,91 @@ export default function AddTermModal({
     status: "Upcoming",
   });
 
+  // Validation states for number inputs
+  const [yearInputValue, setYearInputValue] = React.useState(
+    new Date().getFullYear().toString()
+  );
+  const [yearError, setYearError] = React.useState("");
+  const [gpaInputValue, setGpaInputValue] = React.useState("");
+  const [gpaError, setGpaError] = React.useState("");
+  const [creditsInputValue, setCreditsInputValue] = React.useState("");
+  const [creditsError, setCreditsError] = React.useState("");
+
+  // Validation handlers
+  const handleYearChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setYearInputValue(value);
+
+    if (value === "") {
+      setYearError("Year is required");
+      return;
+    }
+
+    const num = parseInt(value, 10);
+    if (isNaN(num)) {
+      setYearError("Please enter a valid year");
+      return;
+    }
+
+    if (num < 2020 || num > 2030) {
+      setYearError("Year must be between 2020 and 2030");
+      return;
+    }
+
+    setYearError("");
+    setFormData((prev) => ({ ...prev, year: num }));
+  };
+
+  const handleGpaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setGpaInputValue(value);
+
+    if (value === "") {
+      setGpaError("");
+      setFormData((prev) => ({ ...prev, gpa: 0 }));
+      return;
+    }
+
+    const num = parseFloat(value);
+    if (isNaN(num)) {
+      setGpaError("Please enter a valid GPA");
+      return;
+    }
+
+    if (num < 0 || num > 4) {
+      setGpaError("GPA must be between 0.00 and 4.00");
+      return;
+    }
+
+    setGpaError("");
+    setFormData((prev) => ({ ...prev, gpa: num }));
+  };
+
+  const handleCreditsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setCreditsInputValue(value);
+
+    if (value === "") {
+      setCreditsError("");
+      setFormData((prev) => ({ ...prev, credits: 0 }));
+      return;
+    }
+
+    const num = parseInt(value, 10);
+    if (isNaN(num)) {
+      setCreditsError("Please enter a valid number of credits");
+      return;
+    }
+
+    if (num < 0 || num > 30) {
+      setCreditsError("Credits must be between 0 and 30");
+      return;
+    }
+
+    setCreditsError("");
+    setFormData((prev) => ({ ...prev, credits: num }));
+  };
+
   React.useEffect(() => {
     // Auto-generate term name when season or year changes
     if (formData.season && formData.year) {
@@ -56,6 +141,12 @@ export default function AddTermModal({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Check for validation errors before submitting
+    if (yearError || gpaError || creditsError) {
+      return;
+    }
+
     onSave(formData);
 
     // Reset form
@@ -69,6 +160,15 @@ export default function AddTermModal({
       credits: 0,
       status: "Upcoming",
     });
+
+    // Reset validation states
+    setYearInputValue(new Date().getFullYear().toString());
+    setYearError("");
+    setGpaInputValue("");
+    setGpaError("");
+    setCreditsInputValue("");
+    setCreditsError("");
+
     onClose();
   };
 
@@ -145,15 +245,24 @@ export default function AddTermModal({
                 Year *
               </label>
               <input
-                type="number"
+                type="text"
                 name="year"
-                value={formData.year}
-                onChange={handleChange}
+                value={yearInputValue}
+                onChange={handleYearChange}
                 required
-                min="2020"
-                max="2030"
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                className={`w-full bg-neutral-800 border rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none transition-colors ${
+                  yearError
+                    ? "border-red-500 focus:border-red-500"
+                    : "border-neutral-700 focus:border-[#FEEBD8]"
+                }`}
+                placeholder="2020 - 2030"
               />
+              {yearError && (
+                <p className="text-red-400 text-xs mt-1 flex items-center gap-1">
+                  <span>⚠️</span>
+                  {yearError}
+                </p>
+              )}
             </div>
 
             <div className="md:col-span-2">
@@ -223,16 +332,23 @@ export default function AddTermModal({
                 Target GPA
               </label>
               <input
-                type="number"
+                type="text"
                 name="gpa"
-                value={formData.gpa || ""}
-                onChange={handleChange}
-                min="0"
-                max="4"
-                step="0.01"
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
-                placeholder="e.g., 3.75"
+                value={gpaInputValue}
+                onChange={handleGpaChange}
+                className={`w-full bg-neutral-800 border rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none transition-colors ${
+                  gpaError
+                    ? "border-red-500 focus:border-red-500"
+                    : "border-neutral-700 focus:border-[#FEEBD8]"
+                }`}
+                placeholder="0.00 - 4.00"
               />
+              {gpaError && (
+                <p className="text-red-400 text-xs mt-1 flex items-center gap-1">
+                  <span>⚠️</span>
+                  {gpaError}
+                </p>
+              )}
               <p className="text-xs text-[#FEEBD8]/50 mt-1">
                 Leave empty if not applicable or not yet determined
               </p>
@@ -243,15 +359,23 @@ export default function AddTermModal({
                 Planned Credits
               </label>
               <input
-                type="number"
+                type="text"
                 name="credits"
-                value={formData.credits || ""}
-                onChange={handleChange}
-                min="0"
-                max="30"
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
-                placeholder="e.g., 15"
+                value={creditsInputValue}
+                onChange={handleCreditsChange}
+                className={`w-full bg-neutral-800 border rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none transition-colors ${
+                  creditsError
+                    ? "border-red-500 focus:border-red-500"
+                    : "border-neutral-700 focus:border-[#FEEBD8]"
+                }`}
+                placeholder="0 - 30"
               />
+              {creditsError && (
+                <p className="text-red-400 text-xs mt-1 flex items-center gap-1">
+                  <span>⚠️</span>
+                  {creditsError}
+                </p>
+              )}
             </div>
 
             <div>
@@ -353,7 +477,8 @@ export default function AddTermModal({
             </button>
             <button
               type="submit"
-              className="flex-1 bg-[#FEEBD8] text-[#141414] px-6 py-3 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors"
+              disabled={!!(yearError || gpaError || creditsError)}
+              className="flex-1 bg-[#FEEBD8] text-[#141414] px-6 py-3 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Add Term
             </button>

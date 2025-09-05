@@ -8,7 +8,13 @@ import Footer from "../../components/Footer";
 import { useAuth } from "../../components/AuthProvider";
 import { collegeApplicationsApi } from "../../lib/api/college-applications";
 import { essaysApi } from "../../lib/api/essays";
-import { Essay, CollegeApplication, EssayStatus } from "../../lib/types";
+import { extracurricularsApi } from "../../lib/api/extracurriculars";
+import {
+  Essay,
+  CollegeApplication,
+  EssayStatus,
+  Extracurricular,
+} from "../../lib/types";
 import {
   FaUniversity,
   FaPen,
@@ -20,6 +26,7 @@ import {
   FaUsers,
   FaPlus,
   FaArrowRight,
+  FaClipboardList,
 } from "react-icons/fa";
 
 // Mock user data - fallback when no real data is available
@@ -62,6 +69,13 @@ const quickActions = [
     color: "from-green-500 to-green-600",
   },
   {
+    title: "Templates",
+    description: "Import pre-built checklists for universities worldwide",
+    icon: <FaClipboardList className="w-6 h-6" />,
+    link: "/dashboard/templates",
+    color: "from-indigo-500 to-indigo-600",
+  },
+  {
     title: "Upload Document",
     description: "Organize your application files",
     icon: <FaFile className="w-6 h-6" />,
@@ -77,6 +91,9 @@ export default function Dashboard() {
   // State for real data
   const [applications, setApplications] = useState<CollegeApplication[]>([]);
   const [essays, setEssays] = useState<Essay[]>([]);
+  const [extracurriculars, setExtracurriculars] = useState<Extracurricular[]>(
+    []
+  );
   const [dataLoading, setDataLoading] = useState(true);
 
   useEffect(() => {
@@ -87,17 +104,21 @@ export default function Dashboard() {
   const loadDashboardData = async () => {
     try {
       setDataLoading(true);
-      const [applicationsData, essaysData] = await Promise.all([
-        collegeApplicationsApi.getAll().catch(() => []),
-        essaysApi.getAll().catch(() => []),
-      ]);
+      const [applicationsData, essaysData, extracurricularsData] =
+        await Promise.all([
+          collegeApplicationsApi.getAll().catch(() => []),
+          essaysApi.getAll().catch(() => []),
+          extracurricularsApi.getAll().catch(() => []),
+        ]);
       setApplications(applicationsData);
       setEssays(essaysData);
+      setExtracurriculars(extracurricularsData);
     } catch (error) {
       console.warn("Failed to load dashboard data:", error);
       // Use empty arrays as fallback
       setApplications([]);
       setEssays([]);
+      setExtracurriculars([]);
     } finally {
       setDataLoading(false);
     }
@@ -276,7 +297,11 @@ export default function Dashboard() {
       description: "Track your activities and achievements",
       icon: <FaTrophy className="w-8 h-8" />,
       link: "/dashboard/extracurriculars",
-      stats: "8 Activities Added",
+      stats: dataLoading
+        ? "Loading..."
+        : `${extracurriculars.length} ${
+            extracurriculars.length === 1 ? "Activity" : "Activities"
+          } Added`,
     },
     {
       title: "Academic Tracker",
@@ -291,6 +316,13 @@ export default function Dashboard() {
       icon: <FaUsers className="w-8 h-8" />,
       link: "/dashboard/peers",
       stats: "5 Connections • 8 Countries",
+    },
+    {
+      title: "Templates",
+      description: "Import pre-built university application templates",
+      icon: <FaClipboardList className="w-8 h-8" />,
+      link: "/dashboard/templates",
+      stats: "8 Countries • 50+ Templates",
     },
     {
       title: "Settings",
@@ -334,9 +366,11 @@ export default function Dashboard() {
 
           <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6 hover:border-[#FEEBD8]/30 transition-colors">
             <div className="text-2xl font-bold text-[#FEEBD8] mb-1">
-              {currentUser.essays}
+              {dataLoading ? "..." : extracurriculars.length}
             </div>
-            <div className="text-[#FEEBD8]/70 text-sm">Essays in Progress</div>
+            <div className="text-[#FEEBD8]/70 text-sm">
+              Total Extracurriculars
+            </div>
           </div>
 
           <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6 hover:border-[#FEEBD8]/30 transition-colors">
@@ -408,39 +442,41 @@ export default function Dashboard() {
         </div>
 
         {/* Profile Completion */}
-        <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
-          <h3 className="text-xl font-semibold text-[#FEEBD8] mb-4">
-            Complete Your Profile
-          </h3>
-          <div className="mb-4">
-            <div className="flex justify-between text-sm text-[#FEEBD8]/70 mb-2">
-              <span>Profile Completion</span>
-              <span>{currentUser.profileCompletion}%</span>
+        {currentUser?.profileCompletion < 100 && (
+          <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
+            <h3 className="text-xl font-semibold text-[#FEEBD8] mb-4">
+              Complete Your Profile
+            </h3>
+            <div className="mb-4">
+              <div className="flex justify-between text-sm text-[#FEEBD8]/70 mb-2">
+                <span>Profile Completion</span>
+                <span>{currentUser.profileCompletion}%</span>
+              </div>
+              <div className="w-full bg-neutral-700 rounded-full h-2">
+                <div
+                  className="bg-gradient-to-r from-[#FEEBD8] to-[#E5D5B7] h-2 rounded-full transition-all duration-300"
+                  style={{ width: `${currentUser.profileCompletion}%` }}
+                ></div>
+              </div>
             </div>
-            <div className="w-full bg-neutral-700 rounded-full h-2">
-              <div
-                className="bg-gradient-to-r from-[#FEEBD8] to-[#E5D5B7] h-2 rounded-full transition-all duration-300"
-                style={{ width: `${currentUser.profileCompletion}%` }}
-              ></div>
-            </div>
+            {user && (
+              <div className="mb-4 space-y-2 text-sm text-[#FEEBD8]/70">
+                <div>School: {currentUser.school}</div>
+                <div>Graduation Year: {currentUser.graduationYear}</div>
+                <div>Member Since: {currentUser.memberSince}</div>
+                {user.verification_level && (
+                  <div>Verification Level: {user.verification_level}</div>
+                )}
+              </div>
+            )}
+            <Link
+              href="/dashboard/settings"
+              className="inline-block bg-[#FEEBD8] text-[#141414] px-4 py-2 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors"
+            >
+              Complete Profile
+            </Link>
           </div>
-          {user && (
-            <div className="mb-4 space-y-2 text-sm text-[#FEEBD8]/70">
-              <div>School: {currentUser.school}</div>
-              <div>Graduation Year: {currentUser.graduationYear}</div>
-              <div>Member Since: {currentUser.memberSince}</div>
-              {user.verification_level && (
-                <div>Verification Level: {user.verification_level}</div>
-              )}
-            </div>
-          )}
-          <Link
-            href="/dashboard/settings"
-            className="inline-block bg-[#FEEBD8] text-[#141414] px-4 py-2 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors"
-          >
-            Complete Profile
-          </Link>
-        </div>
+        )}
       </div>
 
       <Footer />

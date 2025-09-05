@@ -17,6 +17,7 @@ function AuthContent() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [showDevModal, setShowDevModal] = useState(false);
+  const [usernameError, setUsernameError] = useState("");
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -45,6 +46,25 @@ function AuthContent() {
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
+
+    // Real-time username validation
+    if (name === "username" && !isLogin) {
+      const usernameValidationError = validateUsername(value);
+      setUsernameError(usernameValidationError || "");
+    }
+  };
+
+  const validateUsername = (username: string): string | null => {
+    if (username.length < 3) {
+      return "Username must be at least 3 characters long";
+    }
+    if (username.length > 50) {
+      return "Username must be no more than 50 characters long";
+    }
+    if (!/^[a-zA-Z0-9]+$/.test(username)) {
+      return "Username can only contain letters and numbers";
+    }
+    return null;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -196,6 +216,13 @@ function AuthContent() {
           return;
         }
 
+        // Validate username
+        const usernameError = validateUsername(formData.username);
+        if (usernameError) {
+          setError(usernameError);
+          return;
+        }
+
         // Make API call for registration
         const response = await fetch(
           `${API_BASE_URL}${API_ENDPOINTS.REGISTER}`,
@@ -337,6 +364,7 @@ function AuthContent() {
     setIsLogin(!isLogin);
     setError("");
     setSuccess("");
+    setUsernameError("");
     // Reset form when switching modes
     setFormData({
       email: "",
@@ -454,10 +482,28 @@ function AuthContent() {
                       name="username"
                       value={formData.username}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 bg-[#141414] border border-[#FEEBD8]/20 rounded-xl text-white placeholder-white/50 focus:border-[#FEEBD8] focus:outline-none transition-colors"
-                      placeholder="johndoe"
+                      className={`w-full px-4 py-3 bg-[#141414] border rounded-xl text-white placeholder-white/50 focus:outline-none transition-colors ${
+                        usernameError
+                          ? "border-red-500/50 focus:border-red-500"
+                          : formData.username && !usernameError
+                          ? "border-green-500/50 focus:border-green-500"
+                          : "border-[#FEEBD8]/20 focus:border-[#FEEBD8]"
+                      }`}
+                      placeholder="johndoe123"
                       required={!isLogin}
+                      maxLength={50}
                     />
+                    <div className="mt-2 text-xs">
+                      <p className="text-white/50 mb-1">
+                        3-50 characters, letters and numbers only
+                      </p>
+                      {usernameError && (
+                        <p className="text-red-400">{usernameError}</p>
+                      )}
+                      {formData.username && !usernameError && (
+                        <p className="text-green-400">✓ Username is valid</p>
+                      )}
+                    </div>
                   </div>
                 </div>
               )}

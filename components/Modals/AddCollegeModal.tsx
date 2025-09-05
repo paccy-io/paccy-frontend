@@ -54,6 +54,93 @@ export default function AddCollegeModal({
     notes: "",
   });
 
+  // Validation states for number inputs
+  const [applicationFeeInputValue, setApplicationFeeInputValue] =
+    React.useState("");
+  const [applicationFeeError, setApplicationFeeError] = React.useState("");
+  const [acceptanceInputValue, setAcceptanceInputValue] = React.useState("");
+  const [acceptanceError, setAcceptanceError] = React.useState("");
+  const [rankingInputValue, setRankingInputValue] = React.useState("");
+  const [rankingError, setRankingError] = React.useState("");
+
+  // Validation handlers
+  const handleApplicationFeeChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const value = e.target.value;
+    setApplicationFeeInputValue(value);
+
+    if (value === "") {
+      setApplicationFeeError("");
+      setFormData((prev) => ({ ...prev, applicationFee: 0 }));
+      return;
+    }
+
+    const num = parseFloat(value);
+    if (isNaN(num)) {
+      setApplicationFeeError("Please enter a valid fee amount");
+      return;
+    }
+
+    if (num < 0) {
+      setApplicationFeeError("Application fee cannot be negative");
+      return;
+    }
+
+    setApplicationFeeError("");
+    setFormData((prev) => ({ ...prev, applicationFee: num }));
+  };
+
+  const handleAcceptanceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setAcceptanceInputValue(value);
+
+    if (value === "") {
+      setAcceptanceError("");
+      setFormData((prev) => ({ ...prev, acceptance: 0 }));
+      return;
+    }
+
+    const num = parseFloat(value);
+    if (isNaN(num)) {
+      setAcceptanceError("Please enter a valid acceptance rate");
+      return;
+    }
+
+    if (num < 0 || num > 100) {
+      setAcceptanceError("Acceptance rate must be between 0 and 100");
+      return;
+    }
+
+    setAcceptanceError("");
+    setFormData((prev) => ({ ...prev, acceptance: num }));
+  };
+
+  const handleRankingChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setRankingInputValue(value);
+
+    if (value === "") {
+      setRankingError("");
+      setFormData((prev) => ({ ...prev, ranking: 0 }));
+      return;
+    }
+
+    const num = parseInt(value, 10);
+    if (isNaN(num)) {
+      setRankingError("Please enter a valid ranking");
+      return;
+    }
+
+    if (num < 0) {
+      setRankingError("Ranking cannot be negative");
+      return;
+    }
+
+    setRankingError("");
+    setFormData((prev) => ({ ...prev, ranking: num }));
+  };
+
   // University search functionality
   const [universitySearch, setUniversitySearch] = useState("");
   const [universities, setUniversities] = useState<University[]>([]);
@@ -188,6 +275,11 @@ export default function AddCollegeModal({
       return;
     }
 
+    // Check for validation errors before submitting
+    if (applicationFeeError || acceptanceError || rankingError) {
+      return;
+    }
+
     onSave(formData);
 
     // Reset form
@@ -206,6 +298,15 @@ export default function AddCollegeModal({
     setMajorInput("");
     setSelectedUniversity(null);
     setShowCustomUniversity(false);
+
+    // Reset validation states
+    setApplicationFeeInputValue("");
+    setApplicationFeeError("");
+    setAcceptanceInputValue("");
+    setAcceptanceError("");
+    setRankingInputValue("");
+    setRankingError("");
+
     onClose();
   };
 
@@ -414,13 +515,23 @@ export default function AddCollegeModal({
                 Application Fee ($)
               </label>
               <input
-                type="number"
+                type="text"
                 name="applicationFee"
-                value={formData.applicationFee}
-                onChange={handleChange}
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-3 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
-                min="0"
+                value={applicationFeeInputValue}
+                onChange={handleApplicationFeeChange}
+                className={`w-full bg-neutral-800 border rounded-lg px-4 py-3 text-[#FEEBD8] focus:outline-none transition-colors ${
+                  applicationFeeError
+                    ? "border-red-500 focus:border-red-500"
+                    : "border-neutral-700 focus:border-[#FEEBD8]"
+                }`}
+                placeholder="e.g., 75"
               />
+              {applicationFeeError && (
+                <p className="text-red-400 text-xs mt-1 flex items-center gap-1">
+                  <span>⚠️</span>
+                  {applicationFeeError}
+                </p>
+              )}
             </div>
 
             {/* Acceptance Rate */}
@@ -429,14 +540,23 @@ export default function AddCollegeModal({
                 Acceptance Rate (%)
               </label>
               <input
-                type="number"
+                type="text"
                 name="acceptance"
-                value={formData.acceptance}
-                onChange={handleChange}
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-3 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
-                min="0"
-                max="100"
+                value={acceptanceInputValue}
+                onChange={handleAcceptanceChange}
+                className={`w-full bg-neutral-800 border rounded-lg px-4 py-3 text-[#FEEBD8] focus:outline-none transition-colors ${
+                  acceptanceError
+                    ? "border-red-500 focus:border-red-500"
+                    : "border-neutral-700 focus:border-[#FEEBD8]"
+                }`}
+                placeholder="0 - 100"
               />
+              {acceptanceError && (
+                <p className="text-red-400 text-xs mt-1 flex items-center gap-1">
+                  <span>⚠️</span>
+                  {acceptanceError}
+                </p>
+              )}
             </div>
 
             {/* Ranking */}
@@ -445,13 +565,23 @@ export default function AddCollegeModal({
                 Ranking
               </label>
               <input
-                type="number"
+                type="text"
                 name="ranking"
-                value={formData.ranking}
-                onChange={handleChange}
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-3 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
-                min="1"
+                value={rankingInputValue}
+                onChange={handleRankingChange}
+                className={`w-full bg-neutral-800 border rounded-lg px-4 py-3 text-[#FEEBD8] focus:outline-none transition-colors ${
+                  rankingError
+                    ? "border-red-500 focus:border-red-500"
+                    : "border-neutral-700 focus:border-[#FEEBD8]"
+                }`}
+                placeholder="e.g., 5"
               />
+              {rankingError && (
+                <p className="text-red-400 text-xs mt-1 flex items-center gap-1">
+                  <span>⚠️</span>
+                  {rankingError}
+                </p>
+              )}
             </div>
           </div>
 
@@ -481,7 +611,10 @@ export default function AddCollegeModal({
             </button>
             <button
               type="submit"
-              className="flex-1 bg-[#FEEBD8] text-[#141414] px-6 py-3 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors"
+              disabled={
+                !!(applicationFeeError || acceptanceError || rankingError)
+              }
+              className="flex-1 bg-[#FEEBD8] text-[#141414] px-6 py-3 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Add College
             </button>

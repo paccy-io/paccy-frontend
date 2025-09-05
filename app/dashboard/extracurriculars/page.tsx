@@ -6,6 +6,14 @@ import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
 import AddExtracurricularModal from "../../../components/Modals/AddExtracurricularModal";
 import EditExtracurricularModal from "../../../components/Modals/EditExtracurricularModal";
+import { extracurricularsApi } from "../../../lib/api/extracurriculars";
+import {
+  Extracurricular,
+  CreateExtracurricularDTO,
+  UpdateExtracurricularDTO,
+  ExtracurricularCategory,
+} from "../../../lib/types";
+import { useToast } from "../../../lib/hooks/useToast";
 import {
   FaArrowLeft,
   FaUsers,
@@ -21,119 +29,24 @@ import {
   FaGraduationCap,
   FaMusic,
   FaRunning,
+  FaGlobe,
 } from "react-icons/fa";
 
-// Mock extracurriculars data
-const mockExtracurriculars = [
-  {
-    id: 1,
-    name: "Student Government President",
-    category: "Leadership",
-    role: "President",
-    organization: "Lincoln High School",
-    startDate: "2023-09-01",
-    endDate: "2025-06-01",
-    hoursPerWeek: 15,
-    description:
-      "Led a student body of 1,200+ students, organized school events, and advocated for student interests with administration.",
-    achievements: [
-      "Increased student participation by 40%",
-      "Implemented new mental health resources",
-    ],
-    impact: "High",
-    skills: ["Leadership", "Public Speaking", "Event Planning"],
-  },
-  {
-    id: 2,
-    name: "Habitat for Humanity Volunteer",
-    category: "Community Service",
-    role: "Volunteer Coordinator",
-    organization: "Habitat for Humanity",
-    startDate: "2022-06-01",
-    endDate: "Present",
-    hoursPerWeek: 8,
-    description:
-      "Coordinated volunteer groups and helped build homes for low-income families in the community.",
-    achievements: ["Helped build 5 homes", "Recruited 50+ new volunteers"],
-    impact: "High",
-    skills: ["Project Management", "Teamwork", "Construction"],
-  },
-  {
-    id: 3,
-    name: "Varsity Soccer Team",
-    category: "Sports",
-    role: "Team Captain",
-    organization: "Lincoln High School",
-    startDate: "2021-08-01",
-    endDate: "2025-05-01",
-    hoursPerWeek: 20,
-    description:
-      "Competed at varsity level and led team to state championships. Maintained team morale and coordinated training schedules.",
-    achievements: ["State Championship 2024", "All-Conference Selection"],
-    impact: "Medium",
-    skills: ["Teamwork", "Discipline", "Time Management"],
-  },
-  {
-    id: 4,
-    name: "Math Tutoring Program",
-    category: "Academic",
-    role: "Tutor",
-    organization: "Self-organized",
-    startDate: "2023-01-01",
-    endDate: "Present",
-    hoursPerWeek: 6,
-    description:
-      "Provide free math tutoring to middle school students struggling with algebra and geometry.",
-    achievements: [
-      "Tutored 20+ students",
-      "Average grade improvement of 2 letter grades",
-    ],
-    impact: "Medium",
-    skills: ["Teaching", "Communication", "Patience"],
-  },
-  {
-    id: 5,
-    name: "School Newspaper Editor",
-    category: "Media/Arts",
-    role: "Editor-in-Chief",
-    organization: "Lincoln High School",
-    startDate: "2023-09-01",
-    endDate: "2025-06-01",
-    hoursPerWeek: 10,
-    description:
-      "Managed editorial team, wrote articles, and oversaw publication of monthly school newspaper.",
-    achievements: ["Increased readership by 60%", "Won state journalism award"],
-    impact: "Medium",
-    skills: ["Writing", "Leadership", "Design"],
-  },
-  {
-    id: 6,
-    name: "Part-time Job at Local Bookstore",
-    category: "Work Experience",
-    role: "Sales Associate",
-    organization: "Chapter & Verse Bookstore",
-    startDate: "2024-01-01",
-    endDate: "Present",
-    hoursPerWeek: 12,
-    description:
-      "Customer service, inventory management, and book recommendations. Learned valuable workplace skills.",
-    achievements: [
-      "Employee of the Month (3x)",
-      "Increased book club membership",
-    ],
-    impact: "Medium",
-    skills: ["Customer Service", "Sales", "Responsibility"],
-  },
-];
+// Category icons mapping
 
 const categoryIcons: Record<string, React.ReactNode> = {
-  Leadership: <FaTrophy className="text-yellow-400" />,
-  "Community Service": <FaHeart className="text-red-400" />,
-  Sports: <FaRunning className="text-green-400" />,
-  Academic: <FaGraduationCap className="text-blue-400" />,
-  "Media/Arts": <FaMusic className="text-purple-400" />,
-  "Work Experience": <FaBriefcase className="text-orange-400" />,
-  Clubs: <FaUsers className="text-cyan-400" />,
+  academic: <FaGraduationCap className="text-blue-400" />,
+  sports: <FaRunning className="text-green-400" />,
+  music: <FaMusic className="text-purple-400" />,
+  arts: <FaMusic className="text-purple-400" />,
+  community_service: <FaHeart className="text-red-400" />,
+  leadership: <FaTrophy className="text-yellow-400" />,
+  technology: <FaBriefcase className="text-cyan-400" />,
+  volunteering: <FaHeart className="text-red-400" />,
+  clubs: <FaUsers className="text-cyan-400" />,
+  work_experience: <FaBriefcase className="text-orange-400" />,
+  research: <FaGraduationCap className="text-blue-400" />,
+  other: <FaStar className="text-gray-400" />,
 };
 
 const impactColors: Record<string, string> = {
@@ -143,31 +56,171 @@ const impactColors: Record<string, string> = {
 };
 
 const categoryColors: Record<string, string> = {
-  Leadership: "bg-yellow-500/20 text-yellow-400",
-  "Community Service": "bg-red-500/20 text-red-400",
-  Sports: "bg-green-500/20 text-green-400",
-  Academic: "bg-blue-500/20 text-blue-400",
-  "Media/Arts": "bg-purple-500/20 text-purple-400",
-  "Work Experience": "bg-orange-500/20 text-orange-400",
-  Clubs: "bg-cyan-500/20 text-cyan-400",
+  academic: "bg-blue-500/20 text-blue-400",
+  sports: "bg-green-500/20 text-green-400",
+  music: "bg-purple-500/20 text-purple-400",
+  arts: "bg-purple-500/20 text-purple-400",
+  community_service: "bg-red-500/20 text-red-400",
+  leadership: "bg-yellow-500/20 text-yellow-400",
+  technology: "bg-cyan-500/20 text-cyan-400",
+  volunteering: "bg-red-500/20 text-red-400",
+  clubs: "bg-cyan-500/20 text-cyan-400",
+  work_experience: "bg-orange-500/20 text-orange-400",
+  research: "bg-blue-500/20 text-blue-400",
+  other: "bg-gray-500/20 text-gray-400",
+};
+
+// AI Score styling configuration
+const aiScoreConfig: Record<
+  string,
+  { bg: string; text: string; border: string; icon: string; label: string }
+> = {
+  high: {
+    bg: "bg-emerald-500/20",
+    text: "text-emerald-400",
+    border: "border-emerald-500/30",
+    icon: "⭐",
+    label: "High Impact",
+  },
+  medium: {
+    bg: "bg-amber-500/20",
+    text: "text-amber-400",
+    border: "border-amber-500/30",
+    icon: "✨",
+    label: "Medium Impact",
+  },
+  low: {
+    bg: "bg-slate-500/20",
+    text: "text-slate-400",
+    border: "border-slate-500/30",
+    icon: "💫",
+    label: "Low Impact",
+  },
+};
+
+// Helper function to format category names for display
+const formatCategoryName = (category: string) => {
+  return category.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+};
+
+// Helper function to render AI score badge
+const renderAiScoreBadge = (aiScore?: string) => {
+  if (!aiScore || !["high", "medium", "low"].includes(aiScore.toLowerCase())) {
+    return null;
+  }
+
+  const scoreKey = aiScore.toLowerCase() as "high" | "medium" | "low";
+  const config = aiScoreConfig[scoreKey];
+
+  return (
+    <div
+      className={`px-3 py-1 rounded-full text-xs font-medium ${config.bg} ${config.text} border ${config.border} flex items-center gap-1.5 shadow-sm`}
+    >
+      <span className="text-sm">{config.icon}</span>
+      <span>{config.label}</span>
+    </div>
+  );
 };
 
 export default function ExtracurricularsPage() {
+  const [extracurriculars, setExtracurriculars] = useState<Extracurricular[]>(
+    []
+  );
+  const [loading, setLoading] = useState(true);
   const [showAddActivityModal, setShowAddActivityModal] = useState(false);
   const [showEditActivityModal, setShowEditActivityModal] = useState(false);
-  const [selectedActivity, setSelectedActivity] = useState<any>(null);
+  const [selectedActivity, setSelectedActivity] =
+    useState<Extracurricular | null>(null);
+  const { success: showSuccessToast, error: showErrorToast } = useToast();
 
   useEffect(() => {
     document.title = "Extracurriculars | Paccy";
+    console.log("Extracurriculars page mounted");
+    console.log(
+      "Auth token in localStorage:",
+      localStorage.getItem("auth-token")
+    );
+    loadExtracurriculars();
   }, []);
 
-  const handleAddActivity = () => {
-    setShowAddActivityModal(true);
+  const loadExtracurriculars = async () => {
+    try {
+      setLoading(true);
+      const data = await extracurricularsApi.getAll();
+      setExtracurriculars(data);
+    } catch (error) {
+      console.error("Failed to load extracurriculars:", error);
+      showErrorToast("Failed to load extracurricular activities");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleEditActivity = (activity: any) => {
+  const handleAddActivity = async (activityData: CreateExtracurricularDTO) => {
+    console.log("handleAddActivity called with:", activityData);
+    try {
+      console.log("Making API call to create extracurricular...");
+      const newActivity = await extracurricularsApi.create(activityData);
+      console.log("API call successful, new activity:", newActivity);
+      setExtracurriculars((prev) => [newActivity, ...prev]);
+      setShowAddActivityModal(false);
+      showSuccessToast("Extracurricular activity added successfully!");
+    } catch (error) {
+      console.error("Failed to add extracurricular:", error);
+      showErrorToast("Failed to add extracurricular activity");
+    }
+  };
+
+  const handleEditActivity = (activity: Extracurricular) => {
     setSelectedActivity(activity);
     setShowEditActivityModal(true);
+  };
+
+  const handleUpdateActivity = async (
+    activityData: UpdateExtracurricularDTO
+  ) => {
+    if (!selectedActivity) return;
+
+    console.log("handleUpdateActivity called with:", activityData);
+    console.log("selectedActivity:", selectedActivity);
+    try {
+      console.log("Making API call to update extracurricular...");
+      const updatedActivity = await extracurricularsApi.update(
+        selectedActivity.id,
+        activityData
+      );
+      console.log("API call successful, updated activity:", updatedActivity);
+      setExtracurriculars((prev) =>
+        prev.map((item) =>
+          item.id === selectedActivity.id ? updatedActivity : item
+        )
+      );
+      setShowEditActivityModal(false);
+      setSelectedActivity(null);
+      showSuccessToast("Extracurricular activity updated successfully!");
+    } catch (error) {
+      console.error("Failed to update extracurricular:", error);
+      showErrorToast("Failed to update extracurricular activity");
+    }
+  };
+
+  const handleDeleteActivity = async (activityId: string) => {
+    if (
+      !confirm("Are you sure you want to delete this extracurricular activity?")
+    ) {
+      return;
+    }
+
+    try {
+      await extracurricularsApi.delete(activityId);
+      setExtracurriculars((prev) =>
+        prev.filter((item) => item.id !== activityId)
+      );
+      showSuccessToast("Extracurricular activity deleted successfully!");
+    } catch (error) {
+      console.error("Failed to delete extracurricular:", error);
+      showErrorToast("Failed to delete extracurricular activity");
+    }
   };
 
   return (
@@ -175,7 +228,12 @@ export default function ExtracurricularsPage() {
       <Navbar />
 
       <div className="pt-24 pb-8 px-4">
-        <div className="max-w-6xl mx-auto">
+        {/* Background decorative elements */}
+        <div className="absolute top-20 left-10 w-32 h-32 bg-[#FEEBD8]/10 rounded-full blur-xl"></div>
+        <div className="absolute bottom-32 right-16 w-48 h-48 bg-blue-400/10 rounded-full blur-xl"></div>
+        <div className="absolute top-1/2 left-1/3 w-24 h-24 bg-purple-500/10 rounded-full blur-xl"></div>
+
+        <div className="max-w-6xl mx-auto relative z-10">
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <div>
@@ -186,17 +244,16 @@ export default function ExtracurricularsPage() {
                 <FaArrowLeft />
                 <span>Back to Dashboard</span>
               </Link>
-              <h1 className="text-3xl font-bold text-[#FEEBD8] flex items-center gap-3">
-                <FaUsers className="text-purple-400" />
+              <h1 className="text-4xl font-bold text-[#FEEBD8]">
                 Extracurricular Activities
               </h1>
-              <p className="text-neutral-400 mt-2">
+              <p className="text-white/70 text-lg">
                 Track and manage your extracurricular activities and
                 achievements
               </p>
             </div>
             <button
-              onClick={handleAddActivity}
+              onClick={() => setShowAddActivityModal(true)}
               className="bg-[#FEEBD8] text-[#141414] px-6 py-3 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors flex items-center gap-2"
             >
               <FaPlus />
@@ -206,59 +263,60 @@ export default function ExtracurricularsPage() {
 
           {/* Statistics */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <div className="bg-[#1A1A1A] border border-[#333] rounded-xl p-6">
+            <div className="bg-[#141414] border border-neutral-700/50 rounded-xl p-6 hover:border-[#FEEBD8]/30 transition-colors">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-2xl font-bold text-[#FEEBD8]">
-                    {mockExtracurriculars.length}
+                    {extracurriculars.length}
                   </p>
-                  <p className="text-neutral-400 text-sm">Total Activities</p>
+                  <p className="text-white/70 text-sm">Total Activities</p>
                 </div>
                 <FaUsers className="text-purple-400 text-2xl" />
               </div>
             </div>
 
-            <div className="bg-[#1A1A1A] border border-[#333] rounded-xl p-6">
+            <div className="bg-[#141414] border border-neutral-700/50 rounded-xl p-6 hover:border-[#FEEBD8]/30 transition-colors">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-2xl font-bold text-[#FEEBD8]">
-                    {mockExtracurriculars.reduce(
-                      (total, activity) => total + activity.hoursPerWeek,
+                    {extracurriculars.reduce(
+                      (total, activity) => total + activity.hours_per_week,
                       0
                     )}
                   </p>
-                  <p className="text-neutral-400 text-sm">Hours per Week</p>
+                  <p className="text-white/70 text-sm">Hours per Week</p>
                 </div>
                 <FaClock className="text-blue-400 text-2xl" />
               </div>
             </div>
 
-            <div className="bg-[#1A1A1A] border border-[#333] rounded-xl p-6">
+            <div className="bg-[#141414] border border-neutral-700/50 rounded-xl p-6 hover:border-[#FEEBD8]/30 transition-colors">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-2xl font-bold text-[#FEEBD8]">
                     {
-                      mockExtracurriculars.filter(
-                        (activity) => activity.impact === "High"
-                      ).length
+                      new Set(
+                        extracurriculars.map((activity) => activity.category)
+                      ).size
                     }
                   </p>
-                  <p className="text-neutral-400 text-sm">High Impact</p>
+                  <p className="text-white/70 text-sm">Active Categories</p>
                 </div>
                 <FaStar className="text-yellow-400 text-2xl" />
               </div>
             </div>
 
-            <div className="bg-[#1A1A1A] border border-[#333] rounded-xl p-6">
+            <div className="bg-[#141414] border border-neutral-700/50 rounded-xl p-6 hover:border-[#FEEBD8]/30 transition-colors">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-2xl font-bold text-[#FEEBD8]">
-                    {mockExtracurriculars.reduce(
-                      (total, activity) => total + activity.achievements.length,
+                    {extracurriculars.reduce(
+                      (total, activity) =>
+                        total + (activity.achievements?.length || 0),
                       0
                     )}
                   </p>
-                  <p className="text-neutral-400 text-sm">Achievements</p>
+                  <p className="text-white/70 text-sm">Achievements</p>
                 </div>
                 <FaTrophy className="text-orange-400 text-2xl" />
               </div>
@@ -267,119 +325,156 @@ export default function ExtracurricularsPage() {
 
           {/* Activities List */}
           <div className="space-y-6">
-            {mockExtracurriculars.map((activity) => (
-              <div
-                key={activity.id}
-                className="bg-[#1A1A1A] border border-[#333] rounded-xl p-6"
-              >
-                <div className="flex flex-col lg:flex-row gap-6">
-                  <div className="flex-1">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex items-center gap-4">
-                        <div className="text-3xl">
-                          {categoryIcons[activity.category]}
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-3 mb-2">
-                            <h3 className="text-xl font-semibold text-[#FEEBD8]">
-                              {activity.name}
-                            </h3>
-                            <span
-                              className={`px-3 py-1 rounded-full text-xs font-medium ${
-                                categoryColors[activity.category]
-                              }`}
-                            >
-                              {activity.category}
-                            </span>
+            {loading ? (
+              <div className="bg-[#141414] border border-neutral-700/50 rounded-xl p-12 text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FEEBD8] mx-auto mb-4"></div>
+                <p className="text-white/70">
+                  Loading extracurricular activities...
+                </p>
+              </div>
+            ) : extracurriculars.length === 0 ? (
+              <div className="bg-[#141414] border border-neutral-700/50 rounded-xl p-12 text-center">
+                <FaStar className="text-6xl text-white/30 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-[#FEEBD8] mb-2">
+                  No Activities Yet
+                </h3>
+                <p className="text-white/70 mb-6">
+                  Start building your profile by adding your extracurricular
+                  activities, volunteer work, and achievements.
+                </p>
+                <button
+                  onClick={() => setShowAddActivityModal(true)}
+                  className="bg-[#FEEBD8] text-[#141414] px-6 py-3 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors flex items-center gap-2 mx-auto"
+                >
+                  <FaPlus />
+                  <span>Add Your First Activity</span>
+                </button>
+              </div>
+            ) : (
+              extracurriculars.map((activity) => (
+                <div
+                  key={activity.id}
+                  className="bg-[#141414] border border-neutral-700/50 rounded-xl p-6 hover:border-[#FEEBD8]/30 transition-colors"
+                >
+                  <div className="flex flex-col lg:flex-row gap-6">
+                    <div className="flex-1">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex items-center gap-4">
+                          <div className="text-3xl">
+                            {categoryIcons[activity.category]}
                           </div>
-                          <p className="text-neutral-300 font-medium">
-                            {activity.role} • {activity.organization}
-                          </p>
+                          <div>
+                            <div className="flex items-center gap-3 mb-2">
+                              <h3 className="text-xl font-semibold text-[#FEEBD8]">
+                                {activity.activity_name}
+                              </h3>
+                              <span
+                                className={`px-3 py-1 rounded-full text-xs font-medium ${
+                                  categoryColors[activity.category]
+                                }`}
+                              >
+                                {formatCategoryName(activity.category)}
+                              </span>
+                              {renderAiScoreBadge(activity.ai_score)}
+                            </div>
+                            <p className="text-white/80 font-medium">
+                              {activity.position}
+                              {activity.location && ` • ${activity.location}`}
+                            </p>
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                      <div className="flex items-center gap-2 text-sm text-neutral-400">
-                        <FaCalendarAlt />
-                        <span>
-                          {activity.startDate} -{" "}
-                          {activity.endDate === "Present"
-                            ? "Present"
-                            : activity.endDate}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-neutral-400">
-                        <FaClock />
-                        <span>{activity.hoursPerWeek} hours/week</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm">
-                        <span className="text-neutral-400">Impact:</span>
-                        <div className="flex items-center gap-2">
-                          <div
-                            className={`w-3 h-3 rounded-full ${
-                              impactColors[activity.impact]
-                            }`}
-                          />
-                          <span className="text-[#FEEBD8] font-medium">
-                            {activity.impact}
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                        <div className="flex items-center gap-2 text-sm text-white/70">
+                          <FaCalendarAlt />
+                          <span>
+                            {activity.start_date} -{" "}
+                            {activity.end_date === "present"
+                              ? "Present"
+                              : activity.end_date}
                           </span>
                         </div>
-                      </div>
-                    </div>
-
-                    <p className="text-neutral-300 mb-4">
-                      {activity.description}
-                    </p>
-
-                    {activity.achievements.length > 0 && (
-                      <div className="mb-4">
-                        <h4 className="text-[#FEEBD8] font-medium mb-2 flex items-center gap-2">
-                          <FaTrophy className="text-yellow-400" />
-                          Key Achievements
-                        </h4>
-                        <ul className="space-y-1">
-                          {activity.achievements.map((achievement, index) => (
-                            <li
-                              key={index}
-                              className="text-neutral-300 text-sm flex items-center gap-2"
+                        <div className="flex items-center gap-2 text-sm text-white/70">
+                          <FaClock />
+                          <span>{activity.hours_per_week} hours/week</span>
+                        </div>
+                        {activity.website && (
+                          <div className="flex items-center gap-2 text-sm text-white/70">
+                            <FaGlobe />
+                            <a
+                              href={activity.website}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-[#FEEBD8] hover:underline"
                             >
-                              <div className="w-1.5 h-1.5 bg-[#FEEBD8] rounded-full" />
-                              {achievement}
-                            </li>
-                          ))}
-                        </ul>
+                              Website
+                            </a>
+                          </div>
+                        )}
                       </div>
-                    )}
 
-                    <div className="flex flex-wrap gap-2">
-                      {activity.skills.map((skill, index) => (
-                        <span
-                          key={index}
-                          className="bg-[#2A2A2A] text-[#FEEBD8] px-3 py-1 rounded-full text-sm"
-                        >
-                          {skill}
-                        </span>
-                      ))}
+                      <p className="text-white/80 mb-4">
+                        {activity.description}
+                      </p>
+
+                      {activity.achievements &&
+                        activity.achievements.length > 0 && (
+                          <div className="mb-4">
+                            <h4 className="text-[#FEEBD8] font-medium mb-2 flex items-center gap-2">
+                              <FaTrophy className="text-yellow-400" />
+                              Key Achievements
+                            </h4>
+                            <ul className="space-y-1">
+                              {activity.achievements?.map(
+                                (achievement, index) => (
+                                  <li
+                                    key={index}
+                                    className="text-white/80 text-sm flex items-center gap-2"
+                                  >
+                                    <div className="w-1.5 h-1.5 bg-[#FEEBD8] rounded-full" />
+                                    {achievement}
+                                  </li>
+                                )
+                              )}
+                            </ul>
+                          </div>
+                        )}
+
+                      {activity.skills && activity.skills.length > 0 && (
+                        <div className="flex flex-wrap gap-2">
+                          {activity.skills.map((skill, index) => (
+                            <span
+                              key={index}
+                              className="bg-[#2A2A2A] text-[#FEEBD8] px-3 py-1 rounded-full text-sm"
+                            >
+                              {skill}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                  </div>
 
-                  <div className="flex lg:flex-col gap-2">
-                    <button
-                      onClick={() => handleEditActivity(activity)}
-                      className="bg-[#FEEBD8] text-[#141414] px-4 py-2 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors flex items-center gap-2"
-                    >
-                      <FaEdit />
-                      <span>Edit</span>
-                    </button>
-                    <button className="bg-red-500/20 text-red-400 px-4 py-2 rounded-lg font-medium hover:bg-red-500/30 transition-colors flex items-center gap-2">
-                      <FaTrash />
-                      <span>Remove</span>
-                    </button>
+                    <div className="flex lg:flex-col gap-2">
+                      <button
+                        onClick={() => handleEditActivity(activity)}
+                        className="bg-[#FEEBD8] text-[#141414] px-4 py-2 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors flex items-center gap-2"
+                      >
+                        <FaEdit />
+                        <span>Edit</span>
+                      </button>
+                      <button
+                        onClick={() => handleDeleteActivity(activity.id)}
+                        className="bg-red-500/20 text-red-400 px-4 py-2 rounded-lg font-medium hover:bg-red-500/30 transition-colors flex items-center gap-2 border border-red-500/30"
+                      >
+                        <FaTrash />
+                        <span>Remove</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
       </div>
@@ -391,10 +486,7 @@ export default function ExtracurricularsPage() {
         <AddExtracurricularModal
           isOpen={showAddActivityModal}
           onClose={() => setShowAddActivityModal(false)}
-          onSave={(data) => {
-            console.log("Activity data:", data);
-            setShowAddActivityModal(false);
-          }}
+          onSave={handleAddActivity}
         />
       )}
 
@@ -406,11 +498,7 @@ export default function ExtracurricularsPage() {
             setSelectedActivity(null);
           }}
           extracurricular={selectedActivity}
-          onSave={(data) => {
-            console.log("Updated activity data:", data);
-            setShowEditActivityModal(false);
-            setSelectedActivity(null);
-          }}
+          onSave={handleUpdateActivity}
         />
       )}
     </div>

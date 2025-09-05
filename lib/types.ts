@@ -88,6 +88,22 @@ export enum EssayStatus {
   COMPLETED = "completed",
 }
 
+// Extracurricular Category Enum matching backend
+export enum ExtracurricularCategory {
+  ACADEMIC = "academic",
+  SPORTS = "sports",
+  MUSIC = "music",
+  ARTS = "arts",
+  COMMUNITY_SERVICE = "community_service",
+  LEADERSHIP = "leadership",
+  TECHNOLOGY = "technology",
+  VOLUNTEERING = "volunteering",
+  CLUBS = "clubs",
+  WORK_EXPERIENCE = "work_experience",
+  RESEARCH = "research",
+  OTHER = "other",
+}
+
 // Model interfaces
 export interface Task {
   id: string;
@@ -147,6 +163,25 @@ export interface Essay {
   ai_score?: number; // 0-10
   ai_feedbacks?: string[];
   ai_suggestion?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+// Extracurricular interface
+export interface Extracurricular {
+  id: string;
+  activity_name: string;
+  category: ExtracurricularCategory;
+  position: string;
+  hours_per_week: number;
+  start_date: string; // YYYY-MM format
+  end_date: string; // YYYY-MM format or "present"
+  description?: string;
+  location?: string;
+  website?: string;
+  ai_score?: string;
+  achievements?: string[];
+  skills?: string[];
   created_at: string;
   updated_at: string;
 }
@@ -280,6 +315,35 @@ export interface UpdateEssayDTO {
   ai_suggestion?: string;
 }
 
+// Extracurricular DTO interfaces
+export interface CreateExtracurricularDTO {
+  activity_name: string;
+  category: ExtracurricularCategory;
+  position: string;
+  hours_per_week: number;
+  start_date: string; // YYYY-MM format
+  end_date: string; // YYYY-MM format or "present"
+  description?: string;
+  location?: string;
+  website?: string;
+  achievements?: string[];
+  skills?: string[];
+}
+
+export interface UpdateExtracurricularDTO {
+  activity_name?: string;
+  category?: ExtracurricularCategory;
+  position?: string;
+  hours_per_week?: number;
+  start_date?: string; // YYYY-MM format
+  end_date?: string; // YYYY-MM format or "present"
+  description?: string;
+  location?: string;
+  website?: string;
+  achievements?: string[];
+  skills?: string[];
+}
+
 // API Response interfaces
 export interface ApiResponse<T> {
   success: true;
@@ -355,4 +419,20 @@ export class ApiError extends Error {
     this.name = "ApiError";
     this.code = code;
   }
+}
+
+// Template import result interface
+export interface TemplateImportResult {
+  success: true;
+  collegeApplication: CollegeApplication;
+  template: {
+    id: string;
+    name: string;
+    country: string;
+    flag?: string;
+  };
+  stats: {
+    checklistsCreated: number;
+    tasksCreated: number;
+  };
 }

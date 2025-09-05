@@ -981,6 +981,24 @@ export default function Settings() {
                 className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8] disabled:opacity-50"
               />
             </div>
+            <div>
+              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+                Website
+              </label>
+              <input
+                type="url"
+                value={isEditing ? editedData.website : userData.website}
+                onChange={(e) =>
+                  setEditedData((prev: any) => ({
+                    ...prev,
+                    website: e.target.value,
+                  }))
+                }
+                disabled={!isEditing}
+                placeholder="https://yourwebsite.com"
+                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8] disabled:opacity-50"
+              />
+            </div>
 
             {/* Social Links Section */}
             <div className="md:col-span-2">
