@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
-import AddCourseModal from "../../../components/Modals/AddCourseModal";
 import AddTermModal from "../../../components/Modals/AddTermModal";
 import AddExamScoreModal from "../../../components/Modals/AddExamScoreModal";
 import { calendarApi } from "../../../lib/api/calendar";
@@ -15,13 +14,9 @@ import {
   FaPlus,
   FaEdit,
   FaTrash,
-  FaBookOpen,
   FaChartLine,
   FaTrophy,
-  FaCalendarAlt,
   FaStar,
-  FaChevronDown,
-  FaChevronUp,
 } from "react-icons/fa";
 
 // Mock academic data
@@ -36,56 +31,6 @@ const mockAcademicData = {
       { term: "Spring 2023", gpa: 3.81, courses: 5 },
     ],
   },
-  courses: [
-    {
-      id: 1,
-      name: "AP Calculus BC",
-      grade: "A",
-      credits: 4,
-      term: "Fall 2024",
-      type: "AP",
-    },
-    {
-      id: 2,
-      name: "AP Chemistry",
-      grade: "A-",
-      credits: 4,
-      term: "Fall 2024",
-      type: "AP",
-    },
-    {
-      id: 3,
-      name: "AP English Literature",
-      grade: "A",
-      credits: 3,
-      term: "Fall 2024",
-      type: "AP",
-    },
-    {
-      id: 4,
-      name: "AP World History",
-      grade: "B+",
-      credits: 3,
-      term: "Spring 2024",
-      type: "AP",
-    },
-    {
-      id: 5,
-      name: "Physics Honors",
-      grade: "A",
-      credits: 4,
-      term: "Spring 2024",
-      type: "Honors",
-    },
-    {
-      id: 6,
-      name: "Spanish IV",
-      grade: "A-",
-      credits: 3,
-      term: "Fall 2023",
-      type: "Regular",
-    },
-  ],
   exams: [
     {
       id: 1,
@@ -136,20 +81,11 @@ const gradeColors: Record<string, string> = {
   C: "text-red-400",
 };
 
-const courseTypeColors: Record<string, string> = {
-  AP: "bg-purple-500/20 text-purple-400",
-  IB: "bg-blue-500/20 text-blue-400",
-  Honors: "bg-green-500/20 text-green-400",
-  Regular: "bg-gray-500/20 text-gray-400",
-};
-
 export default function AcademyPage() {
-  const [showAddCourseModal, setShowAddCourseModal] = useState(false);
   const [showAddTermModal, setShowAddTermModal] = useState(false);
   const [showAddExamScoreModal, setShowAddExamScoreModal] = useState(false);
   const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([]);
   const [calendarLoading, setCalendarLoading] = useState(true);
-  const [courseListExpanded, setCourseListExpanded] = useState(true); // Add state for course list expansion
 
   // Helper functions to process calendar events
   const getTestDateEvents = () => {
@@ -295,10 +231,6 @@ export default function AcademyPage() {
     document.title = "Academic Tracker | Paccy";
   }, []);
 
-  const handleAddCourse = () => {
-    setShowAddCourseModal(true);
-  };
-
   const handleAddTerm = () => {
     setShowAddTermModal(true);
   };
@@ -328,93 +260,108 @@ export default function AcademyPage() {
     <div className="min-h-screen bg-[#0a0a0a]">
       <Navbar />
 
-      <div className="max-w-screen-2xl mx-auto px-4 md:px-10 py-8 pt-28">
+      <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 pt-28">
         {/* Header */}
-        <div className="flex items-center space-x-4 mb-8">
+        <div className="flex items-center space-x-6 mb-12">
           <Link
             href="/dashboard"
-            className="text-[#FEEBD8]/70 hover:text-[#FEEBD8] transition-colors"
+            className="flex items-center justify-center w-12 h-12 rounded-lg bg-neutral-800/50 border border-neutral-700 hover:bg-neutral-800 hover:border-neutral-600 transition-colors"
           >
-            <FaArrowLeft size={20} />
+            <FaArrowLeft
+              className="text-[#FEEBD8]/70 hover:text-[#FEEBD8] transition-colors"
+              size={16}
+            />
           </Link>
-          <div>
-            <h1 className="text-4xl font-bold text-[#FEEBD8]">
-              Academic Tracker
-            </h1>
-            <p className="text-[#FEEBD8]/70 mt-2">
+          <div className="flex-1">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 rounded-lg bg-neutral-800 border border-neutral-700">
+                <FaGraduationCap className="text-[#FEEBD8]" size={20} />
+              </div>
+              <h1 className="text-3xl font-bold text-[#FEEBD8]">
+                Academic Tracker
+              </h1>
+            </div>
+            <p className="text-[#FEEBD8]/60 ml-12">
               Monitor your academic progress and achievements
             </p>
           </div>
         </div>
 
         {/* Academic Content */}
-        <div className="space-y-6">
+        <div className="space-y-8">
           {/* GPA Overview */}
-          <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h3 className="text-xl font-semibold text-[#FEEBD8] flex items-center gap-2">
-                  <FaChartLine className="text-blue-400" />
-                  GPA Tracker
-                </h3>
-                <p className="text-[#FEEBD8]/60 text-sm mt-1">
-                  Track your cumulative GPA progress toward your target goals
-                </p>
+          <div className="bg-[#141414] border border-neutral-700 rounded-lg p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-neutral-800">
+                  <FaChartLine className="text-[#FEEBD8]" size={18} />
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold text-[#FEEBD8]">
+                    GPA Tracker
+                  </h3>
+                  <p className="text-[#FEEBD8]/60 text-sm mt-1">
+                    Track your cumulative GPA progress toward your target goals
+                  </p>
+                </div>
               </div>
               <button
                 onClick={handleAddTerm}
                 className="bg-[#FEEBD8] text-[#141414] px-4 py-2 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors flex items-center gap-2"
               >
-                <FaPlus />
+                <FaPlus size={14} />
                 <span>Add Term</span>
               </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-[#FEEBD8] mb-1">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <div className="text-center p-4 rounded-lg bg-neutral-800/50 border border-neutral-700">
+                <div className="text-2xl font-bold text-[#FEEBD8] mb-1">
                   {academicData.gpa.current}
                 </div>
                 <div className="text-[#FEEBD8]/70 text-sm">Current GPA</div>
               </div>
 
-              <div className="text-center">
-                <div className="text-3xl font-bold text-green-400 mb-1">
+              <div className="text-center p-4 rounded-lg bg-neutral-800/50 border border-neutral-700">
+                <div className="text-2xl font-bold text-green-400 mb-1">
                   {academicData.gpa.target}
                 </div>
                 <div className="text-[#FEEBD8]/70 text-sm">Target GPA</div>
               </div>
 
-              <div className="text-center">
-                <div className="text-3xl font-bold text-blue-400 mb-1">
+              <div className="text-center p-4 rounded-lg bg-neutral-800/50 border border-neutral-700">
+                <div className="text-2xl font-bold text-blue-400 mb-1">
                   {calculateGPAProgress().toFixed(1)}%
                 </div>
                 <div className="text-[#FEEBD8]/70 text-sm">Progress</div>
               </div>
             </div>
 
-            <div className="mt-6">
+            <div className="mb-6">
               <div className="flex justify-between text-sm text-[#FEEBD8]/70 mb-2">
                 <span>Progress to Target</span>
                 <span>{calculateGPAProgress().toFixed(1)}%</span>
               </div>
               <div className="w-full bg-neutral-700 rounded-full h-2">
                 <div
-                  className="bg-gradient-to-r from-blue-500 to-green-500 h-2 rounded-full transition-all duration-300"
+                  className="bg-blue-500 h-2 rounded-full transition-all duration-300"
                   style={{ width: `${Math.min(calculateGPAProgress(), 100)}%` }}
                 />
               </div>
             </div>
 
             {/* Term History */}
-            <div className="mt-6">
+            <div>
               <h4 className="text-sm font-medium text-[#FEEBD8]/70 mb-3">
                 Recent Terms
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {academicData.gpa.terms.map((term, idx) => (
-                  <div key={idx} className="bg-neutral-800 rounded-lg p-3">
-                    <div className="flex justify-between items-center">
+                  <div
+                    key={idx}
+                    className="bg-neutral-800 rounded-lg p-3 border border-neutral-700"
+                  >
+                    <div className="flex justify-between items-center mb-1">
                       <span className="text-[#FEEBD8] font-medium">
                         {term.term}
                       </span>
@@ -423,145 +370,63 @@ export default function AcademyPage() {
                       </span>
                     </div>
                     <div className="text-[#FEEBD8]/60 text-sm">
-                      {term.courses} courses
+                      {term.courses} courses completed
                     </div>
                   </div>
                 ))}
               </div>
             </div>
-          </div>
-
-          {/* Courses */}
-          <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <div>
-                  <h3 className="text-xl font-semibold text-[#FEEBD8] flex items-center gap-2">
-                    <FaBookOpen className="text-purple-400" />
-                    Course List
-                  </h3>
-                  <p className="text-[#FEEBD8]/60 text-sm mt-1">
-                    Manage all your current and completed courses with grades
-                  </p>
-                </div>
-                <button
-                  onClick={() => setCourseListExpanded(!courseListExpanded)}
-                  className="text-[#FEEBD8]/60 hover:text-[#FEEBD8] transition-colors ml-2"
-                  aria-label={
-                    courseListExpanded
-                      ? "Collapse course list"
-                      : "Expand course list"
-                  }
-                >
-                  {courseListExpanded ? (
-                    <FaChevronDown size={16} />
-                  ) : (
-                    <FaChevronUp size={16} />
-                  )}
-                </button>
-              </div>
-              <button
-                onClick={handleAddCourse}
-                className="bg-[#FEEBD8] text-[#141414] px-4 py-2 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors flex items-center gap-2"
-              >
-                <FaPlus />
-                <span>Add Course</span>
-              </button>
-            </div>
-
-            {courseListExpanded && (
-              <div className="space-y-3">
-                {academicData.courses.map((course) => (
-                  <div
-                    key={course.id}
-                    className="bg-neutral-800 rounded-lg p-4"
-                  >
-                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <h4 className="text-[#FEEBD8] font-medium">
-                            {course.name}
-                          </h4>
-                          <span
-                            className={`px-2 py-1 rounded-full text-xs ${
-                              courseTypeColors[course.type]
-                            }`}
-                          >
-                            {course.type}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-4 text-sm text-[#FEEBD8]/70">
-                          <span>{course.term}</span>
-                          <span>{course.credits} credits</span>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-3">
-                        <span
-                          className={`text-lg font-semibold ${
-                            gradeColors[course.grade]
-                          }`}
-                        >
-                          {course.grade}
-                        </span>
-                        <div className="flex gap-2">
-                          <button className="text-[#FEEBD8]/60 hover:text-[#FEEBD8] transition-colors">
-                            <FaEdit />
-                          </button>
-                          <button className="text-red-400 hover:text-red-300 transition-colors">
-                            <FaTrash />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {!courseListExpanded && (
-              <div className="text-center py-2">
-                {/* Fully collapsed - no text */}
-              </div>
-            )}
           </div>
 
           {/* Exam Scores */}
-          <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h3 className="text-xl font-semibold text-[#FEEBD8] flex items-center gap-2">
-                  <FaTrophy className="text-yellow-400" />
-                  Exam Scores
-                </h3>
-                <p className="text-[#FEEBD8]/60 text-sm mt-1">
-                  Record and track standardized test scores and AP exam results
-                </p>
+          <div className="bg-[#141414] border border-neutral-700 rounded-lg p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-neutral-800">
+                  <FaTrophy className="text-[#FEEBD8]" size={18} />
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold text-[#FEEBD8]">
+                    Exam Scores
+                  </h3>
+                  <p className="text-[#FEEBD8]/60 text-sm mt-1">
+                    Record and track standardized test scores and AP exam
+                    results
+                  </p>
+                </div>
               </div>
               <button
                 onClick={handleAddExamScore}
                 className="bg-[#FEEBD8] text-[#141414] px-4 py-2 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors flex items-center gap-2"
               >
-                <FaPlus />
+                <FaPlus size={14} />
                 <span>Add Score</span>
               </button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {academicData.exams.map((exam) => (
-                <div key={exam.id} className="bg-neutral-800 rounded-lg p-4">
+                <div
+                  key={exam.id}
+                  className="bg-neutral-800 rounded-lg p-4 border border-neutral-700"
+                >
                   <div className="flex justify-between items-start mb-3">
-                    <div>
-                      <h4 className="text-[#FEEBD8] font-medium">
+                    <div className="flex-1">
+                      <h4 className="text-[#FEEBD8] font-medium text-lg mb-1">
                         {exam.name}
                       </h4>
                       <p className="text-[#FEEBD8]/60 text-sm">
                         {new Date(exam.date).toLocaleDateString()}
                       </p>
                     </div>
-                    <span className="text-2xl font-bold text-green-400">
-                      {exam.score}/{exam.maxScore}
-                    </span>
+                    <div className="text-right">
+                      <span className="text-2xl font-bold text-green-400">
+                        {exam.score}
+                      </span>
+                      <span className="text-[#FEEBD8]/60">
+                        /{exam.maxScore}
+                      </span>
+                    </div>
                   </div>
 
                   <div className="space-y-2">
@@ -575,14 +440,24 @@ export default function AcademyPage() {
                     </div>
                     <div className="w-full bg-neutral-700 rounded-full h-2">
                       <div
-                        className="bg-gradient-to-r from-blue-500 to-green-500 h-2 rounded-full transition-all duration-300"
+                        className="bg-blue-500 h-2 rounded-full transition-all duration-300"
                         style={{
                           width: `${Math.min(getExamProgress(exam), 100)}%`,
                         }}
                       />
                     </div>
-                    <div className="text-xs text-[#FEEBD8]/60">
-                      Attempt {exam.attempts} • Target: {exam.target}
+                    <div className="flex justify-between items-center pt-1">
+                      <div className="text-xs text-[#FEEBD8]/60">
+                        Attempt {exam.attempts} • Target: {exam.target}
+                      </div>
+                      <div className="flex gap-1">
+                        <button className="p-1 rounded bg-neutral-700 text-[#FEEBD8]/60 hover:text-[#FEEBD8] hover:bg-neutral-600 transition-colors">
+                          <FaEdit size={12} />
+                        </button>
+                        <button className="p-1 rounded bg-neutral-700 text-red-400 hover:text-red-300 hover:bg-red-900/30 transition-colors">
+                          <FaTrash size={12} />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -591,35 +466,43 @@ export default function AcademyPage() {
           </div>
 
           {/* Academic Goals */}
-          <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
-            <div className="mb-4">
-              <h3 className="text-xl font-semibold text-[#FEEBD8] flex items-center gap-2">
-                <FaStar className="text-yellow-400" />
-                Academic Goals & Motivation
-              </h3>
-              <p className="text-[#FEEBD8]/60 text-sm mt-1">
-                Stay motivated with upcoming deadlines and achievement reminders
-              </p>
+          <div className="bg-[#141414] border border-neutral-700 rounded-lg p-6">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2 rounded-lg bg-neutral-800">
+                <FaStar className="text-[#FEEBD8]" size={18} />
+              </div>
+              <div>
+                <h3 className="text-xl font-semibold text-[#FEEBD8]">
+                  Academic Goals & Motivation
+                </h3>
+                <p className="text-[#FEEBD8]/60 text-sm mt-1">
+                  Stay motivated with upcoming deadlines and achievement
+                  reminders
+                </p>
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-neutral-800 rounded-lg p-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="bg-neutral-800 rounded-lg p-4 border border-neutral-700">
                 <h4 className="text-[#FEEBD8] font-medium mb-3">
                   Upcoming Deadlines
                 </h4>
                 <div className="space-y-2">
                   {calendarLoading ? (
-                    <div className="text-[#FEEBD8]/70 text-sm">Loading...</div>
+                    <div className="flex items-center gap-2 text-[#FEEBD8]/70 text-sm">
+                      <div className="w-4 h-4 border-2 border-[#FEEBD8]/30 border-t-[#FEEBD8] rounded-full animate-spin"></div>
+                      Loading deadlines...
+                    </div>
                   ) : (
                     <>
                       {/* SAT Registration */}
                       {satExamDate && (
-                        <div className="flex justify-between items-center">
-                          <span className="text-[#FEEBD8]/70 text-sm">
+                        <div className="flex justify-between items-center p-2 rounded bg-neutral-700/50">
+                          <span className="text-[#FEEBD8]/90 text-sm">
                             {satExamDate.title}
                           </span>
                           <span
-                            className={`text-sm ${getTimeLeftColor(
+                            className={`text-sm font-medium ${getTimeLeftColor(
                               getDaysUntil(satExamDate.date!)
                             )}`}
                           >
@@ -632,13 +515,13 @@ export default function AcademyPage() {
                       {apExamDates.map((apExam, index) => (
                         <div
                           key={`ap-${index}`}
-                          className="flex justify-between items-center"
+                          className="flex justify-between items-center p-2 rounded bg-neutral-700/50"
                         >
-                          <span className="text-[#FEEBD8]/70 text-sm">
+                          <span className="text-[#FEEBD8]/90 text-sm">
                             {apExam.title}
                           </span>
                           <span
-                            className={`text-sm ${getTimeLeftColor(
+                            className={`text-sm font-medium ${getTimeLeftColor(
                               getDaysUntil(apExam.date!)
                             )}`}
                           >
@@ -649,12 +532,12 @@ export default function AcademyPage() {
 
                       {/* IB Exam Registration */}
                       {ibExamDate && (
-                        <div className="flex justify-between items-center">
-                          <span className="text-[#FEEBD8]/70 text-sm">
+                        <div className="flex justify-between items-center p-2 rounded bg-neutral-700/50">
+                          <span className="text-[#FEEBD8]/90 text-sm">
                             {ibExamDate.title}
                           </span>
                           <span
-                            className={`text-sm ${getTimeLeftColor(
+                            className={`text-sm font-medium ${getTimeLeftColor(
                               getDaysUntil(ibExamDate.date!)
                             )}`}
                           >
@@ -665,12 +548,12 @@ export default function AcademyPage() {
 
                       {/* Final Exams */}
                       {finalExamDate && (
-                        <div className="flex justify-between items-center">
-                          <span className="text-[#FEEBD8]/70 text-sm">
+                        <div className="flex justify-between items-center p-2 rounded bg-neutral-700/50">
+                          <span className="text-[#FEEBD8]/90 text-sm">
                             Final Exam: {finalExamDate.title}
                           </span>
                           <span
-                            className={`text-sm ${getTimeLeftColor(
+                            className={`text-sm font-medium ${getTimeLeftColor(
                               getDaysUntil(finalExamDate.date!)
                             )}`}
                           >
@@ -685,9 +568,11 @@ export default function AcademyPage() {
                         apExamDates.length === 0 &&
                         !ibExamDate &&
                         !finalExamDate && (
-                          <div className="text-[#FEEBD8]/50 text-sm">
-                            No upcoming test dates found. Add them to your
-                            calendar to track deadlines.
+                          <div className="text-center py-4">
+                            <div className="text-[#FEEBD8]/50 text-sm">
+                              No upcoming test dates found. Add them to your
+                              calendar to track deadlines.
+                            </div>
                           </div>
                         )}
                     </>
@@ -695,20 +580,29 @@ export default function AcademyPage() {
                 </div>
               </div>
 
-              <div className="bg-neutral-800 rounded-lg p-4">
+              <div className="bg-neutral-800 rounded-lg p-4 border border-neutral-700">
                 <h4 className="text-[#FEEBD8] font-medium mb-3">
                   Motivational Reminders
                 </h4>
-                <div className="space-y-2">
-                  <p className="text-[#FEEBD8]/70 text-sm">
-                    🎯 You're only 0.1 points away from your target GPA!
-                  </p>
-                  <p className="text-[#FEEBD8]/70 text-sm">
-                    📚 Your AP courses show strong academic rigor.
-                  </p>
-                  <p className="text-[#FEEBD8]/70 text-sm">
-                    ⭐ Consistent improvement across all terms!
-                  </p>
+                <div className="space-y-3">
+                  <div className="flex items-start gap-2 p-2 rounded bg-neutral-700/50">
+                    <div className="text-base">🎯</div>
+                    <p className="text-[#FEEBD8]/90 text-sm">
+                      You're only 0.1 points away from your target GPA!
+                    </p>
+                  </div>
+                  <div className="flex items-start gap-2 p-2 rounded bg-neutral-700/50">
+                    <div className="text-base">📚</div>
+                    <p className="text-[#FEEBD8]/90 text-sm">
+                      Your AP courses show strong academic rigor.
+                    </p>
+                  </div>
+                  <div className="flex items-start gap-2 p-2 rounded bg-neutral-700/50">
+                    <div className="text-base">⭐</div>
+                    <p className="text-[#FEEBD8]/90 text-sm">
+                      Consistent improvement across all terms!
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -719,17 +613,6 @@ export default function AcademyPage() {
       <Footer />
 
       {/* Modals */}
-      {showAddCourseModal && (
-        <AddCourseModal
-          isOpen={showAddCourseModal}
-          onClose={() => setShowAddCourseModal(false)}
-          onSave={(data) => {
-            console.log("Course data:", data);
-            setShowAddCourseModal(false);
-          }}
-        />
-      )}
-
       {showAddTermModal && (
         <AddTermModal
           isOpen={showAddTermModal}

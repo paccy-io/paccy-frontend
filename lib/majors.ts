@@ -11,6 +11,7 @@ export const POPULAR_MAJORS = [
   "Business Administration & Management",
   "Psychology",
   "Biology",
+  "Computer Engineering",
   "Engineering (Pre-Engineering)",
   "English Language & Literature",
   "Economics",

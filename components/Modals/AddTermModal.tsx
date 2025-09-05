@@ -4,7 +4,9 @@ import {
   FaGraduationCap,
   FaChartLine,
   FaCalendarAlt,
+  FaInfo,
 } from "react-icons/fa";
+import DatePicker from "../DatePicker";
 
 interface Term {
   id: number;
@@ -25,7 +27,6 @@ interface AddTermModalProps {
 }
 
 const seasonOptions = ["Fall", "Spring", "Summer", "Winter"];
-
 const statusOptions = ["Upcoming", "In Progress", "Completed", "Cancelled"];
 
 export default function AddTermModal({
@@ -33,6 +34,7 @@ export default function AddTermModal({
   onClose,
   onSave,
 }: AddTermModalProps) {
+  const [activeTab, setActiveTab] = React.useState("basic");
   const [formData, setFormData] = React.useState({
     name: "",
     year: new Date().getFullYear(),
@@ -44,93 +46,10 @@ export default function AddTermModal({
     status: "Upcoming",
   });
 
-  // Validation states for number inputs
-  const [yearInputValue, setYearInputValue] = React.useState(
-    new Date().getFullYear().toString()
-  );
-  const [yearError, setYearError] = React.useState("");
-  const [gpaInputValue, setGpaInputValue] = React.useState("");
-  const [gpaError, setGpaError] = React.useState("");
-  const [creditsInputValue, setCreditsInputValue] = React.useState("");
-  const [creditsError, setCreditsError] = React.useState("");
-
-  // Validation handlers
-  const handleYearChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setYearInputValue(value);
-
-    if (value === "") {
-      setYearError("Year is required");
-      return;
-    }
-
-    const num = parseInt(value, 10);
-    if (isNaN(num)) {
-      setYearError("Please enter a valid year");
-      return;
-    }
-
-    if (num < 2020 || num > 2030) {
-      setYearError("Year must be between 2020 and 2030");
-      return;
-    }
-
-    setYearError("");
-    setFormData((prev) => ({ ...prev, year: num }));
-  };
-
-  const handleGpaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setGpaInputValue(value);
-
-    if (value === "") {
-      setGpaError("");
-      setFormData((prev) => ({ ...prev, gpa: 0 }));
-      return;
-    }
-
-    const num = parseFloat(value);
-    if (isNaN(num)) {
-      setGpaError("Please enter a valid GPA");
-      return;
-    }
-
-    if (num < 0 || num > 4) {
-      setGpaError("GPA must be between 0.00 and 4.00");
-      return;
-    }
-
-    setGpaError("");
-    setFormData((prev) => ({ ...prev, gpa: num }));
-  };
-
-  const handleCreditsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setCreditsInputValue(value);
-
-    if (value === "") {
-      setCreditsError("");
-      setFormData((prev) => ({ ...prev, credits: 0 }));
-      return;
-    }
-
-    const num = parseInt(value, 10);
-    if (isNaN(num)) {
-      setCreditsError("Please enter a valid number of credits");
-      return;
-    }
-
-    if (num < 0 || num > 30) {
-      setCreditsError("Credits must be between 0 and 30");
-      return;
-    }
-
-    setCreditsError("");
-    setFormData((prev) => ({ ...prev, credits: num }));
-  };
+  // Validation states
+  const [errors, setErrors] = React.useState<Record<string, string>>({});
 
   React.useEffect(() => {
-    // Auto-generate term name when season or year changes
     if (formData.season && formData.year) {
       setFormData((prev) => ({
         ...prev,
@@ -139,13 +58,68 @@ export default function AddTermModal({
     }
   }, [formData.season, formData.year]);
 
+  const validateField = (name: string, value: any) => {
+    const newErrors = { ...errors };
+
+    switch (name) {
+      case "year":
+        const yearNum = parseInt(value);
+        if (isNaN(yearNum) || yearNum < 2020 || yearNum > 2030) {
+          newErrors.year = "Year must be between 2020-2030";
+        } else {
+          delete newErrors.year;
+        }
+        break;
+      case "gpa":
+        const gpaNum = parseFloat(value);
+        if (value !== "" && (isNaN(gpaNum) || gpaNum < 0 || gpaNum > 4)) {
+          newErrors.gpa = "GPA must be between 0.00-4.00";
+        } else {
+          delete newErrors.gpa;
+        }
+        break;
+      case "credits":
+        const creditsNum = parseInt(value);
+        if (
+          value !== "" &&
+          (isNaN(creditsNum) || creditsNum < 0 || creditsNum > 30)
+        ) {
+          newErrors.credits = "Credits must be between 0-30";
+        } else {
+          delete newErrors.credits;
+        }
+        break;
+      default:
+        break;
+    }
+
+    setErrors(newErrors);
+  };
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+
+    validateField(name, value);
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]:
+        name === "year"
+          ? parseInt(value) || new Date().getFullYear()
+          : name === "gpa"
+          ? parseFloat(value) || 0
+          : name === "credits"
+          ? parseInt(value) || 0
+          : value,
+    }));
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Check for validation errors before submitting
-    if (yearError || gpaError || creditsError) {
-      return;
-    }
+    if (Object.keys(errors).length > 0) return;
 
     onSave(formData);
 
@@ -160,28 +134,9 @@ export default function AddTermModal({
       credits: 0,
       status: "Upcoming",
     });
-
-    // Reset validation states
-    setYearInputValue(new Date().getFullYear().toString());
-    setYearError("");
-    setGpaInputValue("");
-    setGpaError("");
-    setCreditsInputValue("");
-    setCreditsError("");
-
+    setErrors({});
+    setActiveTab("basic");
     onClose();
-  };
-
-  const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
-  ) => {
-    const { name, value, type } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "number" ? parseFloat(value) || 0 : value,
-    }));
   };
 
   const getTermDuration = () => {
@@ -191,21 +146,30 @@ export default function AddTermModal({
       const diffTime = Math.abs(end.getTime() - start.getTime());
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
       const weeks = Math.round(diffDays / 7);
-      return `${weeks} weeks (${diffDays} days)`;
+      return `${weeks} weeks`;
     }
     return null;
   };
+
+  const tabs = [
+    { id: "basic", label: "Basic Info", icon: FaInfo },
+    { id: "dates", label: "Dates", icon: FaCalendarAlt },
+    { id: "academic", label: "Academic", icon: FaChartLine },
+  ];
 
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-[#141414] border border-neutral-700 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-[#141414] border border-neutral-700 rounded-lg max-w-lg w-full max-h-[90vh] overflow-hidden">
+        {/* Header */}
         <div className="p-6 border-b border-neutral-700">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <FaGraduationCap className="text-green-400 text-xl" />
-              <h2 className="text-xl font-bold text-[#FEEBD8]">
+              <div className="p-2 rounded-lg bg-neutral-800">
+                <FaGraduationCap className="text-[#FEEBD8]" size={18} />
+              </div>
+              <h2 className="text-xl font-semibold text-[#FEEBD8]">
                 Add Academic Term
               </h2>
             </div>
@@ -213,275 +177,242 @@ export default function AddTermModal({
               onClick={onClose}
               className="text-[#FEEBD8]/60 hover:text-[#FEEBD8] transition-colors"
             >
-              <FaTimes size={20} />
+              <FaTimes size={18} />
             </button>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          {/* Basic Information */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
-                Season *
-              </label>
-              <select
-                name="season"
-                value={formData.season}
-                onChange={handleChange}
-                required
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
-              >
-                {seasonOptions.map((season) => (
-                  <option key={season} value={season}>
-                    {season}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
-                Year *
-              </label>
-              <input
-                type="text"
-                name="year"
-                value={yearInputValue}
-                onChange={handleYearChange}
-                required
-                className={`w-full bg-neutral-800 border rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none transition-colors ${
-                  yearError
-                    ? "border-red-500 focus:border-red-500"
-                    : "border-neutral-700 focus:border-[#FEEBD8]"
-                }`}
-                placeholder="2020 - 2030"
-              />
-              {yearError && (
-                <p className="text-red-400 text-xs mt-1 flex items-center gap-1">
-                  <span>⚠️</span>
-                  {yearError}
-                </p>
-              )}
-            </div>
-
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
-                Term Name
-              </label>
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
-                placeholder="e.g., Fall 2024"
-              />
-              <p className="text-xs text-[#FEEBD8]/50 mt-1">
-                Auto-generated based on season and year, but you can customize
-                it
-              </p>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
-                Start Date
-              </label>
-              <input
-                type="date"
-                name="startDate"
-                value={formData.startDate}
-                onChange={handleChange}
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
-                End Date
-              </label>
-              <input
-                type="date"
-                name="endDate"
-                value={formData.endDate}
-                onChange={handleChange}
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
-                Status
-              </label>
-              <select
-                name="status"
-                value={formData.status}
-                onChange={handleChange}
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
-              >
-                {statusOptions.map((status) => (
-                  <option key={status} value={status}>
-                    {status}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
-                Target GPA
-              </label>
-              <input
-                type="text"
-                name="gpa"
-                value={gpaInputValue}
-                onChange={handleGpaChange}
-                className={`w-full bg-neutral-800 border rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none transition-colors ${
-                  gpaError
-                    ? "border-red-500 focus:border-red-500"
-                    : "border-neutral-700 focus:border-[#FEEBD8]"
-                }`}
-                placeholder="0.00 - 4.00"
-              />
-              {gpaError && (
-                <p className="text-red-400 text-xs mt-1 flex items-center gap-1">
-                  <span>⚠️</span>
-                  {gpaError}
-                </p>
-              )}
-              <p className="text-xs text-[#FEEBD8]/50 mt-1">
-                Leave empty if not applicable or not yet determined
-              </p>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
-                Planned Credits
-              </label>
-              <input
-                type="text"
-                name="credits"
-                value={creditsInputValue}
-                onChange={handleCreditsChange}
-                className={`w-full bg-neutral-800 border rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none transition-colors ${
-                  creditsError
-                    ? "border-red-500 focus:border-red-500"
-                    : "border-neutral-700 focus:border-[#FEEBD8]"
-                }`}
-                placeholder="0 - 30"
-              />
-              {creditsError && (
-                <p className="text-red-400 text-xs mt-1 flex items-center gap-1">
-                  <span>⚠️</span>
-                  {creditsError}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
-                Course Load
-              </label>
-              <select
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
-                disabled
-              >
-                <option>
-                  {formData.credits === 0
-                    ? "Not Set"
-                    : formData.credits < 12
-                    ? "Part-time"
-                    : formData.credits <= 16
-                    ? "Full-time"
-                    : "Overload"}
-                </option>
-              </select>
-            </div>
-          </div>
-
-          {/* Term Duration */}
-          {getTermDuration() && (
-            <div className="bg-neutral-800 rounded-lg p-4">
-              <h4 className="text-[#FEEBD8] font-medium mb-2">Term Duration</h4>
-              <div className="flex items-center gap-2 text-[#FEEBD8]/70">
-                <FaCalendarAlt size={14} />
-                <span>{getTermDuration()}</span>
-              </div>
-            </div>
-          )}
-
-          {/* Term Preview */}
-          <div className="bg-neutral-800 rounded-lg p-4">
-            <h4 className="text-[#FEEBD8] font-medium mb-3">Term Preview</h4>
-            <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                <FaGraduationCap className="text-green-400" size={16} />
-                <div>
-                  <div className="text-[#FEEBD8] font-medium">
-                    {formData.name || `${formData.season} ${formData.year}`}
-                  </div>
-                  <div className="text-sm text-[#FEEBD8]/70">
-                    {formData.startDate && formData.endDate
-                      ? `${new Date(
-                          formData.startDate
-                        ).toLocaleDateString()} - ${new Date(
-                          formData.endDate
-                        ).toLocaleDateString()}`
-                      : "Dates not set"}
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div className="flex items-center gap-2">
-                  <FaChartLine className="text-blue-400" size={14} />
-                  <span className="text-[#FEEBD8]/70">Target GPA:</span>
-                  <span className="text-[#FEEBD8] font-semibold">
-                    {formData.gpa ? formData.gpa.toFixed(2) : "Not set"}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-[#FEEBD8]/70">Credits:</span>
-                  <span className="text-[#FEEBD8] font-semibold">
-                    {formData.credits || "Not set"}
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex justify-center">
-                <span
-                  className={`px-3 py-1 rounded-full text-sm ${
-                    formData.status === "Completed"
-                      ? "bg-green-500/20 text-green-400"
-                      : formData.status === "In Progress"
-                      ? "bg-blue-500/20 text-blue-400"
-                      : formData.status === "Upcoming"
-                      ? "bg-yellow-500/20 text-yellow-400"
-                      : "bg-red-500/20 text-red-400"
+        {/* Tabs */}
+        <div className="border-b border-neutral-700">
+          <div className="flex">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium transition-colors ${
+                    activeTab === tab.id
+                      ? "text-[#FEEBD8] border-b-2 border-[#FEEBD8] bg-neutral-800/50"
+                      : "text-[#FEEBD8]/60 hover:text-[#FEEBD8] hover:bg-neutral-800/30"
                   }`}
                 >
-                  {formData.status}
-                </span>
+                  <Icon size={14} />
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <form onSubmit={handleSubmit}>
+          <div className="p-6 space-y-4 max-h-[60vh] overflow-y-auto">
+            {/* Basic Info Tab */}
+            {activeTab === "basic" && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+                      Season *
+                    </label>
+                    <select
+                      name="season"
+                      value={formData.season}
+                      onChange={handleChange}
+                      required
+                      className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                    >
+                      {seasonOptions.map((season) => (
+                        <option key={season} value={season}>
+                          {season}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+                      Year *
+                    </label>
+                    <input
+                      type="number"
+                      name="year"
+                      value={formData.year}
+                      onChange={handleChange}
+                      required
+                      min="2020"
+                      max="2030"
+                      className={`w-full bg-neutral-800 border rounded-lg px-3 py-2 text-[#FEEBD8] focus:outline-none transition-colors ${
+                        errors.year
+                          ? "border-red-500 focus:border-red-500"
+                          : "border-neutral-700 focus:border-[#FEEBD8]"
+                      }`}
+                    />
+                    {errors.year && (
+                      <p className="text-red-400 text-xs mt-1">{errors.year}</p>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+                    Term Name
+                  </label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                    placeholder="Auto-generated"
+                  />
+                  <p className="text-xs text-[#FEEBD8]/50 mt-1">
+                    Auto-generated from season and year
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+                    Status
+                  </label>
+                  <select
+                    name="status"
+                    value={formData.status}
+                    onChange={handleChange}
+                    className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                  >
+                    {statusOptions.map((status) => (
+                      <option key={status} value={status}>
+                        {status}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
-            </div>
+            )}
+
+            {/* Dates Tab */}
+            {activeTab === "dates" && (
+              <div className="space-y-4">
+                <DatePicker
+                  label="Start Date"
+                  value={formData.startDate}
+                  onChange={(date) =>
+                    setFormData((prev) => ({ ...prev, startDate: date }))
+                  }
+                  placeholder="Select start date"
+                  maxDate={formData.endDate || undefined}
+                />
+
+                <DatePicker
+                  label="End Date"
+                  value={formData.endDate}
+                  onChange={(date) =>
+                    setFormData((prev) => ({ ...prev, endDate: date }))
+                  }
+                  placeholder="Select end date"
+                  minDate={formData.startDate || undefined}
+                />
+
+                {getTermDuration() && (
+                  <div className="bg-neutral-800 rounded-lg p-3">
+                    <div className="flex items-center gap-2 text-[#FEEBD8]/70">
+                      <FaCalendarAlt size={14} />
+                      <span>Duration: {getTermDuration()}</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Academic Tab */}
+            {activeTab === "academic" && (
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+                    Target GPA
+                  </label>
+                  <input
+                    type="number"
+                    name="gpa"
+                    value={formData.gpa || ""}
+                    onChange={handleChange}
+                    step="0.01"
+                    min="0"
+                    max="4"
+                    className={`w-full bg-neutral-800 border rounded-lg px-3 py-2 text-[#FEEBD8] focus:outline-none transition-colors ${
+                      errors.gpa
+                        ? "border-red-500 focus:border-red-500"
+                        : "border-neutral-700 focus:border-[#FEEBD8]"
+                    }`}
+                    placeholder="0.00 - 4.00"
+                  />
+                  {errors.gpa && (
+                    <p className="text-red-400 text-xs mt-1">{errors.gpa}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+                    Planned Credits
+                  </label>
+                  <input
+                    type="number"
+                    name="credits"
+                    value={formData.credits || ""}
+                    onChange={handleChange}
+                    min="0"
+                    max="30"
+                    className={`w-full bg-neutral-800 border rounded-lg px-3 py-2 text-[#FEEBD8] focus:outline-none transition-colors ${
+                      errors.credits
+                        ? "border-red-500 focus:border-red-500"
+                        : "border-neutral-700 focus:border-[#FEEBD8]"
+                    }`}
+                    placeholder="0 - 30"
+                  />
+                  {errors.credits && (
+                    <p className="text-red-400 text-xs mt-1">
+                      {errors.credits}
+                    </p>
+                  )}
+                </div>
+
+                <div className="bg-neutral-800 rounded-lg p-3">
+                  <div className="text-sm text-[#FEEBD8]/70">
+                    Course Load:{" "}
+                    <span className="text-[#FEEBD8]">
+                      {formData.credits === 0
+                        ? "Not Set"
+                        : formData.credits < 12
+                        ? "Part-time"
+                        : formData.credits <= 16
+                        ? "Full-time"
+                        : "Overload"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex gap-3 pt-4 border-t border-neutral-700">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 bg-neutral-700 text-[#FEEBD8] px-6 py-3 rounded-lg font-medium hover:bg-neutral-600 transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={!!(yearError || gpaError || creditsError)}
-              className="flex-1 bg-[#FEEBD8] text-[#141414] px-6 py-3 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Add Term
-            </button>
+          {/* Footer */}
+          <div className="p-6 border-t border-neutral-700">
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={onClose}
+                className="flex-1 bg-neutral-700 text-[#FEEBD8] px-4 py-2 rounded-lg font-medium hover:bg-neutral-600 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={Object.keys(errors).length > 0}
+                className="flex-1 bg-[#FEEBD8] text-[#141414] px-4 py-2 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Add Term
+              </button>
+            </div>
           </div>
         </form>
       </div>

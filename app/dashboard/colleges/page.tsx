@@ -6,6 +6,7 @@ import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
 import { COLLEGE_MAJORS, POPULAR_MAJORS } from "../../../lib/majors";
 import { api, ApiError } from "../../../lib/api/college-applications";
+import DatePicker from "../../../components/DatePicker";
 import {
   CollegeApplication,
   Status,
@@ -132,12 +133,16 @@ const typeColors: Record<ApplicationType, string> = {
 // Helper functions for date format conversion
 const formatDateForInput = (isoDate: string | undefined) => {
   if (!isoDate) return "";
-  return isoDate.split("T")[0]; // Extract YYYY-MM-DD from ISO format
+  // Extract date components directly to avoid timezone conversion issues
+  const dateOnly = isoDate.split("T")[0]; // Get just the YYYY-MM-DD part
+  return dateOnly;
 };
 
 const formatDateForBackend = (inputDate: string) => {
   if (!inputDate) return "";
-  return `${inputDate}T23:59:59Z`; // Convert to ISO 8601 format
+  // Parse input date as local date and format for backend
+  const [year, month, day] = inputDate.split("-");
+  return `${year}-${month}-${day}T23:59:59Z`;
 };
 
 export default function CollegeTracker() {
@@ -495,7 +500,18 @@ export default function CollegeTracker() {
   const getDaysUntilDeadlineMain = (deadline: string) => {
     if (!deadline) return null;
     const today = new Date();
-    const deadlineDate = new Date(deadline);
+    today.setHours(0, 0, 0, 0); // Set to start of day to avoid time comparison issues
+
+    // Extract date part only to avoid timezone issues
+    const dateOnly = deadline.split("T")[0];
+    const [year, month, day] = dateOnly.split("-");
+    const deadlineDate = new Date(
+      parseInt(year),
+      parseInt(month) - 1,
+      parseInt(day)
+    );
+    deadlineDate.setHours(0, 0, 0, 0); // Set to start of day
+
     const diffTime = deadlineDate.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     return diffDays;
@@ -503,7 +519,10 @@ export default function CollegeTracker() {
 
   const formatDeadlineMain = (deadline: string) => {
     if (!deadline) return "No deadline set";
-    const date = new Date(deadline);
+    // Extract date part only to avoid timezone issues
+    const dateOnly = deadline.split("T")[0];
+    const [year, month, day] = dateOnly.split("-");
+    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
     return date.toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
@@ -759,19 +778,13 @@ export default function CollegeTracker() {
                 </div>
 
                 {/* Deadline */}
-                <div>
-                  <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
-                    Application Deadline
-                  </label>
-                  <input
-                    type="date"
-                    value={formatDateForInput(deadline)}
-                    onChange={(e) =>
-                      setDeadline(formatDateForBackend(e.target.value))
-                    }
-                    className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-3 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
-                  />
-                </div>
+                <DatePicker
+                  label="Application Deadline"
+                  value={formatDateForInput(deadline)}
+                  onChange={(date) => setDeadline(formatDateForBackend(date))}
+                  placeholder="Select application deadline"
+                  minDate={new Date().toISOString().split("T")[0]}
+                />
 
                 {/* Notes */}
                 <div>
@@ -1140,17 +1153,18 @@ export default function CollegeTracker() {
                           <option value={Priority.TARGET}>Target</option>
                           <option value={Priority.SAFETY}>Safety</option>
                         </select>
-                        <input
-                          type="date"
-                          value={formatDateForInput(editForm.deadline)}
-                          onChange={(e) =>
-                            setEditForm({
-                              ...editForm,
-                              deadline: formatDateForBackend(e.target.value),
-                            })
-                          }
-                          className="px-3 py-2 bg-neutral-800 text-white rounded-lg border border-neutral-600"
-                        />
+                        <div className="w-48">
+                          <DatePicker
+                            value={formatDateForInput(editForm.deadline)}
+                            onChange={(date) =>
+                              setEditForm({
+                                ...editForm,
+                                deadline: formatDateForBackend(date),
+                              })
+                            }
+                            placeholder="Select deadline"
+                          />
+                        </div>
                         <input
                           type="text"
                           value={editForm.major}

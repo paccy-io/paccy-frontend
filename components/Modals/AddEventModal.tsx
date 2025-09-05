@@ -7,6 +7,7 @@ import {
   FaUniversity,
   FaPen,
 } from "react-icons/fa";
+import DatePicker from "../DatePicker";
 import {
   CalendarEvent,
   EventType,
@@ -195,19 +196,12 @@ export default function AddEventModal({
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
-                Date *
-              </label>
-              <input
-                type="date"
-                name="date"
-                value={formData.date}
-                onChange={handleChange}
-                required
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
-              />
-            </div>
+            <DatePicker
+              label="Date *"
+              value={formData.date}
+              onChange={(date) => setFormData((prev) => ({ ...prev, date }))}
+              placeholder="Select event date"
+            />
 
             <div>
               <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">

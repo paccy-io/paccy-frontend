@@ -9,6 +9,7 @@ import {
   FaChevronDown,
 } from "react-icons/fa";
 import { COLLEGE_MAJORS, POPULAR_MAJORS } from "../../lib/majors";
+import DatePicker from "../DatePicker";
 
 export interface University {
   name: string;
@@ -497,12 +498,13 @@ export default function AddCollegeModal({
                 <FaCalendar className="inline mr-2" />
                 Application Deadline
               </label>
-              <input
-                type="date"
-                name="deadline"
+              <DatePicker
                 value={formData.deadline}
-                onChange={handleChange}
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-3 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                onChange={(date) =>
+                  setFormData((prev) => ({ ...prev, deadline: date }))
+                }
+                placeholder="Select application deadline"
+                minDate={new Date().toISOString().split("T")[0]}
               />
             </div>
           </div>

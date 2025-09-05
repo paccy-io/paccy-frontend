@@ -7,6 +7,7 @@ import {
   FaDollarSign,
   FaGraduationCap,
 } from "react-icons/fa";
+import DatePicker from "../DatePicker";
 
 interface College {
   id: number;
@@ -254,18 +255,14 @@ export default function EditCollegeModal({
               </select>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
-                Application Deadline
-              </label>
-              <input
-                type="date"
-                name="deadline"
-                value={formData.deadline}
-                onChange={handleChange}
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
-              />
-            </div>
+            <DatePicker
+              label="Application Deadline"
+              value={formData.deadline}
+              onChange={(date) =>
+                setFormData((prev) => ({ ...prev, deadline: date }))
+              }
+              placeholder="Select application deadline"
+            />
 
             <div>
               <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">

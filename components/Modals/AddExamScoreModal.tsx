@@ -4,8 +4,9 @@ import {
   FaChartLine,
   FaBook,
   FaCalendarAlt,
-  FaGraduationCap,
+  FaClipboardList,
 } from "react-icons/fa";
+import DatePicker from "../DatePicker";
 
 interface ExamScore {
   id: number;
@@ -41,53 +42,33 @@ const testTypes = [
   "Other",
 ];
 
-const satSubjects = [
-  "Math Level 1",
-  "Math Level 2",
-  "Biology E/M",
-  "Chemistry",
-  "Physics",
-  "U.S. History",
-  "World History",
-  "Literature",
-  "French",
-  "Spanish",
-  "German",
-  "Chinese",
-  "Japanese",
-  "Korean",
-  "Hebrew",
-  "Latin",
-];
-
-const apSubjects = [
-  "Biology",
-  "Calculus AB",
-  "Calculus BC",
-  "Chemistry",
-  "Computer Science A",
-  "Computer Science Principles",
-  "English Language",
-  "English Literature",
-  "Environmental Science",
-  "European History",
-  "French Language",
-  "German Language",
-  "Government and Politics",
-  "Human Geography",
-  "Macroeconomics",
-  "Microeconomics",
-  "Music Theory",
-  "Physics 1",
-  "Physics 2",
-  "Physics C",
-  "Psychology",
-  "Spanish Language",
-  "Statistics",
-  "Studio Art",
-  "U.S. History",
-  "World History",
-];
+const commonSubjects = {
+  "SAT Subject Test": [
+    "Math Level 1",
+    "Math Level 2",
+    "Biology E/M",
+    "Chemistry",
+    "Physics",
+    "U.S. History",
+    "World History",
+    "Literature",
+  ],
+  "AP Exam": [
+    "Biology",
+    "Calculus AB",
+    "Calculus BC",
+    "Chemistry",
+    "Computer Science A",
+    "English Language",
+    "English Literature",
+    "Physics 1",
+    "Physics 2",
+    "Psychology",
+    "Statistics",
+    "U.S. History",
+    "World History",
+  ],
+};
 
 const statusOptions = [
   "Completed",
@@ -101,6 +82,7 @@ export default function AddExamScoreModal({
   onClose,
   onSave,
 }: AddExamScoreModalProps) {
+  const [activeTab, setActiveTab] = React.useState("basic");
   const [formData, setFormData] = React.useState({
     testType: "SAT",
     subject: "",
@@ -113,154 +95,47 @@ export default function AddExamScoreModal({
     status: "Completed",
   });
 
-  // Add validation states for number inputs
-  const [scoreInputValue, setScoreInputValue] = React.useState("0");
-  const [scoreError, setScoreError] = React.useState("");
-  const [maxScoreInputValue, setMaxScoreInputValue] = React.useState("1600");
-  const [maxScoreError, setMaxScoreError] = React.useState("");
-  const [percentileInputValue, setPercentileInputValue] = React.useState("");
-  const [percentileError, setPercentileError] = React.useState("");
+  const [errors, setErrors] = React.useState<Record<string, string>>({});
 
-  // Validation handler for score
-  const handleScoreChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setScoreInputValue(value);
-    setScoreError("");
+  const validateField = (name: string, value: any) => {
+    const newErrors = { ...errors };
 
-    if (value === "") {
-      setScoreError("Score is required");
-      return;
+    switch (name) {
+      case "score":
+        const scoreNum = parseFloat(value);
+        if (value === "" || isNaN(scoreNum) || scoreNum < 0) {
+          newErrors.score = "Valid score required";
+        } else if (scoreNum > formData.maxScore) {
+          newErrors.score = `Score cannot exceed ${formData.maxScore}`;
+        } else {
+          delete newErrors.score;
+        }
+        break;
+      case "maxScore":
+        const maxNum = parseFloat(value);
+        if (value === "" || isNaN(maxNum) || maxNum <= 0) {
+          newErrors.maxScore = "Valid max score required";
+        } else {
+          delete newErrors.maxScore;
+        }
+        break;
+      case "percentile":
+        if (value !== "") {
+          const percentileNum = parseFloat(value);
+          if (isNaN(percentileNum) || percentileNum < 1 || percentileNum > 99) {
+            newErrors.percentile = "Percentile must be 1-99";
+          } else {
+            delete newErrors.percentile;
+          }
+        } else {
+          delete newErrors.percentile;
+        }
+        break;
+      default:
+        break;
     }
 
-    const numValue = parseFloat(value);
-    if (isNaN(numValue)) {
-      setScoreError("Please enter a valid number");
-      return;
-    }
-
-    if (numValue < 0) {
-      setScoreError("Score cannot be negative");
-      return;
-    }
-
-    if (numValue > formData.maxScore) {
-      setScoreError(`Score cannot exceed ${formData.maxScore}`);
-      return;
-    }
-
-    setFormData((prev) => ({ ...prev, score: numValue }));
-  };
-
-  // Validation handler for max score
-  const handleMaxScoreChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setMaxScoreInputValue(value);
-    setMaxScoreError("");
-
-    if (value === "") {
-      setMaxScoreError("Max score is required");
-      return;
-    }
-
-    const numValue = parseFloat(value);
-    if (isNaN(numValue)) {
-      setMaxScoreError("Please enter a valid number");
-      return;
-    }
-
-    if (numValue <= 0) {
-      setMaxScoreError("Max score must be greater than 0");
-      return;
-    }
-
-    if (numValue > 10000) {
-      setMaxScoreError("Max score seems unreasonably high");
-      return;
-    }
-
-    setFormData((prev) => ({ ...prev, maxScore: numValue }));
-
-    // Also validate current score against new max
-    if (formData.score > numValue) {
-      setScoreError(`Score cannot exceed ${numValue}`);
-    } else if (scoreError.includes("cannot exceed")) {
-      setScoreError(""); // Clear score error if it was about exceeding max
-    }
-  };
-
-  // Validation handler for percentile (optional)
-  const handlePercentileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setPercentileInputValue(value);
-    setPercentileError("");
-
-    if (value === "") {
-      setFormData((prev) => ({ ...prev, percentile: 0 }));
-      return;
-    }
-
-    const numValue = parseFloat(value);
-    if (isNaN(numValue)) {
-      setPercentileError("Please enter a valid number");
-      return;
-    }
-
-    if (numValue < 0) {
-      setPercentileError("Percentile cannot be negative");
-      return;
-    }
-
-    if (numValue > 100) {
-      setPercentileError("Percentile cannot exceed 100");
-      return;
-    }
-
-    setFormData((prev) => ({ ...prev, percentile: numValue }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    // Validate all number fields before submitting
-    if (scoreError || maxScoreError || percentileError) {
-      alert("Please fix the validation errors before submitting");
-      return;
-    }
-
-    if (!scoreInputValue.trim()) {
-      alert("Score is required");
-      return;
-    }
-
-    if (!maxScoreInputValue.trim()) {
-      alert("Max score is required");
-      return;
-    }
-
-    onSave(formData);
-
-    // Reset form
-    setFormData({
-      testType: "SAT",
-      subject: "",
-      score: 0,
-      maxScore: 1600,
-      percentile: 0,
-      testDate: "",
-      retakeDate: "",
-      notes: "",
-      status: "Completed",
-    });
-
-    // Reset validation states
-    setScoreInputValue("0");
-    setScoreError("");
-    setMaxScoreInputValue("1600");
-    setMaxScoreError("");
-    setPercentileInputValue("");
-    setPercentileError("");
-
-    onClose();
+    setErrors(newErrors);
   };
 
   const handleChange = (
@@ -268,15 +143,15 @@ export default function AddExamScoreModal({
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
     >
   ) => {
-    const { name, value, type } = e.target;
-    let newValue: string | number =
-      type === "number" ? parseFloat(value) || 0 : value;
+    const { name, value } = e.target;
+
+    validateField(name, value);
 
     setFormData((prev) => {
-      const updated = { ...prev, [name]: newValue };
+      const updated = { ...prev };
 
-      // Auto-set max score based on test type
       if (name === "testType") {
+        // Auto-set max score based on test type
         switch (value) {
           case "SAT":
             updated.maxScore = 1600;
@@ -309,10 +184,54 @@ export default function AddExamScoreModal({
         }
         updated.score = 0;
         updated.percentile = 0;
+        return updated;
+      }
+
+      // Handle different field types
+      if (name === "score") {
+        updated.score = parseFloat(value) || 0;
+      } else if (name === "maxScore") {
+        updated.maxScore = parseFloat(value) || 0;
+      } else if (name === "percentile") {
+        updated.percentile = parseFloat(value) || 0;
+      } else if (name === "testDate") {
+        updated.testDate = value;
+      } else if (name === "retakeDate") {
+        updated.retakeDate = value;
+      } else if (name === "notes") {
+        updated.notes = value;
+      } else if (name === "status") {
+        updated.status = value;
+      } else if (name === "subject") {
+        updated.subject = value;
       }
 
       return updated;
     });
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (Object.keys(errors).length > 0 || formData.score === 0) return;
+
+    onSave(formData);
+
+    // Reset form
+    setFormData({
+      testType: "SAT",
+      subject: "",
+      score: 0,
+      maxScore: 1600,
+      percentile: 0,
+      testDate: "",
+      retakeDate: "",
+      notes: "",
+      status: "Completed",
+    });
+    setErrors({});
+    setActiveTab("basic");
+    onClose();
   };
 
   const getScorePercentage = () => {
@@ -333,26 +252,30 @@ export default function AddExamScoreModal({
   };
 
   const getSubjectOptions = () => {
-    switch (formData.testType) {
-      case "SAT Subject Test":
-        return satSubjects;
-      case "AP Exam":
-        return apSubjects;
-      default:
-        return [];
-    }
+    return (
+      commonSubjects[formData.testType as keyof typeof commonSubjects] || []
+    );
   };
+
+  const tabs = [
+    { id: "basic", label: "Test Info", icon: FaBook },
+    { id: "scores", label: "Scores", icon: FaChartLine },
+    { id: "details", label: "Details", icon: FaClipboardList },
+  ];
 
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-[#141414] border border-neutral-700 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-[#141414] border border-neutral-700 rounded-lg max-w-lg w-full max-h-[90vh] overflow-hidden">
+        {/* Header */}
         <div className="p-6 border-b border-neutral-700">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <FaChartLine className="text-red-400 text-xl" />
-              <h2 className="text-xl font-bold text-[#FEEBD8]">
+              <div className="p-2 rounded-lg bg-neutral-800">
+                <FaChartLine className="text-[#FEEBD8]" size={18} />
+              </div>
+              <h2 className="text-xl font-semibold text-[#FEEBD8]">
                 Add Exam Score
               </h2>
             </div>
@@ -360,309 +283,274 @@ export default function AddExamScoreModal({
               onClick={onClose}
               className="text-[#FEEBD8]/60 hover:text-[#FEEBD8] transition-colors"
             >
-              <FaTimes size={20} />
+              <FaTimes size={18} />
             </button>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          {/* Test Information */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
-                Test Type *
-              </label>
-              <select
-                name="testType"
-                value={formData.testType}
-                onChange={handleChange}
-                required
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
-              >
-                {testTypes.map((type) => (
-                  <option key={type} value={type}>
-                    {type}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {getSubjectOptions().length > 0 && (
-              <div>
-                <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
-                  Subject
-                </label>
-                <select
-                  name="subject"
-                  value={formData.subject}
-                  onChange={handleChange}
-                  className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
-                >
-                  <option value="">Select Subject</option>
-                  {getSubjectOptions().map((subject) => (
-                    <option key={subject} value={subject}>
-                      {subject}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
-
-            {getSubjectOptions().length === 0 && (
-              <div>
-                <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
-                  Subject/Section (Optional)
-                </label>
-                <input
-                  type="text"
-                  name="subject"
-                  value={formData.subject}
-                  onChange={handleChange}
-                  className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
-                  placeholder="e.g., Math, Reading, Science"
-                />
-              </div>
-            )}
-
-            <div>
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
-                Score *
-              </label>
-              <input
-                type="text"
-                name="score"
-                value={scoreInputValue}
-                onChange={handleScoreChange}
-                required
-                className={`w-full bg-neutral-800 border rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none transition-colors ${
-                  scoreError
-                    ? "border-red-500 focus:border-red-500"
-                    : "border-neutral-700 focus:border-[#FEEBD8]"
-                }`}
-                placeholder={`0 - ${formData.maxScore}`}
-              />
-              {scoreError && (
-                <p className="text-red-400 text-xs mt-1 flex items-center gap-1">
-                  <span>⚠️</span>
-                  {scoreError}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
-                Max Score *
-              </label>
-              <input
-                type="text"
-                name="maxScore"
-                value={maxScoreInputValue}
-                onChange={handleMaxScoreChange}
-                className={`w-full bg-neutral-800 border rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none transition-colors ${
-                  maxScoreError
-                    ? "border-red-500 focus:border-red-500"
-                    : "border-neutral-700 focus:border-[#FEEBD8]"
-                }`}
-                placeholder="e.g., 1600, 36, 800"
-              />
-              {maxScoreError && (
-                <p className="text-red-400 text-xs mt-1 flex items-center gap-1">
-                  <span>⚠️</span>
-                  {maxScoreError}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
-                Percentile (Optional)
-              </label>
-              <input
-                type="text"
-                name="percentile"
-                value={percentileInputValue}
-                onChange={handlePercentileChange}
-                className={`w-full bg-neutral-800 border rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none transition-colors ${
-                  percentileError
-                    ? "border-red-500 focus:border-red-500"
-                    : "border-neutral-700 focus:border-[#FEEBD8]"
-                }`}
-                placeholder="1 - 99"
-              />
-              {percentileError && (
-                <p className="text-red-400 text-xs mt-1 flex items-center gap-1">
-                  <span>⚠️</span>
-                  {percentileError}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
-                Test Date
-              </label>
-              <input
-                type="date"
-                name="testDate"
-                value={formData.testDate}
-                onChange={handleChange}
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
-                Status
-              </label>
-              <select
-                name="status"
-                value={formData.status}
-                onChange={handleChange}
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
-              >
-                {statusOptions.map((status) => (
-                  <option key={status} value={status}>
-                    {status}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {formData.status === "Planning to Retake" && (
-              <div>
-                <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
-                  Planned Retake Date
-                </label>
-                <input
-                  type="date"
-                  name="retakeDate"
-                  value={formData.retakeDate}
-                  onChange={handleChange}
-                  className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
-                />
-              </div>
-            )}
-          </div>
-
-          {/* Notes */}
-          <div>
-            <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
-              Notes
-            </label>
-            <textarea
-              name="notes"
-              value={formData.notes}
-              onChange={handleChange}
-              rows={3}
-              className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
-              placeholder="Any additional notes about this test score..."
-            />
-          </div>
-
-          {/* Score Analysis */}
-          {formData.score > 0 && (
-            <div className="bg-neutral-800 rounded-lg p-4">
-              <h4 className="text-[#FEEBD8] font-medium mb-3">
-                Score Analysis
-              </h4>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                <div>
-                  <div className="text-2xl font-bold text-[#FEEBD8]">
-                    {formData.score}
-                  </div>
-                  <div className="text-sm text-[#FEEBD8]/70">Score</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-[#FEEBD8]">
-                    {getScorePercentage()}%
-                  </div>
-                  <div className="text-sm text-[#FEEBD8]/70">Percentage</div>
-                </div>
-                {formData.percentile > 0 && (
-                  <div>
-                    <div className="text-2xl font-bold text-[#FEEBD8]">
-                      {formData.percentile}
-                    </div>
-                    <div className="text-sm text-[#FEEBD8]/70">Percentile</div>
-                  </div>
-                )}
-                <div>
-                  <div
-                    className={`text-lg font-bold ${getScoreCategory().color}`}
-                  >
-                    {getScoreCategory().label}
-                  </div>
-                  <div className="text-sm text-[#FEEBD8]/70">Category</div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Exam Preview */}
-          <div className="bg-neutral-800 rounded-lg p-4">
-            <h4 className="text-[#FEEBD8] font-medium mb-3">Exam Preview</h4>
-            <div className="space-y-2">
-              <div className="flex items-center gap-3">
-                <FaGraduationCap className="text-red-400" size={16} />
-                <div>
-                  <div className="text-[#FEEBD8] font-medium">
-                    {formData.testType}
-                    {formData.subject && (
-                      <span className="text-[#FEEBD8]/60 ml-2">
-                        - {formData.subject}
-                      </span>
-                    )}
-                  </div>
-                  <div className="text-sm text-[#FEEBD8]/70">
-                    Score: {formData.score || 0} / {formData.maxScore}
-                    {formData.percentile > 0 && (
-                      <span className="ml-2">
-                        ({formData.percentile}th percentile)
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-4 text-sm text-[#FEEBD8]/60">
-                {formData.testDate && (
-                  <span className="flex items-center gap-1">
-                    <FaCalendarAlt size={12} />
-                    {new Date(formData.testDate).toLocaleDateString()}
-                  </span>
-                )}
-                <span
-                  className={`px-2 py-1 rounded text-xs ${
-                    formData.status === "Completed"
-                      ? "bg-green-500/20 text-green-400"
-                      : formData.status === "Scheduled"
-                      ? "bg-blue-500/20 text-blue-400"
-                      : formData.status === "Planning to Retake"
-                      ? "bg-yellow-500/20 text-yellow-400"
-                      : "bg-red-500/20 text-red-400"
+        {/* Tabs */}
+        <div className="border-b border-neutral-700">
+          <div className="flex">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium transition-colors ${
+                    activeTab === tab.id
+                      ? "text-[#FEEBD8] border-b-2 border-[#FEEBD8] bg-neutral-800/50"
+                      : "text-[#FEEBD8]/60 hover:text-[#FEEBD8] hover:bg-neutral-800/30"
                   }`}
                 >
-                  {formData.status}
-                </span>
+                  <Icon size={14} />
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <form onSubmit={handleSubmit}>
+          <div className="p-6 space-y-4 max-h-[60vh] overflow-y-auto">
+            {/* Basic Info Tab */}
+            {activeTab === "basic" && (
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+                    Test Type *
+                  </label>
+                  <select
+                    name="testType"
+                    value={formData.testType}
+                    onChange={handleChange}
+                    required
+                    className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                  >
+                    {testTypes.map((type) => (
+                      <option key={type} value={type}>
+                        {type}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {getSubjectOptions().length > 0 ? (
+                  <div>
+                    <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+                      Subject
+                    </label>
+                    <select
+                      name="subject"
+                      value={formData.subject}
+                      onChange={handleChange}
+                      className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                    >
+                      <option value="">Select Subject</option>
+                      {getSubjectOptions().map((subject) => (
+                        <option key={subject} value={subject}>
+                          {subject}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                ) : (
+                  <div>
+                    <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+                      Subject/Section (Optional)
+                    </label>
+                    <input
+                      type="text"
+                      name="subject"
+                      value={formData.subject}
+                      onChange={handleChange}
+                      className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                      placeholder="e.g., Math, Reading, Science"
+                    />
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+                    Status
+                  </label>
+                  <select
+                    name="status"
+                    value={formData.status}
+                    onChange={handleChange}
+                    className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                  >
+                    {statusOptions.map((status) => (
+                      <option key={status} value={status}>
+                        {status}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
-            </div>
+            )}
+
+            {/* Scores Tab */}
+            {activeTab === "scores" && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+                      Score *
+                    </label>
+                    <input
+                      type="number"
+                      name="score"
+                      value={formData.score || ""}
+                      onChange={handleChange}
+                      required
+                      min="0"
+                      max={formData.maxScore}
+                      className={`w-full bg-neutral-800 border rounded-lg px-3 py-2 text-[#FEEBD8] focus:outline-none transition-colors ${
+                        errors.score
+                          ? "border-red-500 focus:border-red-500"
+                          : "border-neutral-700 focus:border-[#FEEBD8]"
+                      }`}
+                      placeholder={`0 - ${formData.maxScore}`}
+                    />
+                    {errors.score && (
+                      <p className="text-red-400 text-xs mt-1">
+                        {errors.score}
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+                      Max Score *
+                    </label>
+                    <input
+                      type="number"
+                      name="maxScore"
+                      value={formData.maxScore}
+                      onChange={handleChange}
+                      required
+                      min="1"
+                      className={`w-full bg-neutral-800 border rounded-lg px-3 py-2 text-[#FEEBD8] focus:outline-none transition-colors ${
+                        errors.maxScore
+                          ? "border-red-500 focus:border-red-500"
+                          : "border-neutral-700 focus:border-[#FEEBD8]"
+                      }`}
+                    />
+                    {errors.maxScore && (
+                      <p className="text-red-400 text-xs mt-1">
+                        {errors.maxScore}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+                    Percentile (Optional)
+                  </label>
+                  <input
+                    type="number"
+                    name="percentile"
+                    value={formData.percentile || ""}
+                    onChange={handleChange}
+                    min="1"
+                    max="99"
+                    className={`w-full bg-neutral-800 border rounded-lg px-3 py-2 text-[#FEEBD8] focus:outline-none transition-colors ${
+                      errors.percentile
+                        ? "border-red-500 focus:border-red-500"
+                        : "border-neutral-700 focus:border-[#FEEBD8]"
+                    }`}
+                    placeholder="1 - 99"
+                  />
+                  {errors.percentile && (
+                    <p className="text-red-400 text-xs mt-1">
+                      {errors.percentile}
+                    </p>
+                  )}
+                </div>
+
+                {formData.score > 0 && (
+                  <div className="bg-neutral-800 rounded-lg p-3">
+                    <div className="text-center">
+                      <div className="text-lg font-semibold text-[#FEEBD8] mb-1">
+                        {getScorePercentage()}% •{" "}
+                        <span className={getScoreCategory().color}>
+                          {getScoreCategory().label}
+                        </span>
+                      </div>
+                      <div className="text-sm text-[#FEEBD8]/70">
+                        {formData.score} / {formData.maxScore}
+                        {formData.percentile > 0 &&
+                          ` (${formData.percentile}th percentile)`}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Details Tab */}
+            {activeTab === "details" && (
+              <div className="space-y-4">
+                <DatePicker
+                  label="Test Date"
+                  value={formData.testDate}
+                  onChange={(date) =>
+                    setFormData((prev) => ({ ...prev, testDate: date }))
+                  }
+                  placeholder="Select test date"
+                />
+
+                {formData.status === "Planning to Retake" && (
+                  <DatePicker
+                    label="Planned Retake Date"
+                    value={formData.retakeDate}
+                    onChange={(date) =>
+                      setFormData((prev) => ({ ...prev, retakeDate: date }))
+                    }
+                    placeholder="Select retake date"
+                    minDate={formData.testDate || undefined}
+                  />
+                )}
+
+                <div>
+                  <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+                    Notes
+                  </label>
+                  <textarea
+                    name="notes"
+                    value={formData.notes}
+                    onChange={handleChange}
+                    rows={4}
+                    className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                    placeholder="Any additional notes about this test score..."
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex gap-3 pt-4 border-t border-neutral-700">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 bg-neutral-700 text-[#FEEBD8] px-6 py-3 rounded-lg font-medium hover:bg-neutral-600 transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="flex-1 bg-[#FEEBD8] text-[#141414] px-6 py-3 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors"
-            >
-              Add Exam Score
-            </button>
+          {/* Footer */}
+          <div className="p-6 border-t border-neutral-700">
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={onClose}
+                className="flex-1 bg-neutral-700 text-[#FEEBD8] px-4 py-2 rounded-lg font-medium hover:bg-neutral-600 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={
+                  Object.keys(errors).length > 0 || formData.score === 0
+                }
+                className="flex-1 bg-[#FEEBD8] text-[#141414] px-4 py-2 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Add Score
+              </button>
+            </div>
           </div>
         </form>
       </div>

@@ -63,7 +63,15 @@ export default function EventDetailsModal({
   if (!isOpen || !event) return null;
 
   const formatDate = (date: string) => {
-    return new Date(date).toLocaleDateString("en-US", {
+    // Extract date part only to avoid timezone issues
+    const dateOnly = date.split("T")[0];
+    const [year, month, day] = dateOnly.split("-");
+    const formattedDate = new Date(
+      parseInt(year),
+      parseInt(month) - 1,
+      parseInt(day)
+    );
+    return formattedDate.toLocaleDateString("en-US", {
       weekday: "long",
       year: "numeric",
       month: "long",

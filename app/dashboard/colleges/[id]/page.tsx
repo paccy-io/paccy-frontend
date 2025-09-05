@@ -7,6 +7,7 @@ import Navbar from "../../../../components/Navbar";
 import Footer from "../../../../components/Footer";
 import { api, ApiError } from "../../../../lib/api/college-applications";
 import { API_BASE_URL, API_ENDPOINTS } from "../../../../config/api";
+import DatePicker from "../../../../components/DatePicker";
 import {
   CollegeApplication,
   Checklist as BackendChecklist,
@@ -166,7 +167,9 @@ const priorityColors: Record<string, string> = {
 // Helper functions for date format conversion
 const formatDateForInput = (isoDate: string | undefined | null) => {
   if (!isoDate) return "";
-  return isoDate.split("T")[0]; // Extract YYYY-MM-DD from ISO format
+  // Extract date components directly to avoid timezone conversion issues
+  const dateOnly = isoDate.split("T")[0]; // Get just the YYYY-MM-DD part
+  return dateOnly;
 };
 
 const formatDateForBackend = (inputDate: string) => {
@@ -174,10 +177,14 @@ const formatDateForBackend = (inputDate: string) => {
     // Use tomorrow's date as default
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
-    const tomorrowISO = tomorrow.toISOString().split("T")[0]; // Get YYYY-MM-DD format
-    return `${tomorrowISO}T23:59:59Z`;
+    const year = tomorrow.getFullYear();
+    const month = String(tomorrow.getMonth() + 1).padStart(2, "0");
+    const day = String(tomorrow.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}T23:59:59Z`;
   }
-  return `${inputDate}T23:59:59Z`; // Convert to ISO 8601 format
+  // Parse input date as local date and format for backend
+  const [year, month, day] = inputDate.split("-");
+  return `${year}-${month}-${day}T23:59:59Z`;
 };
 
 export default function CollegeDetail() {
@@ -237,6 +244,16 @@ export default function CollegeDetail() {
     name: "",
     description: "",
     category: "Application",
+  });
+  const [newTaskForm, setNewTaskForm] = useState({
+    name: "",
+    deadline: "",
+    priority: "medium" as TaskPriority,
+    type: "document_preparation" as TaskType,
+    component: "common_app" as TaskComponent,
+    status: "not_started" as TaskStatus,
+    responsible: "student" as TaskResponsible,
+    notes: "",
   });
   const [newItemForm, setNewItemForm] = useState({
     name: "",
@@ -552,7 +569,10 @@ export default function CollegeDetail() {
 
   const formatDeadline = (deadline: string) => {
     if (!deadline) return "No deadline set";
-    const date = new Date(deadline);
+    // Parse date avoiding timezone issues
+    const dateOnly = deadline.split("T")[0];
+    const [year, month, day] = dateOnly.split("-");
+    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
     return date.toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
@@ -563,7 +583,18 @@ export default function CollegeDetail() {
   const getDaysUntilDeadline = (deadline: string) => {
     if (!deadline) return null;
     const today = new Date();
-    const deadlineDate = new Date(deadline);
+    today.setHours(0, 0, 0, 0); // Set to start of day to avoid time comparison issues
+
+    // Parse deadline date avoiding timezone issues
+    const dateOnly = deadline.split("T")[0];
+    const [year, month, day] = dateOnly.split("-");
+    const deadlineDate = new Date(
+      parseInt(year),
+      parseInt(month) - 1,
+      parseInt(day)
+    );
+    deadlineDate.setHours(0, 0, 0, 0); // Set to start of day
+
     const diffTime = deadlineDate.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     return diffDays;
@@ -1668,24 +1699,19 @@ export default function CollegeDetail() {
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-[#FEEBD8]/70 text-sm mb-2">
-                    Application Deadline
-                  </label>
-                  <input
-                    type="date"
-                    value={formatDateForInput(
-                      editForm.deadline || college?.deadline
-                    )}
-                    onChange={(e) =>
-                      setEditForm((prev) => ({
-                        ...prev,
-                        deadline: formatDateForBackend(e.target.value),
-                      }))
-                    }
-                    className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
-                  />
-                </div>
+                <DatePicker
+                  label="Application Deadline"
+                  value={formatDateForInput(
+                    editForm.deadline || college?.deadline
+                  )}
+                  onChange={(date) =>
+                    setEditForm((prev) => ({
+                      ...prev,
+                      deadline: formatDateForBackend(date),
+                    }))
+                  }
+                  placeholder="Select application deadline"
+                />
 
                 <div>
                   <label className="block text-[#FEEBD8]/70 text-sm mb-2">
@@ -1973,35 +1999,29 @@ export default function CollegeDetail() {
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                const formData = new FormData(e.currentTarget);
 
                 console.log("=== TASK CREATION DEBUG ===");
-                console.log("Raw form data:");
-                for (let [key, value] of formData.entries()) {
-                  console.log(`  ${key}:`, value);
-                }
+                console.log("Form state:", newTaskForm);
 
                 const deadlineValue = formatDateForBackend(
-                  formData.get("deadline") as string
+                  newTaskForm.deadline
                 );
-                const notesValue = formData.get("notes") as string;
 
                 console.log("Formatted deadline value:", deadlineValue);
-                console.log("Notes value:", notesValue);
 
                 const taskData: any = {
-                  name: (formData.get("name") as string).trim(),
-                  priority: formData.get("priority") as TaskPriority,
-                  type: formData.get("type") as TaskType,
-                  component: formData.get("component") as TaskComponent,
-                  status: formData.get("status") as TaskStatus,
-                  responsible: formData.get("responsible") as TaskResponsible,
+                  name: newTaskForm.name.trim(),
+                  priority: newTaskForm.priority,
+                  type: newTaskForm.type,
+                  component: newTaskForm.component,
+                  status: newTaskForm.status,
+                  responsible: newTaskForm.responsible,
                   deadline: deadlineValue, // Always include deadline (either user input or tomorrow)
                 };
 
                 // Only include notes if it has a value
-                if (notesValue && notesValue.trim()) {
-                  taskData.notes = notesValue.trim();
+                if (newTaskForm.notes && newTaskForm.notes.trim()) {
+                  taskData.notes = newTaskForm.notes.trim();
                 }
 
                 // Validate required fields
@@ -2023,6 +2043,17 @@ export default function CollegeDetail() {
                 handleCreateTask(selectedChecklistForTask, taskData);
                 setShowAddTaskModal(false);
                 setSelectedChecklistForTask(null);
+                // Reset form
+                setNewTaskForm({
+                  name: "",
+                  deadline: "",
+                  priority: "medium" as TaskPriority,
+                  type: "document_preparation" as TaskType,
+                  component: "common_app" as TaskComponent,
+                  status: "not_started" as TaskStatus,
+                  responsible: "student" as TaskResponsible,
+                  notes: "",
+                });
               }}
               className="space-y-4"
             >
@@ -2031,8 +2062,14 @@ export default function CollegeDetail() {
                   Task Name
                 </label>
                 <input
-                  name="name"
                   type="text"
+                  value={newTaskForm.name}
+                  onChange={(e) =>
+                    setNewTaskForm((prev) => ({
+                      ...prev,
+                      name: e.target.value,
+                    }))
+                  }
                   className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
                   placeholder="e.g., Write personal statement"
                   required
@@ -2040,25 +2077,28 @@ export default function CollegeDetail() {
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-[#FEEBD8]/70 text-sm mb-2">
-                    Deadline
-                  </label>
-                  <input
-                    name="deadline"
-                    type="date"
-                    className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
-                  />
-                </div>
+                <DatePicker
+                  label="Deadline"
+                  value={newTaskForm.deadline}
+                  onChange={(date) =>
+                    setNewTaskForm((prev) => ({ ...prev, deadline: date }))
+                  }
+                  placeholder="Select task deadline"
+                />
 
                 <div>
                   <label className="block text-[#FEEBD8]/70 text-sm mb-2">
                     Priority
                   </label>
                   <select
-                    name="priority"
+                    value={newTaskForm.priority}
+                    onChange={(e) =>
+                      setNewTaskForm((prev) => ({
+                        ...prev,
+                        priority: e.target.value as TaskPriority,
+                      }))
+                    }
                     className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
-                    defaultValue="medium"
                   >
                     <option value="low">Low</option>
                     <option value="medium">Medium</option>
@@ -2073,9 +2113,14 @@ export default function CollegeDetail() {
                     Task Type
                   </label>
                   <select
-                    name="type"
+                    value={newTaskForm.type}
+                    onChange={(e) =>
+                      setNewTaskForm((prev) => ({
+                        ...prev,
+                        type: e.target.value as TaskType,
+                      }))
+                    }
                     className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
-                    defaultValue="document_preparation"
                   >
                     <option value="document_preparation">
                       Document Preparation
@@ -2095,9 +2140,14 @@ export default function CollegeDetail() {
                     Component
                   </label>
                   <select
-                    name="component"
+                    value={newTaskForm.component}
+                    onChange={(e) =>
+                      setNewTaskForm((prev) => ({
+                        ...prev,
+                        component: e.target.value as TaskComponent,
+                      }))
+                    }
                     className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
-                    defaultValue="common_app"
                   >
                     <option value="common_app">Common App</option>
                     <option value="supplemental_essay">
@@ -2124,9 +2174,14 @@ export default function CollegeDetail() {
                     Status
                   </label>
                   <select
-                    name="status"
+                    value={newTaskForm.status}
+                    onChange={(e) =>
+                      setNewTaskForm((prev) => ({
+                        ...prev,
+                        status: e.target.value as TaskStatus,
+                      }))
+                    }
                     className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
-                    defaultValue="not_started"
                   >
                     <option value="not_started">Not Started</option>
                     <option value="in_progress">In Progress</option>
@@ -2141,9 +2196,14 @@ export default function CollegeDetail() {
                     Responsible Person
                   </label>
                   <select
-                    name="responsible"
+                    value={newTaskForm.responsible}
+                    onChange={(e) =>
+                      setNewTaskForm((prev) => ({
+                        ...prev,
+                        responsible: e.target.value as TaskResponsible,
+                      }))
+                    }
                     className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
-                    defaultValue="student"
                   >
                     <option value="student">Student</option>
                     <option value="parent">Parent</option>
@@ -2160,7 +2220,13 @@ export default function CollegeDetail() {
                   Notes
                 </label>
                 <textarea
-                  name="notes"
+                  value={newTaskForm.notes}
+                  onChange={(e) =>
+                    setNewTaskForm((prev) => ({
+                      ...prev,
+                      notes: e.target.value,
+                    }))
+                  }
                   className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8] h-24 resize-none"
                   placeholder="Additional notes or details"
                 />
@@ -2229,26 +2295,21 @@ export default function CollegeDetail() {
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-[#FEEBD8]/70 text-sm mb-2">
-                    Deadline
-                  </label>
-                  <input
-                    type="date"
-                    value={formatDateForInput(editingTask.deadline)}
-                    onChange={(e) =>
-                      setEditingTask((prev) =>
-                        prev
-                          ? {
-                              ...prev,
-                              deadline: formatDateForBackend(e.target.value),
-                            }
-                          : null
-                      )
-                    }
-                    className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
-                  />
-                </div>
+                <DatePicker
+                  label="Deadline"
+                  value={formatDateForInput(editingTask.deadline)}
+                  onChange={(date) =>
+                    setEditingTask((prev) =>
+                      prev
+                        ? {
+                            ...prev,
+                            deadline: formatDateForBackend(date),
+                          }
+                        : null
+                    )
+                  }
+                  placeholder="Select task deadline"
+                />
 
                 <div>
                   <label className="block text-[#FEEBD8]/70 text-sm mb-2">
