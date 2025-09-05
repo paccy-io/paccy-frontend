@@ -238,6 +238,9 @@ export default function CollegeDetail() {
   const [newTag, setNewTag] = useState("");
   const [tagsInput, setTagsInput] = useState("");
 
+  // Tab state for edit modal
+  const [activeEditTab, setActiveEditTab] = useState("basic");
+
   // Form data
   const [editForm, setEditForm] = useState<Partial<College>>({});
   const [newChecklistForm, setNewChecklistForm] = useState({
@@ -1484,7 +1487,7 @@ export default function CollegeDetail() {
       {/* Edit College Modal */}
       {showEditCollegeModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-[#1a1a1a] border border-neutral-700/50 rounded-lg p-4 sm:p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-[#1a1a1a] border border-neutral-700/50 rounded-lg p-4 sm:p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-lg sm:text-xl font-semibold text-[#FEEBD8]">
                 Edit College Information
@@ -1494,6 +1497,7 @@ export default function CollegeDetail() {
                   setShowEditCollegeModal(false);
                   setEditForm({});
                   setTagsInput("");
+                  setActiveEditTab("basic");
                 }}
                 className="text-[#FEEBD8]/50 hover:text-[#FEEBD8] transition-colors"
               >
@@ -1501,281 +1505,351 @@ export default function CollegeDetail() {
               </button>
             </div>
 
+            {/* Tab Navigation */}
+            <div className="flex space-x-1 mb-6 bg-neutral-800/50 p-1 rounded-lg">
+              <button
+                onClick={() => setActiveEditTab("basic")}
+                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                  activeEditTab === "basic"
+                    ? "bg-[#FEEBD8] text-[#141414]"
+                    : "text-[#FEEBD8]/70 hover:text-[#FEEBD8] hover:bg-neutral-700/50"
+                }`}
+              >
+                Basic Info
+              </button>
+              <button
+                onClick={() => setActiveEditTab("application")}
+                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                  activeEditTab === "application"
+                    ? "bg-[#FEEBD8] text-[#141414]"
+                    : "text-[#FEEBD8]/70 hover:text-[#FEEBD8] hover:bg-neutral-700/50"
+                }`}
+              >
+                Application
+              </button>
+              <button
+                onClick={() => setActiveEditTab("additional")}
+                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                  activeEditTab === "additional"
+                    ? "bg-[#FEEBD8] text-[#141414]"
+                    : "text-[#FEEBD8]/70 hover:text-[#FEEBD8] hover:bg-neutral-700/50"
+                }`}
+              >
+                Additional
+              </button>
+            </div>
+
+            {/* Tab Content */}
             <div className="space-y-4">
-              <div>
-                <label className="block text-[#FEEBD8]/70 text-sm mb-2">
-                  University Name
-                </label>
-                <input
-                  type="text"
-                  value={
-                    editForm.universityName || college?.universityName || ""
-                  }
-                  onChange={(e) =>
-                    setEditForm((prev) => ({
-                      ...prev,
-                      universityName: e.target.value,
-                    }))
-                  }
-                  className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
-                />
-              </div>
+              {/* Basic Info Tab */}
+              {activeEditTab === "basic" && (
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-[#FEEBD8]/70 text-sm mb-2">
+                      University Name
+                    </label>
+                    <input
+                      type="text"
+                      value={
+                        editForm.universityName || college?.universityName || ""
+                      }
+                      onChange={(e) =>
+                        setEditForm((prev) => ({
+                          ...prev,
+                          universityName: e.target.value,
+                        }))
+                      }
+                      className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
+                    />
+                  </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-[#FEEBD8]/70 text-sm mb-2">
-                    State
-                  </label>
-                  <input
-                    type="text"
-                    value={
-                      editForm.universityState || college?.universityState || ""
-                    }
-                    onChange={(e) =>
-                      setEditForm((prev) => ({
-                        ...prev,
-                        universityState: e.target.value,
-                      }))
-                    }
-                    className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
-                    placeholder="e.g., California"
-                  />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-[#FEEBD8]/70 text-sm mb-2">
+                        State
+                      </label>
+                      <input
+                        type="text"
+                        value={
+                          editForm.universityState ||
+                          college?.universityState ||
+                          ""
+                        }
+                        onChange={(e) =>
+                          setEditForm((prev) => ({
+                            ...prev,
+                            universityState: e.target.value,
+                          }))
+                        }
+                        className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
+                        placeholder="e.g., California"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[#FEEBD8]/70 text-sm mb-2">
+                        Country
+                      </label>
+                      <input
+                        type="text"
+                        value={
+                          editForm.universityCountry ||
+                          college?.universityCountry ||
+                          ""
+                        }
+                        onChange={(e) =>
+                          setEditForm((prev) => ({
+                            ...prev,
+                            universityCountry: e.target.value,
+                          }))
+                        }
+                        className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
+                        placeholder="e.g., United States"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-[#FEEBD8]/70 text-sm mb-2">
+                        Major
+                      </label>
+                      <input
+                        type="text"
+                        value={editForm.major || college?.major || ""}
+                        onChange={(e) =>
+                          setEditForm((prev) => ({
+                            ...prev,
+                            major: e.target.value,
+                          }))
+                        }
+                        className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
+                        placeholder="e.g., Computer Science"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[#FEEBD8]/70 text-sm mb-2">
+                        Priority Level
+                      </label>
+                      <select
+                        value={editForm.priority || college?.priority || ""}
+                        onChange={(e) =>
+                          setEditForm((prev) => ({
+                            ...prev,
+                            priority: e.target.value
+                              ? (e.target.value as
+                                  | "Safety"
+                                  | "Target"
+                                  | "Reach")
+                              : undefined,
+                          }))
+                        }
+                        className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
+                      >
+                        <option value="">Select Priority Level</option>
+                        <option value="Safety">Safety</option>
+                        <option value="Target">Target</option>
+                        <option value="Reach">Reach</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-[#FEEBD8]/70 text-sm mb-2">
+                        Website(s)
+                      </label>
+                      <input
+                        type="text"
+                        value={
+                          editForm.universityWebsite ||
+                          college?.universityWebsite ||
+                          ""
+                        }
+                        onChange={(e) =>
+                          setEditForm((prev) => ({
+                            ...prev,
+                            universityWebsite: e.target.value,
+                          }))
+                        }
+                        className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
+                        placeholder="e.g., https://www.university.edu"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[#FEEBD8]/70 text-sm mb-2">
+                        Contact Email
+                      </label>
+                      <input
+                        type="email"
+                        value={
+                          editForm.contactEmail || college?.contactEmail || ""
+                        }
+                        onChange={(e) =>
+                          setEditForm((prev) => ({
+                            ...prev,
+                            contactEmail: e.target.value,
+                          }))
+                        }
+                        className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
+                        placeholder="admissions@university.edu"
+                      />
+                    </div>
+                  </div>
                 </div>
+              )}
 
-                <div>
-                  <label className="block text-[#FEEBD8]/70 text-sm mb-2">
-                    Country
-                  </label>
-                  <input
-                    type="text"
-                    value={
-                      editForm.universityCountry ||
-                      college?.universityCountry ||
-                      ""
-                    }
-                    onChange={(e) =>
-                      setEditForm((prev) => ({
-                        ...prev,
-                        universityCountry: e.target.value,
-                      }))
-                    }
-                    className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
-                    placeholder="e.g., United States"
-                  />
+              {/* Application Tab */}
+              {activeEditTab === "application" && (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-[#FEEBD8]/70 text-sm mb-2">
+                        Status
+                      </label>
+                      <select
+                        value={editForm.status || college?.status || ""}
+                        onChange={(e) =>
+                          setEditForm((prev) => ({
+                            ...prev,
+                            status: e.target.value,
+                          }))
+                        }
+                        className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
+                      >
+                        <option value="not_started">Not Started</option>
+                        <option value="in_progress">In Progress</option>
+                        <option value="submitted">Submitted</option>
+                        <option value="under_review">Under Review</option>
+                        <option value="accepted">Accepted</option>
+                        <option value="rejected">Rejected</option>
+                        <option value="deferred">Deferred</option>
+                        <option value="waitlisted">Waitlisted</option>
+                        <option value="withdrawn">Withdrawn</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-[#FEEBD8]/70 text-sm mb-2">
+                        Application Type
+                      </label>
+                      <select
+                        value={editForm.type || college?.type || ""}
+                        onChange={(e) =>
+                          setEditForm((prev) => ({
+                            ...prev,
+                            type: e.target.value,
+                          }))
+                        }
+                        className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
+                      >
+                        <option value="early_decision">
+                          Early Decision (ED)
+                        </option>
+                        <option value="early_action">Early Action (EA)</option>
+                        <option value="regular_decision">
+                          Regular Decision (RD)
+                        </option>
+                        <option value="rolling_admission">
+                          Rolling Admission
+                        </option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <DatePicker
+                      label="Application Deadline"
+                      value={formatDateForInput(
+                        editForm.deadline || college?.deadline
+                      )}
+                      onChange={(date) =>
+                        setEditForm((prev) => ({
+                          ...prev,
+                          deadline: formatDateForBackend(date),
+                        }))
+                      }
+                      placeholder="Select application deadline"
+                    />
+
+                    <div>
+                      <label className="block text-[#FEEBD8]/70 text-sm mb-2">
+                        Application Fee ($)
+                      </label>
+                      <input
+                        type="number"
+                        value={
+                          editForm.applicationFee ||
+                          college?.applicationFee ||
+                          ""
+                        }
+                        onChange={(e) =>
+                          setEditForm((prev) => ({
+                            ...prev,
+                            applicationFee: Number(e.target.value),
+                          }))
+                        }
+                        className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
+                        placeholder="0"
+                      />
+                    </div>
+                  </div>
                 </div>
-              </div>
+              )}
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-[#FEEBD8]/70 text-sm mb-2">
-                    Major
-                  </label>
-                  <input
-                    type="text"
-                    value={editForm.major || college?.major || ""}
-                    onChange={(e) =>
-                      setEditForm((prev) => ({
-                        ...prev,
-                        major: e.target.value,
-                      }))
-                    }
-                    className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
-                    placeholder="e.g., Computer Science"
-                  />
+              {/* Additional Tab */}
+              {activeEditTab === "additional" && (
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-[#FEEBD8]/70 text-sm mb-2">
+                      Tags (comma separated)
+                    </label>
+                    <input
+                      type="text"
+                      value={tagsInput}
+                      onChange={(e) => setTagsInput(e.target.value)}
+                      onBlur={(e) => {
+                        // Process tags on blur (when user leaves the field)
+                        const processedTags = e.target.value
+                          .split(",")
+                          .map((tag) => tag.trim())
+                          .filter((tag) => tag);
+                        setEditForm((prev) => ({
+                          ...prev,
+                          tags: processedTags,
+                        }));
+                      }}
+                      className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
+                      placeholder="e.g., Ivy League, Engineering, Research"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[#FEEBD8]/70 text-sm mb-2">
+                      Notes
+                    </label>
+                    <textarea
+                      value={editForm.notes || college?.notes || ""}
+                      onChange={(e) =>
+                        setEditForm((prev) => ({
+                          ...prev,
+                          notes: e.target.value,
+                        }))
+                      }
+                      className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8] h-32 resize-none"
+                      placeholder="Add any notes about this college..."
+                    />
+                  </div>
                 </div>
+              )}
 
-                <div>
-                  <label className="block text-[#FEEBD8]/70 text-sm mb-2">
-                    Priority Level
-                  </label>
-                  <select
-                    value={editForm.priority || college?.priority || ""}
-                    onChange={(e) =>
-                      setEditForm((prev) => ({
-                        ...prev,
-                        priority: e.target.value
-                          ? (e.target.value as "Safety" | "Target" | "Reach")
-                          : undefined,
-                      }))
-                    }
-                    className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
-                  >
-                    <option value="">Select Priority Level</option>
-                    <option value="Safety">Safety</option>
-                    <option value="Target">Target</option>
-                    <option value="Reach">Reach</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-[#FEEBD8]/70 text-sm mb-2">
-                    Website(s)
-                  </label>
-                  <input
-                    type="text"
-                    value={
-                      editForm.universityWebsite ||
-                      college?.universityWebsite ||
-                      ""
-                    }
-                    onChange={(e) =>
-                      setEditForm((prev) => ({
-                        ...prev,
-                        universityWebsite: e.target.value,
-                      }))
-                    }
-                    className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
-                    placeholder="e.g., https://www.university.edu"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[#FEEBD8]/70 text-sm mb-2">
-                    Contact Email
-                  </label>
-                  <input
-                    type="email"
-                    value={editForm.contactEmail || college?.contactEmail || ""}
-                    onChange={(e) =>
-                      setEditForm((prev) => ({
-                        ...prev,
-                        contactEmail: e.target.value,
-                      }))
-                    }
-                    className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
-                    placeholder="admissions@university.edu"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-[#FEEBD8]/70 text-sm mb-2">
-                    Status
-                  </label>
-                  <select
-                    value={editForm.status || college?.status || ""}
-                    onChange={(e) =>
-                      setEditForm((prev) => ({
-                        ...prev,
-                        status: e.target.value,
-                      }))
-                    }
-                    className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
-                  >
-                    <option value="not_started">Not Started</option>
-                    <option value="in_progress">In Progress</option>
-                    <option value="submitted">Submitted</option>
-                    <option value="under_review">Under Review</option>
-                    <option value="accepted">Accepted</option>
-                    <option value="rejected">Rejected</option>
-                    <option value="deferred">Deferred</option>
-                    <option value="waitlisted">Waitlisted</option>
-                    <option value="withdrawn">Withdrawn</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-[#FEEBD8]/70 text-sm mb-2">
-                    Application Type
-                  </label>
-                  <select
-                    value={editForm.type || college?.type || ""}
-                    onChange={(e) =>
-                      setEditForm((prev) => ({ ...prev, type: e.target.value }))
-                    }
-                    className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
-                  >
-                    <option value="early_decision">Early Decision (ED)</option>
-                    <option value="early_action">Early Action (EA)</option>
-                    <option value="regular_decision">
-                      Regular Decision (RD)
-                    </option>
-                    <option value="rolling_admission">Rolling Admission</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <DatePicker
-                  label="Application Deadline"
-                  value={formatDateForInput(
-                    editForm.deadline || college?.deadline
-                  )}
-                  onChange={(date) =>
-                    setEditForm((prev) => ({
-                      ...prev,
-                      deadline: formatDateForBackend(date),
-                    }))
-                  }
-                  placeholder="Select application deadline"
-                />
-
-                <div>
-                  <label className="block text-[#FEEBD8]/70 text-sm mb-2">
-                    Application Fee ($)
-                  </label>
-                  <input
-                    type="number"
-                    value={
-                      editForm.applicationFee || college?.applicationFee || ""
-                    }
-                    onChange={(e) =>
-                      setEditForm((prev) => ({
-                        ...prev,
-                        applicationFee: Number(e.target.value),
-                      }))
-                    }
-                    className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
-                    placeholder="0"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-[#FEEBD8]/70 text-sm mb-2">
-                  Tags (comma separated)
-                </label>
-                <input
-                  type="text"
-                  value={tagsInput}
-                  onChange={(e) => setTagsInput(e.target.value)}
-                  onBlur={(e) => {
-                    // Process tags on blur (when user leaves the field)
-                    const processedTags = e.target.value
-                      .split(",")
-                      .map((tag) => tag.trim())
-                      .filter((tag) => tag);
-                    setEditForm((prev) => ({
-                      ...prev,
-                      tags: processedTags,
-                    }));
-                  }}
-                  className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
-                  placeholder="e.g., Ivy League, Engineering, Research"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[#FEEBD8]/70 text-sm mb-2">
-                  Notes
-                </label>
-                <textarea
-                  value={editForm.notes || college?.notes || ""}
-                  onChange={(e) =>
-                    setEditForm((prev) => ({ ...prev, notes: e.target.value }))
-                  }
-                  className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8] h-24 resize-none"
-                  placeholder="Add any notes about this college..."
-                />
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-3 pt-4">
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-3 pt-6 border-t border-neutral-700/50">
                 <button
                   onClick={handleSaveCollege}
-                  className="flex-1 bg-[#FEEBD8] text-[#141414] px-4 py-2 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors"
+                  className="flex-1 bg-[#FEEBD8] text-[#141414] px-4 py-3 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors"
                 >
                   Save Changes
                 </button>
@@ -1784,8 +1858,9 @@ export default function CollegeDetail() {
                     setShowEditCollegeModal(false);
                     setEditForm({});
                     setTagsInput("");
+                    setActiveEditTab("basic");
                   }}
-                  className="px-4 py-2 border border-neutral-700/50 rounded-lg text-[#FEEBD8]/70 hover:text-[#FEEBD8] hover:border-[#FEEBD8]/30 transition-colors"
+                  className="px-4 py-3 border border-neutral-700/50 rounded-lg text-[#FEEBD8]/70 hover:text-[#FEEBD8] hover:border-[#FEEBD8]/30 transition-colors"
                 >
                   Cancel
                 </button>

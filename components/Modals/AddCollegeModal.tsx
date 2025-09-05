@@ -30,6 +30,8 @@ interface College {
   ranking: number;
   major: string;
   notes: string;
+  applicationType: string;
+  priorityLevel: string;
 }
 
 interface AddCollegeModalProps {
@@ -52,7 +54,8 @@ export default function AddCollegeModal({
     acceptance: 0,
     ranking: 0,
     major: "",
-    notes: "",
+    applicationType: "regular_decision",
+    priorityLevel: "",
   });
 
   // Validation states for number inputs
@@ -281,7 +284,10 @@ export default function AddCollegeModal({
       return;
     }
 
-    onSave(formData);
+    onSave({
+      ...formData,
+      notes: "", // Default empty notes since we removed the field
+    });
 
     // Reset form
     setFormData({
@@ -293,7 +299,8 @@ export default function AddCollegeModal({
       acceptance: 0,
       ranking: 0,
       major: "",
-      notes: "",
+      applicationType: "regular_decision",
+      priorityLevel: "",
     });
     setUniversitySearch("");
     setMajorInput("");
@@ -587,19 +594,42 @@ export default function AddCollegeModal({
             </div>
           </div>
 
-          {/* Notes */}
-          <div>
-            <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
-              Notes
-            </label>
-            <textarea
-              name="notes"
-              value={formData.notes}
-              onChange={handleChange}
-              rows={4}
-              className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
-              placeholder="Add any additional notes about this college..."
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Application Type */}
+            <div>
+              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+                Application Type
+              </label>
+              <select
+                name="applicationType"
+                value={formData.applicationType}
+                onChange={handleChange}
+                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-3 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+              >
+                <option value="early_decision">Early Decision</option>
+                <option value="early_action">Early Action</option>
+                <option value="regular_decision">Regular Decision</option>
+                <option value="rolling_admission">Rolling Admission</option>
+              </select>
+            </div>
+
+            {/* Priority Level */}
+            <div>
+              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+                Priority Level
+              </label>
+              <select
+                name="priorityLevel"
+                value={formData.priorityLevel}
+                onChange={handleChange}
+                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-3 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+              >
+                <option value="">Select Priority Level</option>
+                <option value="Safety">Safety</option>
+                <option value="Target">Target</option>
+                <option value="Reach">Reach</option>
+              </select>
+            </div>
           </div>
 
           {/* Action Buttons */}

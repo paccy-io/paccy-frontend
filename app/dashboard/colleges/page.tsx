@@ -162,7 +162,6 @@ export default function CollegeTracker() {
     setApplicationType("");
     setPriority("");
     setDeadline("");
-    setNotes("");
     setShowUniversityDropdown(false);
     setShowMajorDropdown(false);
     setShowCustomUniversity(false);
@@ -196,7 +195,6 @@ export default function CollegeTracker() {
   const [applicationType, setApplicationType] = useState("");
   const [priority, setPriority] = useState("");
   const [deadline, setDeadline] = useState("");
-  const [notes, setNotes] = useState("");
 
   // Edit states
   const [editingCollegeId, setEditingCollegeId] = useState<string | null>(null);
@@ -353,7 +351,6 @@ export default function CollegeTracker() {
         priority: (priority || Priority.TARGET) as Priority,
         major: majorInput,
         deadline: deadline || undefined,
-        notes: notes || undefined,
         location: selectedUniversity
           ? `${selectedUniversity["state-province"] || ""}, ${
               selectedUniversity.country
@@ -734,47 +731,50 @@ export default function CollegeTracker() {
                   </div>
                 </div>
 
-                {/* Application Type */}
-                <div>
-                  <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
-                    Application Type
-                  </label>
-                  <select
-                    value={applicationType}
-                    onChange={(e) => setApplicationType(e.target.value)}
-                    className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-3 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
-                  >
-                    <option value="">Select Application Type</option>
-                    <option value={ApplicationType.EARLY_DECISION}>
-                      Early Decision
-                    </option>
-                    <option value={ApplicationType.EARLY_ACTION}>
-                      Early Action
-                    </option>
-                    <option value={ApplicationType.REGULAR_DECISION}>
-                      Regular Decision
-                    </option>
-                    <option value={ApplicationType.ROLLING_ADMISSION}>
-                      Rolling Admission
-                    </option>
-                  </select>
-                </div>
+                {/* Application Type and Priority Level */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Application Type */}
+                  <div>
+                    <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+                      Application Type
+                    </label>
+                    <select
+                      value={applicationType}
+                      onChange={(e) => setApplicationType(e.target.value)}
+                      className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-3 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                    >
+                      <option value="">Select Application Type</option>
+                      <option value={ApplicationType.EARLY_DECISION}>
+                        Early Decision
+                      </option>
+                      <option value={ApplicationType.EARLY_ACTION}>
+                        Early Action
+                      </option>
+                      <option value={ApplicationType.REGULAR_DECISION}>
+                        Regular Decision
+                      </option>
+                      <option value={ApplicationType.ROLLING_ADMISSION}>
+                        Rolling Admission
+                      </option>
+                    </select>
+                  </div>
 
-                {/* Priority */}
-                <div>
-                  <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
-                    Priority Level
-                  </label>
-                  <select
-                    value={priority}
-                    onChange={(e) => setPriority(e.target.value)}
-                    className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-3 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
-                  >
-                    <option value="">Select Priority</option>
-                    <option value={Priority.REACH}>Reach</option>
-                    <option value={Priority.TARGET}>Target</option>
-                    <option value={Priority.SAFETY}>Safety</option>
-                  </select>
+                  {/* Priority Level */}
+                  <div>
+                    <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+                      Priority Level
+                    </label>
+                    <select
+                      value={priority}
+                      onChange={(e) => setPriority(e.target.value)}
+                      className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-3 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                    >
+                      <option value="">Select Priority</option>
+                      <option value={Priority.REACH}>Reach</option>
+                      <option value={Priority.TARGET}>Target</option>
+                      <option value={Priority.SAFETY}>Safety</option>
+                    </select>
+                  </div>
                 </div>
 
                 {/* Deadline */}
@@ -785,20 +785,6 @@ export default function CollegeTracker() {
                   placeholder="Select application deadline"
                   minDate={new Date().toISOString().split("T")[0]}
                 />
-
-                {/* Notes */}
-                <div>
-                  <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
-                    Notes (Optional)
-                  </label>
-                  <textarea
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                    placeholder="Add any additional notes about this application..."
-                    rows={3}
-                    className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-3 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8] resize-none"
-                  />
-                </div>
 
                 {/* Action Buttons */}
                 <div className="flex gap-4 pt-6">
