@@ -17,6 +17,10 @@ import {
   FaChartLine,
   FaTrophy,
   FaStar,
+  FaMedal,
+  FaAward,
+  FaBullseye,
+  FaFireAlt,
 } from "react-icons/fa";
 
 // Mock academic data
@@ -61,174 +65,128 @@ const mockAcademicData = {
     },
     {
       id: 4,
-      name: "AP Chemistry",
+      name: "AP Physics 1",
       score: 4,
       maxScore: 5,
-      date: "2024-05-12",
+      date: "2024-05-20",
       target: 5,
       attempts: 1,
     },
   ],
+  academicGoals: [
+    { id: 1, goal: "Achieve 3.95 GPA", completed: false, priority: "high" },
+    { id: 2, goal: "Score 1520+ on SAT", completed: false, priority: "high" },
+    { id: 3, goal: "Take 5 AP courses", completed: true, priority: "medium" },
+    { id: 4, goal: "Maintain honor roll", completed: true, priority: "medium" },
+  ],
 };
 
-const gradeColors: Record<string, string> = {
+const gradeColorMap: { [key: string]: string } = {
   A: "text-green-400",
-  "A-": "text-green-300",
-  "B+": "text-yellow-400",
-  B: "text-yellow-300",
-  "B-": "text-orange-400",
-  "C+": "text-orange-300",
-  C: "text-red-400",
+  B: "text-blue-400",
+  C: "text-yellow-400",
+  D: "text-orange-400",
+  F: "text-red-400",
 };
+
+// Simple GPA Interface
+interface GradeYear {
+  grade: number; // 9, 10, 11, 12
+  name: string;
+  gpa: number | null;
+}
+
+type GPAScale = "4.0" | "5.0" | "100";
 
 export default function AcademyPage() {
   const [showAddTermModal, setShowAddTermModal] = useState(false);
   const [showAddExamScoreModal, setShowAddExamScoreModal] = useState(false);
   const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([]);
-  const [calendarLoading, setCalendarLoading] = useState(true);
 
-  // Helper functions to process calendar events
-  const getTestDateEvents = () => {
-    return calendarEvents.filter(
-      (event) => event.type === EventType.TEST_DATE && event.date
-    );
+  // GPA Tracker State
+  const [gpaScale, setGpaScale] = useState<GPAScale>("4.0");
+  const [isEditingGPA, setIsEditingGPA] = useState(false);
+  const [gradeYears, setGradeYears] = useState<GradeYear[]>([
+    { grade: 9, name: "Freshman", gpa: null },
+    { grade: 10, name: "Sophomore", gpa: null },
+    { grade: 11, name: "Junior", gpa: null },
+    { grade: 12, name: "Senior", gpa: null },
+  ]);
+
+  // GPA Conversion Functions
+  const convertGPA = (
+    gpa: number,
+    fromScale: GPAScale,
+    toScale: GPAScale
+  ): string => {
+    if (fromScale === toScale) return gpa.toFixed(2);
+
+    // Convert to 4.0 scale first
+    let normalized = gpa;
+    if (fromScale === "5.0") normalized = (gpa / 5) * 4;
+    if (fromScale === "100") normalized = (gpa / 100) * 4;
+
+    // Convert from 4.0 to target scale
+    if (toScale === "5.0") return ((normalized / 4) * 5).toFixed(2);
+    if (toScale === "100") return ((normalized / 4) * 100).toFixed(1);
+    return normalized.toFixed(2);
   };
 
-  const getFinalExamDate = () => {
-    const testEvents = getTestDateEvents();
-    if (testEvents.length === 0) return null;
+  const updateYearGPA = (gradeIndex: number, newGPA: number | null) => {
+    const updated = [...gradeYears];
+    updated[gradeIndex].gpa = newGPA;
+    setGradeYears(updated);
+  };
 
-    // Filter out SAT, AP, IB events - only get generic final exams
-    // Also filter out past dates
-    const finalExamEvents = testEvents.filter((event) => {
-      const title = event.title.toLowerCase();
-      const eventDate = new Date(event.date!);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0); // Reset time to compare only dates
+  const calculateCumulativeGPA = (): number => {
+    const validGPAs = gradeYears.filter((year) => year.gpa !== null);
+    if (validGPAs.length === 0) return 0;
 
-      return (
-        !title.includes("sat") &&
-        !title.includes("ap") &&
-        !title.includes("ib") &&
-        eventDate >= today
-      ); // Only future or today's events
+    // Convert all to 4.0 scale for calculation
+    const normalizedGPAs = validGPAs.map((year) => {
+      let normalized = year.gpa!;
+      if (gpaScale === "5.0") normalized = (year.gpa! / 5) * 4;
+      if (gpaScale === "100") normalized = (year.gpa! / 100) * 4;
+      return normalized;
     });
 
-    if (finalExamEvents.length === 0) return null;
-
-    // Find the earliest upcoming final exam
-    const sortedByDate = finalExamEvents.sort(
-      (a, b) => new Date(a.date!).getTime() - new Date(b.date!).getTime()
-    );
-
-    return sortedByDate[0];
-  };
-
-  const getSATExamDate = () => {
-    const testEvents = getTestDateEvents();
-    const satEvents = testEvents.filter((event) => {
-      const title = event.title.toLowerCase();
-      const eventDate = new Date(event.date!);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-
-      return title.includes("sat") && eventDate >= today; // Only future or today's events
-    });
-
-    if (satEvents.length === 0) return null;
-
-    // Get the earliest future SAT date
-    const futureSATs = satEvents.sort(
-      (a, b) => new Date(a.date!).getTime() - new Date(b.date!).getTime()
-    );
-
-    return futureSATs[0];
-  };
-
-  const getAPExamDates = () => {
-    const testEvents = getTestDateEvents();
-    const apEvents = testEvents.filter((event) => {
-      const title = event.title.toLowerCase();
-      const eventDate = new Date(event.date!);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-
-      return title.includes("ap") && eventDate >= today; // Only future or today's events
-    });
-
-    if (apEvents.length === 0) return [];
-
-    // Return all future AP exams, sorted by date (earliest first)
-    return apEvents.sort(
-      (a, b) => new Date(a.date!).getTime() - new Date(b.date!).getTime()
+    return (
+      normalizedGPAs.reduce((sum, gpa) => sum + gpa, 0) / normalizedGPAs.length
     );
   };
 
-  const getIBExamDate = () => {
-    const testEvents = getTestDateEvents();
-    const ibEvents = testEvents.filter((event) => {
-      const title = event.title.toLowerCase();
-      const eventDate = new Date(event.date!);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-
-      return title.includes("ib") && eventDate >= today; // Only future or today's events
-    });
-
-    if (ibEvents.length === 0) return null;
-
-    // Get the earliest future IB date
-    const futureIBs = ibEvents.sort(
-      (a, b) => new Date(a.date!).getTime() - new Date(b.date!).getTime()
-    );
-
-    return futureIBs[0];
+  const getGPALevel = (
+    gpa: number
+  ): { level: string; color: string; icon: any } => {
+    if (gpa >= 3.8)
+      return { level: "Outstanding", color: "text-purple-400", icon: FaMedal };
+    if (gpa >= 3.5)
+      return { level: "Excellent", color: "text-green-400", icon: FaTrophy };
+    if (gpa >= 3.0)
+      return { level: "Good", color: "text-blue-400", icon: FaAward };
+    if (gpa >= 2.5)
+      return { level: "Fair", color: "text-yellow-400", icon: FaBullseye };
+    return {
+      level: "Needs Improvement",
+      color: "text-red-400",
+      icon: FaFireAlt,
+    };
   };
 
-  const getDaysUntil = (dateString: string) => {
-    const targetDate = new Date(dateString);
-    const today = new Date();
-    const diffTime = targetDate.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays;
-  };
+  const cumulativeGPA = calculateCumulativeGPA();
+  const gpaLevel = getGPALevel(cumulativeGPA);
 
-  const formatTimeLeft = (days: number) => {
-    if (days < 0) return "Past due";
-    if (days === 0) return "Today";
-    if (days === 1) return "1 day left";
-    if (days < 7) return `${days} days left`;
-    if (days < 30) return `${Math.ceil(days / 7)} weeks left`;
-    return `${Math.ceil(days / 30)} months left`;
-  };
-
-  const getTimeLeftColor = (days: number) => {
-    if (days < 0) return "text-gray-400";
-    if (days <= 3) return "text-red-400";
-    if (days <= 14) return "text-yellow-400";
-    return "text-green-400";
-  };
-
-  // Load calendar events
   useEffect(() => {
-    const loadCalendarEvents = async () => {
+    const fetchCalendarEvents = async () => {
       try {
-        setCalendarLoading(true);
         const events = await calendarApi.getAll();
         setCalendarEvents(events);
       } catch (error) {
-        console.error("Failed to load calendar events:", error);
-        setCalendarEvents([]);
-      } finally {
-        setCalendarLoading(false);
+        console.error("Failed to fetch calendar events:", error);
       }
     };
 
-    loadCalendarEvents();
-  }, []);
-
-  useEffect(() => {
-    document.title = "Academic Tracker | Paccy";
+    fetchCalendarEvents();
   }, []);
 
   const handleAddTerm = () => {
@@ -238,6 +196,7 @@ export default function AcademyPage() {
   const handleAddExamScore = () => {
     setShowAddExamScoreModal(true);
   };
+
   const [academicData, setAcademicData] = useState(mockAcademicData);
 
   const calculateGPAProgress = () => {
@@ -254,356 +213,467 @@ export default function AcademyPage() {
   const satExamDate = getSATExamDate();
   const apExamDates = getAPExamDates(); // Changed to plural for multiple APs
   const ibExamDate = getIBExamDate();
-  const finalExamDate = getFinalExamDate();
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a]">
+    <div className="min-h-screen bg-[#0A0A0A] text-[#FEEBD8]">
       <Navbar />
 
-      <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 pt-28">
+      <div className="max-w-7xl mx-auto px-4 pt-24 pb-8">
         {/* Header */}
-        <div className="flex items-center space-x-6 mb-12">
-          <Link
-            href="/dashboard"
-            className="flex items-center justify-center w-12 h-12 rounded-lg bg-neutral-800/50 border border-neutral-700 hover:bg-neutral-800 hover:border-neutral-600 transition-colors"
-          >
-            <FaArrowLeft
-              className="text-[#FEEBD8]/70 hover:text-[#FEEBD8] transition-colors"
-              size={16}
-            />
-          </Link>
-          <div className="flex-1">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 rounded-lg bg-neutral-800 border border-neutral-700">
-                <FaGraduationCap className="text-[#FEEBD8]" size={20} />
-              </div>
-              <h1 className="text-3xl font-bold text-[#FEEBD8]">
-                Academic Tracker
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-4">
+            <Link
+              href="/dashboard"
+              className="p-2 rounded-lg bg-neutral-800 hover:bg-neutral-700 transition-colors"
+            >
+              <FaArrowLeft size={18} />
+            </Link>
+            <div>
+              <h1 className="text-3xl font-bold text-[#FEEBD8] flex items-center gap-3">
+                <FaGraduationCap className="text-[#FEEBD8]" />
+                Academy Dashboard
               </h1>
+              <p className="text-[#FEEBD8]/60 mt-1">
+                Track your academic progress and achievements
+              </p>
             </div>
-            <p className="text-[#FEEBD8]/60 ml-12">
-              Monitor your academic progress and achievements
-            </p>
           </div>
         </div>
 
-        {/* Academic Content */}
         <div className="space-y-8">
-          {/* GPA Overview */}
-          <div className="bg-[#141414] border border-neutral-700 rounded-lg p-6">
+          {/* High School GPA Tracker */}
+          <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6 hover:border-[#FEEBD8]/30 transition-colors">
+            {/* Header */}
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-neutral-800">
-                  <FaChartLine className="text-[#FEEBD8]" size={18} />
+                <div className="p-2 rounded-lg bg-gradient-to-br from-[#FEEBD8] to-[#E5D5B7] shadow-md">
+                  <FaChartLine className="text-[#141414]" size={20} />
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-[#FEEBD8]">
-                    GPA Tracker
-                  </h3>
-                  <p className="text-[#FEEBD8]/60 text-sm mt-1">
-                    Track your cumulative GPA progress toward your target goals
+                  <h2 className="text-xl font-bold text-[#FEEBD8] mb-1">
+                    High School GPA
+                  </h2>
+                  <p className="text-[#FEEBD8]/70 text-sm">
+                    Track your academic journey through high school
                   </p>
                 </div>
               </div>
+
+              {/* Edit Button */}
               <button
-                onClick={handleAddTerm}
-                className="bg-[#FEEBD8] text-[#141414] px-4 py-2 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors flex items-center gap-2"
+                onClick={() => setIsEditingGPA(!isEditingGPA)}
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
+                  isEditingGPA
+                    ? "bg-[#FEEBD8] text-[#141414] hover:bg-[#E5D5B7]"
+                    : "bg-neutral-700/50 text-[#FEEBD8] hover:bg-neutral-700"
+                }`}
               >
-                <FaPlus size={14} />
-                <span>Add Term</span>
+                <FaEdit size={12} />
+                {isEditingGPA ? "Save" : "Edit"}
               </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-              <div className="text-center p-4 rounded-lg bg-neutral-800/50 border border-neutral-700">
-                <div className="text-2xl font-bold text-[#FEEBD8] mb-1">
-                  {academicData.gpa.current}
+            {/* GPA Scale Selector - Only show when editing */}
+            {isEditingGPA && (
+              <div className="mb-6">
+                <label className="block text-[#FEEBD8]/70 text-sm mb-3">
+                  GPA Scale
+                </label>
+                <div className="inline-flex bg-neutral-800/50 rounded-xl p-1 border border-neutral-700/50">
+                  {(["4.0", "5.0", "100"] as const).map((scale, index) => (
+                    <button
+                      key={scale}
+                      onClick={() => setGpaScale(scale)}
+                      className={`relative px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 ease-out min-w-[60px] ${
+                        gpaScale === scale
+                          ? "bg-[#FEEBD8] text-[#141414] shadow-lg shadow-[#FEEBD8]/20 transform scale-105"
+                          : "text-[#FEEBD8]/60 hover:text-[#FEEBD8] hover:bg-neutral-700/40 hover:scale-102"
+                      } ${index === 0 ? "ml-0" : "ml-1"}`}
+                    >
+                      <span className="relative z-10">
+                        {scale === "100" ? "100%" : scale}
+                      </span>
+                      {gpaScale === scale && (
+                        <div className="absolute inset-0 bg-gradient-to-r from-[#FEEBD8] to-[#E5D5B7] rounded-lg opacity-10" />
+                      )}
+                    </button>
+                  ))}
                 </div>
-                <div className="text-[#FEEBD8]/70 text-sm">Current GPA</div>
               </div>
+            )}
 
-              <div className="text-center p-4 rounded-lg bg-neutral-800/50 border border-neutral-700">
-                <div className="text-2xl font-bold text-green-400 mb-1">
-                  {academicData.gpa.target}
-                </div>
-                <div className="text-[#FEEBD8]/70 text-sm">Target GPA</div>
-              </div>
-
-              <div className="text-center p-4 rounded-lg bg-neutral-800/50 border border-neutral-700">
-                <div className="text-2xl font-bold text-blue-400 mb-1">
-                  {calculateGPAProgress().toFixed(1)}%
-                </div>
-                <div className="text-[#FEEBD8]/70 text-sm">Progress</div>
-              </div>
-            </div>
-
+            {/* Cumulative GPA Display */}
             <div className="mb-6">
-              <div className="flex justify-between text-sm text-[#FEEBD8]/70 mb-2">
-                <span>Progress to Target</span>
-                <span>{calculateGPAProgress().toFixed(1)}%</span>
-              </div>
-              <div className="w-full bg-neutral-700 rounded-full h-2">
-                <div
-                  className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${Math.min(calculateGPAProgress(), 100)}%` }}
-                />
+              <div className="bg-neutral-800/30 rounded-lg p-4 border border-neutral-700/30">
+                <div className="text-center">
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <gpaLevel.icon className={`${gpaLevel.color} text-lg`} />
+                    <span className={`text-sm font-semibold ${gpaLevel.color}`}>
+                      {gpaLevel.level}
+                    </span>
+                  </div>
+
+                  <div className="text-3xl font-bold text-[#FEEBD8] mb-2">
+                    {cumulativeGPA > 0
+                      ? convertGPA(cumulativeGPA, "4.0", gpaScale)
+                      : "--"}
+                  </div>
+
+                  <div className="text-[#FEEBD8]/70 text-sm mb-3">
+                    Cumulative GPA (
+                    {gpaScale === "100" ? "Percentage" : `${gpaScale} Scale`})
+                  </div>
+
+                  {/* Scale Conversions */}
+                  {cumulativeGPA > 0 && (
+                    <div className="grid grid-cols-3 gap-3 text-xs">
+                      <div className="text-center p-3 rounded-lg bg-neutral-700/30">
+                        <div className="font-semibold text-[#FEEBD8] text-sm">
+                          {convertGPA(cumulativeGPA, "4.0", "4.0")}
+                        </div>
+                        <div className="text-[#FEEBD8]/60 mt-1">4.0</div>
+                      </div>
+                      <div className="text-center p-3 rounded-lg bg-neutral-700/30">
+                        <div className="font-semibold text-[#FEEBD8] text-sm">
+                          {convertGPA(cumulativeGPA, "4.0", "5.0")}
+                        </div>
+                        <div className="text-[#FEEBD8]/60 mt-1">5.0</div>
+                      </div>
+                      <div className="text-center p-3 rounded-lg bg-neutral-700/30">
+                        <div className="font-semibold text-[#FEEBD8] text-sm">
+                          {convertGPA(cumulativeGPA, "4.0", "100")}%
+                        </div>
+                        <div className="text-[#FEEBD8]/60 mt-1">%</div>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
-            {/* Term History */}
-            <div>
-              <h4 className="text-sm font-medium text-[#FEEBD8]/70 mb-3">
-                Recent Terms
-              </h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {academicData.gpa.terms.map((term, idx) => (
-                  <div
-                    key={idx}
-                    className="bg-neutral-800 rounded-lg p-3 border border-neutral-700"
-                  >
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="text-[#FEEBD8] font-medium">
-                        {term.term}
-                      </span>
-                      <span className="text-green-400 font-semibold">
-                        {term.gpa}
-                      </span>
+            {/* Grade Years Grid */}
+            <div className="grid grid-cols-2 gap-4">
+              {gradeYears.map((year, index) => (
+                <div key={year.grade} className="group">
+                  <div className="bg-neutral-800/30 rounded-lg p-4 border border-neutral-700/30 hover:border-[#FEEBD8]/30 transition-all duration-200">
+                    <div className="flex items-center justify-between mb-3">
+                      <div>
+                        <h3 className="text-sm font-semibold text-[#FEEBD8]">
+                          Grade {year.grade}
+                        </h3>
+                        <p className="text-xs text-[#FEEBD8]/60 mt-1">
+                          {year.name}
+                        </p>
+                      </div>
+
+                      <div className="text-right">
+                        <div className="text-lg font-bold text-[#FEEBD8]">
+                          {year.gpa !== null
+                            ? convertGPA(year.gpa, gpaScale, gpaScale)
+                            : "--"}
+                        </div>
+                      </div>
                     </div>
-                    <div className="text-[#FEEBD8]/60 text-sm">
-                      {term.courses} courses completed
+
+                    {/* Read-only mode by default, editable when editing */}
+                    {isEditingGPA ? (
+                      <div className="space-y-3">
+                        <input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          max={
+                            gpaScale === "4.0"
+                              ? "4"
+                              : gpaScale === "5.0"
+                              ? "5"
+                              : "100"
+                          }
+                          placeholder={`Enter GPA (${
+                            gpaScale === "100" ? "%" : gpaScale
+                          })`}
+                          value={year.gpa || ""}
+                          onChange={(e) => {
+                            const value = parseFloat(e.target.value);
+                            updateYearGPA(index, isNaN(value) ? null : value);
+                          }}
+                          className="w-full bg-neutral-700/50 border border-neutral-700 rounded-lg px-3 py-2 text-[#FEEBD8] text-center text-sm font-medium placeholder-[#FEEBD8]/40 focus:outline-none focus:border-[#FEEBD8] focus:bg-neutral-700 transition-all duration-200"
+                        />
+
+                        {year.gpa !== null && (
+                          <div className="text-xs text-center">
+                            <div className="flex justify-between text-[#FEEBD8]/60 space-x-2">
+                              <span>
+                                4.0: {convertGPA(year.gpa, gpaScale, "4.0")}
+                              </span>
+                              <span>
+                                5.0: {convertGPA(year.gpa, gpaScale, "5.0")}
+                              </span>
+                              <span>
+                                %: {convertGPA(year.gpa, gpaScale, "100")}%
+                              </span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="text-center py-2">
+                        {year.gpa !== null ? (
+                          <div className="text-xs text-[#FEEBD8]/60">
+                            <div className="flex justify-between space-x-2">
+                              <span>
+                                4.0: {convertGPA(year.gpa, gpaScale, "4.0")}
+                              </span>
+                              <span>
+                                5.0: {convertGPA(year.gpa, gpaScale, "5.0")}
+                              </span>
+                              <span>
+                                %: {convertGPA(year.gpa, gpaScale, "100")}%
+                              </span>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="text-sm text-gray-500">
+                            No GPA entered
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Progress Summary */}
+            {cumulativeGPA > 0 && (
+              <div className="mt-8 p-6 bg-gradient-to-r from-green-900/15 to-blue-900/15 rounded-lg border border-green-500/20">
+                <div className="flex items-center gap-3 mb-4">
+                  <FaBullseye className="text-green-400 text-lg" />
+                  <h3 className="text-lg font-semibold text-green-400">
+                    Academic Progress
+                  </h3>
+                </div>
+                <p className="text-gray-300 leading-relaxed text-base">
+                  Your cumulative high school GPA is{" "}
+                  <span className="font-bold text-white">
+                    {convertGPA(cumulativeGPA, "4.0", gpaScale)}
+                  </span>
+                  .
+                  {cumulativeGPA >= 3.8 &&
+                    " 🏆 Outstanding! You're in the top tier for college admissions."}
+                  {cumulativeGPA >= 3.5 &&
+                    cumulativeGPA < 3.8 &&
+                    " 🎯 Excellent work! You're competitive for most universities."}
+                  {cumulativeGPA >= 3.0 &&
+                    cumulativeGPA < 3.5 &&
+                    " 📈 Good progress! Keep pushing to reach your target schools."}
+                  {cumulativeGPA < 3.0 &&
+                    " 💪 Focus on your remaining years to boost your overall GPA."}
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Exam Scores and Events */}
+          <div className="space-y-6">
+            {/* Exam Scores Overview */}
+            <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6 hover:border-[#FEEBD8]/30 transition-colors">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-gradient-to-br from-[#FEEBD8] to-[#E5D5B7]">
+                    <FaTrophy className="text-[#141414]" size={18} />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold text-[#FEEBD8]">
+                      Exam Scores
+                    </h3>
+                    <p className="text-[#FEEBD8]/70 text-sm mt-1">
+                      Track your standardized test performance
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={handleAddExamScore}
+                  className="bg-[#FEEBD8] text-[#141414] px-3 py-2 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors flex items-center gap-2"
+                >
+                  <FaPlus size={12} />
+                  <span>Add</span>
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                {academicData.exams.map((exam) => (
+                  <div
+                    key={exam.id}
+                    className="bg-neutral-800/50 rounded-lg p-4 border border-neutral-700/30"
+                  >
+                    <div className="flex justify-between items-start mb-3">
+                      <div>
+                        <h4 className="font-medium text-[#FEEBD8] text-sm">
+                          {exam.name}
+                        </h4>
+                        <p className="text-[#FEEBD8]/60 text-xs mt-1">
+                          {new Date(exam.date).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-lg font-semibold text-[#FEEBD8]">
+                          {exam.score}/{exam.maxScore}
+                        </div>
+                        <div className="text-xs text-[#FEEBD8]/60">
+                          {getExamProgress(exam).toFixed(0)}%
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mb-2">
+                      <div className="flex justify-between text-xs text-[#FEEBD8]/60 mb-1">
+                        <span>Progress</span>
+                        <span>{getExamProgress(exam).toFixed(0)}%</span>
+                      </div>
+                      <div className="w-full bg-neutral-700 rounded-full h-2">
+                        <div
+                          className="bg-[#FEEBD8] h-2 rounded-full transition-all duration-300"
+                          style={{ width: `${getExamProgress(exam)}%` }}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="text-[#FEEBD8]/60">
+                        Target: {exam.target}
+                      </span>
+                      <span className="text-gray-400">
+                        Attempts: {exam.attempts}
+                      </span>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
-          </div>
 
-          {/* Exam Scores */}
-          <div className="bg-[#141414] border border-neutral-700 rounded-lg p-6">
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-3">
+            {/* Upcoming Academic Events */}
+            <div className="bg-[#141414] border border-neutral-700 rounded-xl p-6">
+              <div className="flex items-center gap-3 mb-6">
                 <div className="p-2 rounded-lg bg-neutral-800">
-                  <FaTrophy className="text-[#FEEBD8]" size={18} />
+                  <FaGraduationCap className="text-[#FEEBD8]" size={18} />
                 </div>
                 <div>
                   <h3 className="text-xl font-semibold text-[#FEEBD8]">
-                    Exam Scores
+                    Upcoming Events
                   </h3>
                   <p className="text-[#FEEBD8]/60 text-sm mt-1">
-                    Record and track standardized test scores and AP exam
-                    results
+                    Academic deadlines and important dates
                   </p>
                 </div>
               </div>
-              <button
-                onClick={handleAddExamScore}
-                className="bg-[#FEEBD8] text-[#141414] px-4 py-2 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors flex items-center gap-2"
-              >
-                <FaPlus size={14} />
-                <span>Add Score</span>
-              </button>
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {academicData.exams.map((exam) => (
-                <div
-                  key={exam.id}
-                  className="bg-neutral-800 rounded-lg p-4 border border-neutral-700"
-                >
-                  <div className="flex justify-between items-start mb-3">
-                    <div className="flex-1">
-                      <h4 className="text-[#FEEBD8] font-medium text-lg mb-1">
-                        {exam.name}
-                      </h4>
-                      <p className="text-[#FEEBD8]/60 text-sm">
-                        {new Date(exam.date).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-2xl font-bold text-green-400">
-                        {exam.score}
-                      </span>
-                      <span className="text-[#FEEBD8]/60">
-                        /{exam.maxScore}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-[#FEEBD8]/70">
-                        Progress to Target ({exam.target})
-                      </span>
-                      <span className="text-[#FEEBD8]/70">
-                        {getExamProgress(exam).toFixed(1)}%
-                      </span>
-                    </div>
-                    <div className="w-full bg-neutral-700 rounded-full h-2">
-                      <div
-                        className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-                        style={{
-                          width: `${Math.min(getExamProgress(exam), 100)}%`,
-                        }}
-                      />
-                    </div>
-                    <div className="flex justify-between items-center pt-1">
-                      <div className="text-xs text-[#FEEBD8]/60">
-                        Attempt {exam.attempts} • Target: {exam.target}
+              <div className="space-y-4">
+                {/* SAT Exam Date - Only if upcoming */}
+                {new Date(satExamDate).getTime() > new Date().getTime() && (
+                  <div className="bg-blue-900/20 border border-blue-700/50 rounded-lg p-4">
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <h4 className="font-medium text-blue-300">SAT Exam</h4>
+                        <p className="text-[#FEEBD8]/60 text-sm">
+                          {new Date(satExamDate).toLocaleDateString("en-US", {
+                            weekday: "long",
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          })}
+                        </p>
                       </div>
-                      <div className="flex gap-1">
-                        <button className="p-1 rounded bg-neutral-700 text-[#FEEBD8]/60 hover:text-[#FEEBD8] hover:bg-neutral-600 transition-colors">
-                          <FaEdit size={12} />
-                        </button>
-                        <button className="p-1 rounded bg-neutral-700 text-red-400 hover:text-red-300 hover:bg-red-900/30 transition-colors">
-                          <FaTrash size={12} />
-                        </button>
+                      <div className="text-blue-400 font-semibold">
+                        {Math.ceil(
+                          (new Date(satExamDate).getTime() -
+                            new Date().getTime()) /
+                            (1000 * 60 * 60 * 24)
+                        )}{" "}
+                        days
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          </div>
+                )}
 
-          {/* Academic Goals */}
-          <div className="bg-[#141414] border border-neutral-700 rounded-lg p-6">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="p-2 rounded-lg bg-neutral-800">
-                <FaStar className="text-[#FEEBD8]" size={18} />
-              </div>
-              <div>
-                <h3 className="text-xl font-semibold text-[#FEEBD8]">
-                  Academic Goals & Motivation
-                </h3>
-                <p className="text-[#FEEBD8]/60 text-sm mt-1">
-                  Stay motivated with upcoming deadlines and achievement
-                  reminders
-                </p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="bg-neutral-800 rounded-lg p-4 border border-neutral-700">
-                <h4 className="text-[#FEEBD8] font-medium mb-3">
-                  Upcoming Deadlines
-                </h4>
-                <div className="space-y-2">
-                  {calendarLoading ? (
-                    <div className="flex items-center gap-2 text-[#FEEBD8]/70 text-sm">
-                      <div className="w-4 h-4 border-2 border-[#FEEBD8]/30 border-t-[#FEEBD8] rounded-full animate-spin"></div>
-                      Loading deadlines...
+                {/* AP Exam Dates - Only upcoming ones */}
+                {apExamDates
+                  .filter(
+                    (ap) => new Date(ap.date).getTime() > new Date().getTime()
+                  )
+                  .slice(0, 3)
+                  .map((ap, index) => (
+                    <div
+                      key={index}
+                      className="bg-green-900/20 border border-green-700/50 rounded-lg p-4"
+                    >
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <h4 className="font-medium text-green-300">
+                            AP {ap.subject}
+                          </h4>
+                          <p className="text-[#FEEBD8]/60 text-sm">
+                            {new Date(ap.date).toLocaleDateString("en-US", {
+                              weekday: "long",
+                              year: "numeric",
+                              month: "long",
+                              day: "numeric",
+                            })}
+                          </p>
+                        </div>
+                        <div className="text-green-400 font-semibold">
+                          {Math.ceil(
+                            (new Date(ap.date).getTime() -
+                              new Date().getTime()) /
+                              (1000 * 60 * 60 * 24)
+                          )}{" "}
+                          days
+                        </div>
+                      </div>
                     </div>
-                  ) : (
-                    <>
-                      {/* SAT Registration */}
-                      {satExamDate && (
-                        <div className="flex justify-between items-center p-2 rounded bg-neutral-700/50">
-                          <span className="text-[#FEEBD8]/90 text-sm">
-                            {satExamDate.title}
-                          </span>
-                          <span
-                            className={`text-sm font-medium ${getTimeLeftColor(
-                              getDaysUntil(satExamDate.date!)
-                            )}`}
-                          >
-                            {formatTimeLeft(getDaysUntil(satExamDate.date!))}
-                          </span>
+                  ))}
+
+                {/* Calendar Events - Test Dates Only */}
+                {calendarEvents
+                  .filter(
+                    (event) =>
+                      event.date &&
+                      event.type === EventType.TEST_DATE &&
+                      new Date(event.date).getTime() > new Date().getTime()
+                  )
+                  .slice(0, 3)
+                  .map((event) => (
+                    <div
+                      key={event.id}
+                      className="bg-purple-900/20 border border-purple-700/50 rounded-lg p-4"
+                    >
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <h4 className="font-medium text-purple-300">
+                            {event.title}
+                          </h4>
+                          <p className="text-[#FEEBD8]/60 text-sm">
+                            {event.date &&
+                              new Date(event.date).toLocaleDateString("en-US", {
+                                weekday: "long",
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                              })}
+                          </p>
                         </div>
-                      )}
-
-                      {/* AP Exam Registration - Multiple APs allowed */}
-                      {apExamDates.map((apExam, index) => (
-                        <div
-                          key={`ap-${index}`}
-                          className="flex justify-between items-center p-2 rounded bg-neutral-700/50"
-                        >
-                          <span className="text-[#FEEBD8]/90 text-sm">
-                            {apExam.title}
-                          </span>
-                          <span
-                            className={`text-sm font-medium ${getTimeLeftColor(
-                              getDaysUntil(apExam.date!)
-                            )}`}
-                          >
-                            {formatTimeLeft(getDaysUntil(apExam.date!))}
-                          </span>
+                        <div className="text-purple-400 font-semibold">
+                          {event.date &&
+                            Math.ceil(
+                              (new Date(event.date).getTime() -
+                                new Date().getTime()) /
+                                (1000 * 60 * 60 * 24)
+                            )}{" "}
+                          days
                         </div>
-                      ))}
-
-                      {/* IB Exam Registration */}
-                      {ibExamDate && (
-                        <div className="flex justify-between items-center p-2 rounded bg-neutral-700/50">
-                          <span className="text-[#FEEBD8]/90 text-sm">
-                            {ibExamDate.title}
-                          </span>
-                          <span
-                            className={`text-sm font-medium ${getTimeLeftColor(
-                              getDaysUntil(ibExamDate.date!)
-                            )}`}
-                          >
-                            {formatTimeLeft(getDaysUntil(ibExamDate.date!))}
-                          </span>
-                        </div>
-                      )}
-
-                      {/* Final Exams */}
-                      {finalExamDate && (
-                        <div className="flex justify-between items-center p-2 rounded bg-neutral-700/50">
-                          <span className="text-[#FEEBD8]/90 text-sm">
-                            Final Exam: {finalExamDate.title}
-                          </span>
-                          <span
-                            className={`text-sm font-medium ${getTimeLeftColor(
-                              getDaysUntil(finalExamDate.date!)
-                            )}`}
-                          >
-                            {formatTimeLeft(getDaysUntil(finalExamDate.date!))}
-                          </span>
-                        </div>
-                      )}
-
-                      {/* No deadlines message */}
-                      {!calendarLoading &&
-                        !satExamDate &&
-                        apExamDates.length === 0 &&
-                        !ibExamDate &&
-                        !finalExamDate && (
-                          <div className="text-center py-4">
-                            <div className="text-[#FEEBD8]/50 text-sm">
-                              No upcoming test dates found. Add them to your
-                              calendar to track deadlines.
-                            </div>
-                          </div>
-                        )}
-                    </>
-                  )}
-                </div>
-              </div>
-
-              <div className="bg-neutral-800 rounded-lg p-4 border border-neutral-700">
-                <h4 className="text-[#FEEBD8] font-medium mb-3">
-                  Motivational Reminders
-                </h4>
-                <div className="space-y-3">
-                  <div className="flex items-start gap-2 p-2 rounded bg-neutral-700/50">
-                    <div className="text-base">🎯</div>
-                    <p className="text-[#FEEBD8]/90 text-sm">
-                      You're only 0.1 points away from your target GPA!
-                    </p>
-                  </div>
-                  <div className="flex items-start gap-2 p-2 rounded bg-neutral-700/50">
-                    <div className="text-base">📚</div>
-                    <p className="text-[#FEEBD8]/90 text-sm">
-                      Your AP courses show strong academic rigor.
-                    </p>
-                  </div>
-                  <div className="flex items-start gap-2 p-2 rounded bg-neutral-700/50">
-                    <div className="text-base">⭐</div>
-                    <p className="text-[#FEEBD8]/90 text-sm">
-                      Consistent improvement across all terms!
-                    </p>
-                  </div>
-                </div>
+                      </div>
+                    </div>
+                  ))}
               </div>
             </div>
           </div>
@@ -617,23 +687,46 @@ export default function AcademyPage() {
         <AddTermModal
           isOpen={showAddTermModal}
           onClose={() => setShowAddTermModal(false)}
-          onSave={(data) => {
-            console.log("Term data:", data);
+          onSave={(termData) => {
+            // Handle term save
+            console.log("Term saved:", termData);
             setShowAddTermModal(false);
           }}
         />
       )}
-
       {showAddExamScoreModal && (
         <AddExamScoreModal
           isOpen={showAddExamScoreModal}
           onClose={() => setShowAddExamScoreModal(false)}
-          onSave={(data) => {
-            console.log("Exam score data:", data);
+          onSave={(examData) => {
+            // Handle exam save
+            console.log("Exam saved:", examData);
             setShowAddExamScoreModal(false);
           }}
         />
       )}
     </div>
   );
+}
+
+// Utility functions for exam dates
+function getSATExamDate() {
+  // Return next SAT exam date (always future)
+  const nextYear = new Date().getFullYear() + 1;
+  return `${nextYear}-03-08`;
+}
+
+function getAPExamDates() {
+  // Return array of AP exam dates (always future)
+  const nextYear = new Date().getFullYear() + 1;
+  return [
+    { subject: "Computer Science A", date: `${nextYear}-05-08` },
+    { subject: "Calculus BC", date: `${nextYear}-05-12` },
+    { subject: "Physics 1", date: `${nextYear}-05-15` },
+  ];
+}
+
+function getIBExamDate() {
+  // Return IB exam period
+  return "2025-05-01";
 }

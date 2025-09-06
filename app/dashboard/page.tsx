@@ -290,7 +290,8 @@ export default function Dashboard() {
       description: "Keep all your files organized",
       icon: <FaFile className="w-8 h-8" />,
       link: "/dashboard/documents",
-      stats: "12 Documents Uploaded",
+      stats: "Demo Available",
+      demo: true,
     },
     {
       title: "Extracurriculars",
@@ -315,7 +316,8 @@ export default function Dashboard() {
       description: "Connect with fellow students worldwide",
       icon: <FaUsers className="w-8 h-8" />,
       link: "/dashboard/peers",
-      stats: "5 Connections • 8 Countries",
+      stats: "Demo Available",
+      demo: true,
     },
     {
       title: "Templates",
@@ -416,27 +418,60 @@ export default function Dashboard() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {getDashboardSections().map((section, index) => (
-              <Link
-                key={index}
-                href={section.link}
-                className="group bg-[#141414] border border-neutral-700/50 rounded-lg p-6 hover:border-[#FEEBD8]/30 transition-all duration-300 hover:shadow-lg"
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <div className="text-[#FEEBD8] group-hover:text-white transition-colors">
-                    {section.icon}
+              <div key={index} className="relative">
+                <Link
+                  href={section.link}
+                  className={`group border rounded-lg p-6 transition-all duration-300 hover:shadow-lg block ${
+                    section.demo
+                      ? "bg-[#141414]/50 border-neutral-700/30 opacity-70 hover:opacity-85 hover:border-neutral-600/40"
+                      : "bg-[#141414] border-neutral-700/50 hover:border-[#FEEBD8]/30"
+                  }`}
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <div
+                      className={`transition-colors ${
+                        section.demo
+                          ? "text-[#FEEBD8]/50 group-hover:text-[#FEEBD8]/70"
+                          : "text-[#FEEBD8] group-hover:text-white"
+                      }`}
+                    >
+                      {section.icon}
+                    </div>
+                    {section.demo ? (
+                      <div className="bg-amber-500/20 text-amber-300 text-xs px-2 py-1 rounded-full font-medium">
+                        Demo
+                      </div>
+                    ) : (
+                      <FaArrowRight className="text-[#FEEBD8]/40 group-hover:text-[#FEEBD8] group-hover:translate-x-1 transition-all" />
+                    )}
                   </div>
-                  <FaArrowRight className="text-[#FEEBD8]/40 group-hover:text-[#FEEBD8] group-hover:translate-x-1 transition-all" />
-                </div>
-                <h3 className="text-xl font-semibold text-[#FEEBD8] mb-2 group-hover:text-white transition-colors">
-                  {section.title}
-                </h3>
-                <p className="text-[#FEEBD8]/70 text-sm mb-3 group-hover:text-[#FEEBD8]/90 transition-colors">
-                  {section.description}
-                </p>
-                <div className="text-xs text-[#FEEBD8]/60 font-medium">
-                  {section.stats}
-                </div>
-              </Link>
+                  <h3
+                    className={`text-xl font-semibold mb-2 transition-colors ${
+                      section.demo
+                        ? "text-[#FEEBD8]/50 group-hover:text-[#FEEBD8]/70"
+                        : "text-[#FEEBD8] group-hover:text-white"
+                    }`}
+                  >
+                    {section.title}
+                  </h3>
+                  <p
+                    className={`text-sm mb-3 transition-colors ${
+                      section.demo
+                        ? "text-[#FEEBD8]/40 group-hover:text-[#FEEBD8]/60"
+                        : "text-[#FEEBD8]/70 group-hover:text-[#FEEBD8]/90"
+                    }`}
+                  >
+                    {section.description}
+                  </p>
+                  <div
+                    className={`text-xs font-medium ${
+                      section.demo ? "text-amber-300/80" : "text-[#FEEBD8]/60"
+                    }`}
+                  >
+                    {section.stats}
+                  </div>
+                </Link>
+              </div>
             ))}
           </div>
         </div>

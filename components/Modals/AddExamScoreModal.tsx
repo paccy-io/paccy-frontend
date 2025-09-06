@@ -14,11 +14,9 @@ interface ExamScore {
   subject: string;
   score: number;
   maxScore: number;
-  percentile: number;
   testDate: string;
   retakeDate?: string;
   notes: string;
-  status: string;
 }
 
 interface AddExamScoreModalProps {
@@ -88,11 +86,9 @@ export default function AddExamScoreModal({
     subject: "",
     score: 0,
     maxScore: 1600,
-    percentile: 0,
     testDate: "",
     retakeDate: "",
     notes: "",
-    status: "Completed",
   });
 
   const [errors, setErrors] = React.useState<Record<string, string>>({});
@@ -119,18 +115,6 @@ export default function AddExamScoreModal({
           delete newErrors.maxScore;
         }
         break;
-      case "percentile":
-        if (value !== "") {
-          const percentileNum = parseFloat(value);
-          if (isNaN(percentileNum) || percentileNum < 1 || percentileNum > 99) {
-            newErrors.percentile = "Percentile must be 1-99";
-          } else {
-            delete newErrors.percentile;
-          }
-        } else {
-          delete newErrors.percentile;
-        }
-        break;
       default:
         break;
     }
@@ -151,7 +135,8 @@ export default function AddExamScoreModal({
       const updated = { ...prev };
 
       if (name === "testType") {
-        // Auto-set max score based on test type
+        // Update test type and auto-set max score based on test type and reset subscores
+        updated.testType = value;
         switch (value) {
           case "SAT":
             updated.maxScore = 1600;
@@ -178,12 +163,19 @@ export default function AddExamScoreModal({
             updated.maxScore = 9;
             updated.subject = "";
             break;
+          case "GRE":
+            updated.maxScore = 340; // Verbal + Quantitative combined
+            updated.subject = "";
+            break;
+          case "GMAT":
+            updated.maxScore = 800;
+            updated.subject = "";
+            break;
           default:
             updated.maxScore = 100;
             break;
         }
         updated.score = 0;
-        updated.percentile = 0;
         return updated;
       }
 
@@ -192,16 +184,12 @@ export default function AddExamScoreModal({
         updated.score = parseFloat(value) || 0;
       } else if (name === "maxScore") {
         updated.maxScore = parseFloat(value) || 0;
-      } else if (name === "percentile") {
-        updated.percentile = parseFloat(value) || 0;
       } else if (name === "testDate") {
         updated.testDate = value;
       } else if (name === "retakeDate") {
         updated.retakeDate = value;
       } else if (name === "notes") {
         updated.notes = value;
-      } else if (name === "status") {
-        updated.status = value;
       } else if (name === "subject") {
         updated.subject = value;
       }
@@ -223,11 +211,9 @@ export default function AddExamScoreModal({
       subject: "",
       score: 0,
       maxScore: 1600,
-      percentile: 0,
       testDate: "",
       retakeDate: "",
       notes: "",
-      status: "Completed",
     });
     setErrors({});
     setActiveTab("basic");
@@ -260,7 +246,7 @@ export default function AddExamScoreModal({
   const tabs = [
     { id: "basic", label: "Test Info", icon: FaBook },
     { id: "scores", label: "Scores", icon: FaChartLine },
-    { id: "details", label: "Details", icon: FaClipboardList },
+    { id: "details", label: "Details", icon: FaCalendarAlt },
   ];
 
   if (!isOpen) return null;
@@ -357,7 +343,7 @@ export default function AddExamScoreModal({
                 ) : (
                   <div>
                     <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
-                      Subject/Section (Optional)
+                      Name (Optional)
                     </label>
                     <input
                       type="text"
@@ -369,124 +355,85 @@ export default function AddExamScoreModal({
                     />
                   </div>
                 )}
-
-                <div>
-                  <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
-                    Status
-                  </label>
-                  <select
-                    name="status"
-                    value={formData.status}
-                    onChange={handleChange}
-                    className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
-                  >
-                    {statusOptions.map((status) => (
-                      <option key={status} value={status}>
-                        {status}
-                      </option>
-                    ))}
-                  </select>
-                </div>
               </div>
             )}
 
             {/* Scores Tab */}
             {activeTab === "scores" && (
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
-                      Score *
-                    </label>
-                    <input
-                      type="number"
-                      name="score"
-                      value={formData.score || ""}
-                      onChange={handleChange}
-                      required
-                      min="0"
-                      max={formData.maxScore}
-                      className={`w-full bg-neutral-800 border rounded-lg px-3 py-2 text-[#FEEBD8] focus:outline-none transition-colors ${
-                        errors.score
-                          ? "border-red-500 focus:border-red-500"
-                          : "border-neutral-700 focus:border-[#FEEBD8]"
-                      }`}
-                      placeholder={`0 - ${formData.maxScore}`}
-                    />
-                    {errors.score && (
-                      <p className="text-red-400 text-xs mt-1">
-                        {errors.score}
-                      </p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
-                      Max Score *
-                    </label>
-                    <input
-                      type="number"
-                      name="maxScore"
-                      value={formData.maxScore}
-                      onChange={handleChange}
-                      required
-                      min="1"
-                      className={`w-full bg-neutral-800 border rounded-lg px-3 py-2 text-[#FEEBD8] focus:outline-none transition-colors ${
-                        errors.maxScore
-                          ? "border-red-500 focus:border-red-500"
-                          : "border-neutral-700 focus:border-[#FEEBD8]"
-                      }`}
-                    />
-                    {errors.maxScore && (
-                      <p className="text-red-400 text-xs mt-1">
-                        {errors.maxScore}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
+              <div className="space-y-6">
+                {/* Total Score Section */}
                 <div>
-                  <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
-                    Percentile (Optional)
-                  </label>
-                  <input
-                    type="number"
-                    name="percentile"
-                    value={formData.percentile || ""}
-                    onChange={handleChange}
-                    min="1"
-                    max="99"
-                    className={`w-full bg-neutral-800 border rounded-lg px-3 py-2 text-[#FEEBD8] focus:outline-none transition-colors ${
-                      errors.percentile
-                        ? "border-red-500 focus:border-red-500"
-                        : "border-neutral-700 focus:border-[#FEEBD8]"
-                    }`}
-                    placeholder="1 - 99"
-                  />
-                  {errors.percentile && (
-                    <p className="text-red-400 text-xs mt-1">
-                      {errors.percentile}
-                    </p>
-                  )}
-                </div>
+                  <h3 className="text-base font-medium text-[#FEEBD8] mb-3">
+                    Total Score
+                  </h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+                        Score *
+                      </label>
+                      <input
+                        type="number"
+                        name="score"
+                        value={formData.score || ""}
+                        onChange={handleChange}
+                        required
+                        min="0"
+                        max={formData.maxScore}
+                        className={`w-full bg-neutral-800 border rounded-lg px-3 py-2 text-[#FEEBD8] focus:outline-none transition-colors ${
+                          errors.score
+                            ? "border-red-500 focus:border-red-500"
+                            : "border-neutral-700 focus:border-[#FEEBD8]"
+                        }`}
+                        placeholder={`0 - ${formData.maxScore}`}
+                      />
+                      {errors.score && (
+                        <p className="text-red-400 text-xs mt-1">
+                          {errors.score}
+                        </p>
+                      )}
+                    </div>
 
-                {formData.score > 0 && (
-                  <div className="bg-neutral-800 rounded-lg p-3">
-                    <div className="text-center">
-                      <div className="text-lg font-semibold text-[#FEEBD8] mb-1">
-                        {getScorePercentage()}% •{" "}
-                        <span className={getScoreCategory().color}>
-                          {getScoreCategory().label}
-                        </span>
-                      </div>
-                      <div className="text-sm text-[#FEEBD8]/70">
-                        {formData.score} / {formData.maxScore}
-                        {formData.percentile > 0 &&
-                          ` (${formData.percentile}th percentile)`}
-                      </div>
+                    <div>
+                      <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+                        Max Score *
+                      </label>
+                      <input
+                        type="number"
+                        name="maxScore"
+                        value={formData.maxScore}
+                        onChange={handleChange}
+                        required
+                        min="1"
+                        className={`w-full bg-neutral-800 border rounded-lg px-3 py-2 text-[#FEEBD8] focus:outline-none transition-colors ${
+                          errors.maxScore
+                            ? "border-red-500 focus:border-red-500"
+                            : "border-neutral-700 focus:border-[#FEEBD8]"
+                        }`}
+                      />
+                      {errors.maxScore && (
+                        <p className="text-red-400 text-xs mt-1">
+                          {errors.maxScore}
+                        </p>
+                      )}
                     </div>
                   </div>
-                )}
+
+                  {formData.score > 0 && (
+                    <div className="bg-neutral-800 rounded-lg p-3 mt-3">
+                      <div className="text-center">
+                        <div className="text-lg font-semibold text-[#FEEBD8] mb-1">
+                          {getScorePercentage()}% •{" "}
+                          <span className={getScoreCategory().color}>
+                            {getScoreCategory().label}
+                          </span>
+                        </div>
+                        <div className="text-sm text-[#FEEBD8]/70">
+                          {formData.score} / {formData.maxScore}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 
@@ -502,21 +449,9 @@ export default function AddExamScoreModal({
                   placeholder="Select test date"
                 />
 
-                {formData.status === "Planning to Retake" && (
-                  <DatePicker
-                    label="Planned Retake Date"
-                    value={formData.retakeDate}
-                    onChange={(date) =>
-                      setFormData((prev) => ({ ...prev, retakeDate: date }))
-                    }
-                    placeholder="Select retake date"
-                    minDate={formData.testDate || undefined}
-                  />
-                )}
-
                 <div>
                   <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
-                    Notes
+                    Notes (recommended for subscores)
                   </label>
                   <textarea
                     name="notes"
