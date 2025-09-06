@@ -32,14 +32,8 @@ export const templatesApi = {
     templateId: string,
     collegeApplicationId: string
   ): Promise<TemplateImportResult> {
-    console.log("🎯 Templates API importTemplate called:", {
-      templateId,
-      collegeApplicationId,
-    });
-
     // Get the template data (this would normally come from a backend API)
     const template = getTemplateById(templateId);
-    console.log("📋 Template found:", template);
     if (!template) {
       throw new Error(`Template with ID ${templateId} not found`);
     }
@@ -61,12 +55,6 @@ export const templatesApi = {
     let checklistsCreated = 0;
     let tasksCreated = 0;
 
-    console.log(`Starting template import for: ${template.name}`);
-    console.log(`Application deadline: ${existingApplication.deadline}`);
-    console.log(
-      `Number of checklists to create: ${template.checklists.length}`
-    );
-
     for (const templateChecklist of template.checklists) {
       try {
         // First create the checklist
@@ -79,19 +67,10 @@ export const templatesApi = {
             `Template checklist: ${templateChecklist.name}`,
         };
 
-        console.log(
-          `Creating checklist: ${templateChecklist.name} with ${templateChecklist.tasks.length} tasks`,
-          checklistData
-        );
-
         const createdChecklistResponse = await checklistsApi.create(
           checklistData
         );
         checklistsCreated++;
-
-        console.log(
-          `✓ Checklist created successfully: ${templateChecklist.name}`
-        );
 
         // Handle the response - it could be either a Checklist or CollegeApplication
         let checklistId: string;
@@ -161,10 +140,6 @@ export const templatesApi = {
         }
 
         // Then add tasks to the checklist
-        console.log(
-          `Creating ${templateChecklist.tasks.length} tasks for checklist: ${templateChecklist.name}`
-        );
-
         for (const templateTask of templateChecklist.tasks) {
           try {
             const taskData: StandaloneCreateTaskDTO =
@@ -175,31 +150,13 @@ export const templatesApi = {
                 checklistId
               );
 
-            console.log(
-              `  Creating task: ${taskData.name} (due: ${taskData.deadline})`
-            );
-
             await tasksApi.create(taskData);
             tasksCreated++;
-
-            console.log(`  ✓ Task created: ${taskData.name}`);
           } catch (taskError) {
-            console.error(
-              `  ✗ Failed to create task: ${templateTask.name}`,
-              taskError
-            );
             throw taskError;
           }
         }
-
-        console.log(
-          `✓ All tasks created for checklist: ${templateChecklist.name}`
-        );
       } catch (error) {
-        console.error(
-          `Failed to process checklist: ${templateChecklist.name}`,
-          error
-        );
         throw new Error(
           `Failed to create checklist "${templateChecklist.name}": ${
             error instanceof Error ? error.message : "Unknown error"
@@ -209,11 +166,6 @@ export const templatesApi = {
     }
 
     // Log final summary
-    console.log(`🎉 Template import completed successfully!`);
-    console.log(`📋 Created ${checklistsCreated} checklists`);
-    console.log(`✅ Created ${tasksCreated} tasks`);
-    console.log(`📚 Template: ${template.name}`);
-
     // Return the updated college application with import stats
     const updatedCollegeApplication = await collegeApplicationsApi.getById(
       collegeApplicationId

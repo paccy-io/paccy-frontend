@@ -9,6 +9,7 @@ import { useAuth } from "../../components/AuthProvider";
 import { collegeApplicationsApi } from "../../lib/api/college-applications";
 import { essaysApi } from "../../lib/api/essays";
 import { extracurricularsApi } from "../../lib/api/extracurriculars";
+import { academicApi } from "../../lib/api/academic";
 import {
   Essay,
   CollegeApplication,
@@ -75,13 +76,6 @@ const quickActions = [
     link: "/dashboard/templates",
     color: "from-indigo-500 to-indigo-600",
   },
-  {
-    title: "Upload Document",
-    description: "Organize your application files",
-    icon: <FaFile className="w-6 h-6" />,
-    link: "/dashboard/documents",
-    color: "from-yellow-500 to-yellow-600",
-  },
 ];
 
 export default function Dashboard() {
@@ -94,6 +88,11 @@ export default function Dashboard() {
   const [extracurriculars, setExtracurriculars] = useState<Extracurricular[]>(
     []
   );
+  const [academicData, setAcademicData] = useState({
+    exams: [] as any[],
+    gpa: null as any,
+    loading: true,
+  });
   const [dataLoading, setDataLoading] = useState(true);
 
   useEffect(() => {
@@ -113,6 +112,9 @@ export default function Dashboard() {
       setApplications(applicationsData);
       setEssays(essaysData);
       setExtracurriculars(extracurricularsData);
+
+      // Load academic data separately to avoid blocking other data
+      loadAcademicData();
     } catch (error) {
       console.warn("Failed to load dashboard data:", error);
       // Use empty arrays as fallback
@@ -121,6 +123,29 @@ export default function Dashboard() {
       setExtracurriculars([]);
     } finally {
       setDataLoading(false);
+    }
+  };
+
+  // Load academic data
+  const loadAcademicData = async () => {
+    try {
+      setAcademicData((prev) => ({ ...prev, loading: true }));
+      const [examsData, gpaData] = await Promise.all([
+        academicApi.getExams().catch(() => []),
+        academicApi.getHighSchoolGPA().catch(() => null),
+      ]);
+      setAcademicData({
+        exams: examsData,
+        gpa: gpaData,
+        loading: false,
+      });
+    } catch (error) {
+      console.warn("Failed to load academic data:", error);
+      setAcademicData({
+        exams: [],
+        gpa: null,
+        loading: false,
+      });
     }
   };
 
@@ -165,6 +190,54 @@ export default function Dashboard() {
         essay.status === EssayStatus.NOT_STARTED ||
         essay.status === EssayStatus.REVIEW_NEEDED
     ).length;
+  };
+
+  // Calculate cumulative GPA
+  const calculateCumulativeGPA = () => {
+    if (!academicData.gpa) return null;
+
+    const gpaValues = [
+      academicData.gpa.gpa_1,
+      academicData.gpa.gpa_2,
+      academicData.gpa.gpa_3,
+      academicData.gpa.gpa_4,
+    ]
+      .filter(Boolean)
+      .map(parseFloat);
+
+    if (gpaValues.length === 0) return null;
+
+    // Convert to 4.0 scale for calculation
+    const normalizedGPAs = gpaValues.map((gpa) => {
+      const scale = academicData.gpa.scale;
+      if (scale === "5.0") return (gpa / 5) * 4;
+      if (scale === "100") return (gpa / 100) * 4;
+      return gpa; // Already 4.0 scale
+    });
+
+    return (
+      normalizedGPAs.reduce((sum, gpa) => sum + gpa, 0) / normalizedGPAs.length
+    );
+  };
+
+  // Get academic stats for dashboard
+  const getAcademicStats = () => {
+    if (academicData.loading) return "Loading...";
+
+    const gpa = calculateCumulativeGPA();
+    const examCount = academicData.exams.length;
+
+    if (gpa && examCount > 0) {
+      return `GPA ${gpa.toFixed(2)} • ${examCount} ${
+        examCount === 1 ? "Exam" : "Exams"
+      }`;
+    } else if (gpa) {
+      return `GPA ${gpa.toFixed(2)}`;
+    } else if (examCount > 0) {
+      return `${examCount} ${examCount === 1 ? "Exam" : "Exams"} Logged`;
+    } else {
+      return "Track your academic progress";
+    }
   };
 
   const getTotalEssaysCount = () => {
@@ -309,7 +382,8 @@ export default function Dashboard() {
       description: "Monitor your academic progress",
       icon: <FaGraduationCap className="w-8 h-8" />,
       link: "/dashboard/academy",
-      stats: "GPA 3.85 • 4 Exams",
+      stats: getAcademicStats(),
+      new: true,
     },
     {
       title: "Peer Network",

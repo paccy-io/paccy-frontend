@@ -494,21 +494,6 @@ export default function CollegeDetail() {
         ...taskData,
       };
 
-      // Enhanced debug logging
-      console.log("=== HANDLE CREATE TASK DEBUG ===");
-      console.log("College ID:", collegeId);
-      console.log("Checklist ID:", checklistId);
-      console.log("Input taskData:", JSON.stringify(taskData, null, 2));
-      console.log(
-        "Final createData being sent to API:",
-        JSON.stringify(createData, null, 2)
-      );
-      console.log(
-        "API endpoint will be:",
-        `${API_BASE_URL}${API_ENDPOINTS.COLLEGE_APPLICATION_TASKS}`
-      );
-      console.log("===================================");
-
       await api.tasks.create(createData);
       showSuccess(`Created task "${taskData.name}" successfully`);
 
@@ -691,7 +676,6 @@ export default function CollegeDetail() {
 
     // Only proceed if there are changes to update
     if (Object.keys(updateData).length === 0) {
-      console.log("No changes detected, skipping update");
       setShowEditCollegeModal(false);
       setEditForm({});
       setTagsInput("");
@@ -699,13 +683,8 @@ export default function CollegeDetail() {
     }
 
     try {
-      // Debug: Log the data being sent
-      console.log("Updating college with data:", updateData);
-      console.log("College ID:", collegeId);
-
       // Check if auth token exists
       const token = localStorage.getItem("auth-token");
-      console.log("Auth token exists:", !!token);
       if (!token) {
         throw new Error("No authentication token found. Please log in again.");
       }
@@ -2075,14 +2054,9 @@ export default function CollegeDetail() {
               onSubmit={(e) => {
                 e.preventDefault();
 
-                console.log("=== TASK CREATION DEBUG ===");
-                console.log("Form state:", newTaskForm);
-
                 const deadlineValue = formatDateForBackend(
                   newTaskForm.deadline
                 );
-
-                console.log("Formatted deadline value:", deadlineValue);
 
                 const taskData: any = {
                   name: newTaskForm.name.trim(),
@@ -2104,16 +2078,6 @@ export default function CollegeDetail() {
                   showError("Task name is required");
                   return;
                 }
-
-                console.log(
-                  "Final taskData to be sent:",
-                  JSON.stringify(taskData, null, 2)
-                );
-                console.log(
-                  "selectedChecklistForTask:",
-                  selectedChecklistForTask
-                );
-                console.log("===========================");
 
                 handleCreateTask(selectedChecklistForTask, taskData);
                 setShowAddTaskModal(false);

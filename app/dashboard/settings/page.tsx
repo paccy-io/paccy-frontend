@@ -137,7 +137,6 @@ export default function Settings() {
       }
 
       const result = await response.json();
-      console.log("Profile update success:", result);
       return result;
     } catch (error) {
       console.error("Error updating user profile:", error);

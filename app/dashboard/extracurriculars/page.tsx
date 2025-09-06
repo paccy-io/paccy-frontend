@@ -135,11 +135,6 @@ export default function ExtracurricularsPage() {
 
   useEffect(() => {
     document.title = "Extracurriculars | Paccy";
-    console.log("Extracurriculars page mounted");
-    console.log(
-      "Auth token in localStorage:",
-      localStorage.getItem("auth-token")
-    );
     loadExtracurriculars();
   }, []);
 
@@ -157,11 +152,8 @@ export default function ExtracurricularsPage() {
   };
 
   const handleAddActivity = async (activityData: CreateExtracurricularDTO) => {
-    console.log("handleAddActivity called with:", activityData);
     try {
-      console.log("Making API call to create extracurricular...");
       const newActivity = await extracurricularsApi.create(activityData);
-      console.log("API call successful, new activity:", newActivity);
       setExtracurriculars((prev) => [newActivity, ...prev]);
       setShowAddActivityModal(false);
       showSuccessToast("Extracurricular activity added successfully!");
@@ -181,15 +173,11 @@ export default function ExtracurricularsPage() {
   ) => {
     if (!selectedActivity) return;
 
-    console.log("handleUpdateActivity called with:", activityData);
-    console.log("selectedActivity:", selectedActivity);
     try {
-      console.log("Making API call to update extracurricular...");
       const updatedActivity = await extracurricularsApi.update(
         selectedActivity.id,
         activityData
       );
-      console.log("API call successful, updated activity:", updatedActivity);
       setExtracurriculars((prev) =>
         prev.map((item) =>
           item.id === selectedActivity.id ? updatedActivity : item

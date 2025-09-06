@@ -6,7 +6,6 @@ import {
   FaCalendarAlt,
   FaClipboardList,
 } from "react-icons/fa";
-import DatePicker from "../DatePicker";
 
 interface ExamScore {
   id: number;
@@ -23,21 +22,30 @@ interface AddExamScoreModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (exam: Omit<ExamScore, "id">) => void;
+  examToEdit?: {
+    id: string;
+    type: string;
+    name: string;
+    score: string;
+    max_score: string;
+    exam_date: string;
+    notes?: string;
+  } | null;
 }
 
 const testTypes = [
   "SAT",
   "ACT",
   "SAT Subject Test",
-  "AP Exam",
-  "IB Exam",
+  "AP",
+  "IB",
   "TOEFL",
   "IELTS",
   "GRE",
   "GMAT",
   "LSAT",
   "MCAT",
-  "Other",
+  "other",
 ];
 
 const commonSubjects = {
@@ -51,20 +59,55 @@ const commonSubjects = {
     "World History",
     "Literature",
   ],
-  "AP Exam": [
-    "Biology",
+  AP: [
+    // Arts
+    "Art History",
+    "Music Theory",
+    "Studio Art: 2-D Design",
+    "Studio Art: 3-D Design",
+    "Studio Art: Drawing",
+
+    // English
+    "English Language and Composition",
+    "English Literature and Composition",
+
+    // History & Social Science
+    "Comparative Government and Politics",
+    "European History",
+    "Human Geography",
+    "Macroeconomics",
+    "Microeconomics",
+    "Psychology",
+    "United States Government and Politics",
+    "United States History",
+    "World History: Modern",
+
+    // Math & Computer Science
     "Calculus AB",
     "Calculus BC",
-    "Chemistry",
     "Computer Science A",
-    "English Language",
-    "English Literature",
-    "Physics 1",
-    "Physics 2",
-    "Psychology",
+    "Computer Science Principles",
+    "Precalculus",
     "Statistics",
-    "U.S. History",
-    "World History",
+
+    // Sciences
+    "Biology",
+    "Chemistry",
+    "Environmental Science",
+    "Physics 1: Algebra-Based",
+    "Physics 2: Algebra-Based",
+    "Physics C: Electricity and Magnetism",
+    "Physics C: Mechanics",
+
+    // World Languages & Cultures
+    "Chinese Language and Culture",
+    "French Language and Culture",
+    "German Language and Culture",
+    "Italian Language and Culture",
+    "Japanese Language and Culture",
+    "Latin",
+    "Spanish Language and Culture",
+    "Spanish Literature and Culture",
   ],
 };
 
@@ -79,6 +122,7 @@ export default function AddExamScoreModal({
   isOpen,
   onClose,
   onSave,
+  examToEdit,
 }: AddExamScoreModalProps) {
   const [activeTab, setActiveTab] = React.useState("basic");
   const [formData, setFormData] = React.useState({
@@ -92,6 +136,34 @@ export default function AddExamScoreModal({
   });
 
   const [errors, setErrors] = React.useState<Record<string, string>>({});
+
+  // Initialize form data when editing
+  React.useEffect(() => {
+    if (examToEdit) {
+      setFormData({
+        testType: examToEdit.type,
+        subject: examToEdit.name !== examToEdit.type ? examToEdit.name : "",
+        score: parseFloat(examToEdit.score),
+        maxScore: parseFloat(examToEdit.max_score),
+        testDate: examToEdit.exam_date,
+        retakeDate: "",
+        notes: examToEdit.notes || "",
+      });
+    } else {
+      // Reset to default when adding new
+      setFormData({
+        testType: "SAT",
+        subject: "",
+        score: 0,
+        maxScore: 1600,
+        testDate: "",
+        retakeDate: "",
+        notes: "",
+      });
+    }
+    setErrors({});
+    setActiveTab("basic");
+  }, [examToEdit, isOpen]);
 
   const validateField = (name: string, value: any) => {
     const newErrors = { ...errors };
@@ -113,6 +185,19 @@ export default function AddExamScoreModal({
           newErrors.maxScore = "Valid max score required";
         } else {
           delete newErrors.maxScore;
+        }
+        break;
+      case "testDate":
+        if (!value || value.trim() === "") {
+          newErrors.testDate = "Exam date is required";
+        } else {
+          // Validate YYYY-MM format
+          const dateRegex = /^\d{4}-\d{2}$/;
+          if (!dateRegex.test(value)) {
+            newErrors.testDate = "Invalid date format (YYYY-MM required)";
+          } else {
+            delete newErrors.testDate;
+          }
         }
         break;
       default:
@@ -149,10 +234,10 @@ export default function AddExamScoreModal({
           case "SAT Subject Test":
             updated.maxScore = 800;
             break;
-          case "AP Exam":
+          case "AP":
             updated.maxScore = 5;
             break;
-          case "IB Exam":
+          case "IB":
             updated.maxScore = 7;
             break;
           case "TOEFL":
@@ -201,7 +286,17 @@ export default function AddExamScoreModal({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (Object.keys(errors).length > 0 || formData.score === 0) return;
+    // Validate all required fields before submission
+    validateField("score", formData.score);
+    validateField("maxScore", formData.maxScore);
+    validateField("testDate", formData.testDate);
+
+    if (
+      Object.keys(errors).length > 0 ||
+      formData.score === 0 ||
+      !formData.testDate
+    )
+      return;
 
     onSave(formData);
 
@@ -262,7 +357,7 @@ export default function AddExamScoreModal({
                 <FaChartLine className="text-[#FEEBD8]" size={18} />
               </div>
               <h2 className="text-xl font-semibold text-[#FEEBD8]">
-                Add Exam Score
+                {examToEdit ? "Edit Exam Score" : "Add Exam Score"}
               </h2>
             </div>
             <button
@@ -440,14 +535,32 @@ export default function AddExamScoreModal({
             {/* Details Tab */}
             {activeTab === "details" && (
               <div className="space-y-4">
-                <DatePicker
-                  label="Test Date"
-                  value={formData.testDate}
-                  onChange={(date) =>
-                    setFormData((prev) => ({ ...prev, testDate: date }))
-                  }
-                  placeholder="Select test date"
-                />
+                <div>
+                  <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+                    Exam Date (Month & Year) *
+                  </label>
+                  <input
+                    type="month"
+                    name="testDate"
+                    value={formData.testDate}
+                    onChange={handleChange}
+                    required
+                    className={`w-full bg-neutral-800 border rounded-lg px-3 py-2 text-[#FEEBD8] focus:outline-none transition-colors ${
+                      errors.testDate
+                        ? "border-red-500 focus:border-red-500"
+                        : "border-neutral-700 focus:border-[#FEEBD8]"
+                    }`}
+                    placeholder="YYYY-MM"
+                  />
+                  {errors.testDate && (
+                    <p className="text-red-400 text-xs mt-1">
+                      {errors.testDate}
+                    </p>
+                  )}
+                  <p className="text-[#FEEBD8]/50 text-xs mt-1">
+                    Select the month and year when you took this exam
+                  </p>
+                </div>
 
                 <div>
                   <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
@@ -479,11 +592,13 @@ export default function AddExamScoreModal({
               <button
                 type="submit"
                 disabled={
-                  Object.keys(errors).length > 0 || formData.score === 0
+                  Object.keys(errors).length > 0 ||
+                  formData.score === 0 ||
+                  !formData.testDate
                 }
                 className="flex-1 bg-[#FEEBD8] text-[#141414] px-4 py-2 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Add Score
+                {examToEdit ? "Update Score" : "Add Score"}
               </button>
             </div>
           </div>

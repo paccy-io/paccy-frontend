@@ -52,7 +52,6 @@ async function handleApiResponse<T>(
   }
 
   if (!data.success) {
-    console.log("API Error Response:", data);
     const error = data as any;
     // Create more descriptive error message including server error details
     let errorMessage: any = data.error || "Unknown server error";
@@ -109,30 +108,7 @@ async function makeRequest<T>(
   }
 
   try {
-    // Log request details in development only
-    if (process.env.NODE_ENV === "development") {
-      console.log("=== API REQUEST DEBUG ===");
-      console.log(`Making ${method} request to:`, url);
-      console.log("Request headers:", headers);
-      if (body) {
-        console.log("Request body (raw):", body);
-        console.log("Request body (JSON):", JSON.stringify(body, null, 2));
-      }
-      console.log("Request config:", config);
-      console.log("==========================");
-    }
-
     const response = await fetch(url, config);
-
-    if (process.env.NODE_ENV === "development") {
-      console.log("=== API RESPONSE DEBUG ===");
-      console.log("Response status:", response.status);
-      console.log(
-        "Response headers:",
-        Object.fromEntries(response.headers.entries())
-      );
-      console.log("===========================");
-    }
 
     return handleApiResponse<T>(response, context);
   } catch (error) {

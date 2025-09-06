@@ -278,14 +278,8 @@ const EditExtracurricularModal: React.FC<EditExtracurricularModalProps> = ({
 
     const changedFields = getChangedFields();
 
-    console.log("EditExtracurricular handleSubmit called");
-    console.log("Original data:", originalData);
-    console.log("Current form data:", formData);
-    console.log("Changed fields only:", changedFields);
-
     // Only submit if there are actually changes
     if (Object.keys(changedFields).length === 0) {
-      console.log("No changes detected, not submitting");
       onClose(); // Just close the modal if no changes
       return;
     }

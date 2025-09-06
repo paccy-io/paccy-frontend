@@ -7,6 +7,12 @@ import Footer from "../../../components/Footer";
 import AddTermModal from "../../../components/Modals/AddTermModal";
 import AddExamScoreModal from "../../../components/Modals/AddExamScoreModal";
 import { calendarApi } from "../../../lib/api/calendar";
+import {
+  academicApi,
+  Exam,
+  HighSchoolGPA,
+  GPAScale as ApiGPAScale,
+} from "../../../lib/api/academic";
 import { CalendarEvent, EventType } from "../../../lib/types";
 import {
   FaArrowLeft,
@@ -21,65 +27,8 @@ import {
   FaAward,
   FaBullseye,
   FaFireAlt,
+  FaSpinner,
 } from "react-icons/fa";
-
-// Mock academic data
-const mockAcademicData = {
-  gpa: {
-    current: 3.85,
-    target: 3.95,
-    terms: [
-      { term: "Fall 2024", gpa: 3.92, courses: 6 },
-      { term: "Spring 2024", gpa: 3.78, courses: 6 },
-      { term: "Fall 2023", gpa: 3.85, courses: 5 },
-      { term: "Spring 2023", gpa: 3.81, courses: 5 },
-    ],
-  },
-  exams: [
-    {
-      id: 1,
-      name: "SAT",
-      score: 1480,
-      maxScore: 1600,
-      date: "2024-10-15",
-      target: 1520,
-      attempts: 2,
-    },
-    {
-      id: 2,
-      name: "ACT",
-      score: 33,
-      maxScore: 36,
-      date: "2024-08-20",
-      target: 35,
-      attempts: 1,
-    },
-    {
-      id: 3,
-      name: "AP Calculus BC",
-      score: 5,
-      maxScore: 5,
-      date: "2024-05-15",
-      target: 5,
-      attempts: 1,
-    },
-    {
-      id: 4,
-      name: "AP Physics 1",
-      score: 4,
-      maxScore: 5,
-      date: "2024-05-20",
-      target: 5,
-      attempts: 1,
-    },
-  ],
-  academicGoals: [
-    { id: 1, goal: "Achieve 3.95 GPA", completed: false, priority: "high" },
-    { id: 2, goal: "Score 1520+ on SAT", completed: false, priority: "high" },
-    { id: 3, goal: "Take 5 AP courses", completed: true, priority: "medium" },
-    { id: 4, goal: "Maintain honor roll", completed: true, priority: "medium" },
-  ],
-};
 
 const gradeColorMap: { [key: string]: string } = {
   A: "text-green-400",
@@ -101,7 +50,16 @@ type GPAScale = "4.0" | "5.0" | "100";
 export default function AcademyPage() {
   const [showAddTermModal, setShowAddTermModal] = useState(false);
   const [showAddExamScoreModal, setShowAddExamScoreModal] = useState(false);
+  const [editingExam, setEditingExam] = useState<Exam | null>(null);
   const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([]);
+
+  // API Data State
+  const [exams, setExams] = useState<Exam[]>([]);
+  const [highSchoolGPA, setHighSchoolGPA] = useState<HighSchoolGPA | null>(
+    null
+  );
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
   // GPA Tracker State
   const [gpaScale, setGpaScale] = useState<GPAScale>("4.0");
@@ -173,40 +131,99 @@ export default function AcademyPage() {
     };
   };
 
-  const cumulativeGPA = calculateCumulativeGPA();
-  const gpaLevel = getGPALevel(cumulativeGPA);
-
+  // Load initial data from API
   useEffect(() => {
-    const fetchCalendarEvents = async () => {
+    const loadData = async () => {
       try {
+        setLoading(true);
+
+        // Load exam scores
+        const examData = await academicApi.getExams();
+        setExams(examData);
+
+        // Load high school GPA
+        const gpaData = await academicApi.getHighSchoolGPA();
+        setHighSchoolGPA(gpaData);
+
+        // If GPA data exists, populate the form
+        if (gpaData) {
+          setGpaScale(gpaData.scale);
+          const updatedYears = [...gradeYears];
+          if (gpaData.gpa_1) updatedYears[0].gpa = parseFloat(gpaData.gpa_1);
+          if (gpaData.gpa_2) updatedYears[1].gpa = parseFloat(gpaData.gpa_2);
+          if (gpaData.gpa_3) updatedYears[2].gpa = parseFloat(gpaData.gpa_3);
+          if (gpaData.gpa_4) updatedYears[3].gpa = parseFloat(gpaData.gpa_4);
+          setGradeYears(updatedYears);
+        }
+
+        // Load calendar events
         const events = await calendarApi.getAll();
         setCalendarEvents(events);
       } catch (error) {
-        console.error("Failed to fetch calendar events:", error);
+        console.error("Failed to load academy data:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchCalendarEvents();
+    loadData();
   }, []);
+
+  // Save GPA data to API
+  const saveGPAData = async () => {
+    try {
+      setSaving(true);
+
+      const gpaData = {
+        scale: gpaScale as ApiGPAScale,
+        gpa_1: gradeYears[0].gpa?.toString(),
+        gpa_2: gradeYears[1].gpa?.toString(),
+        gpa_3: gradeYears[2].gpa?.toString(),
+        gpa_4: gradeYears[3].gpa?.toString(),
+      };
+
+      const savedGPA = await academicApi.saveHighSchoolGPA(gpaData);
+      setHighSchoolGPA(savedGPA);
+      setIsEditingGPA(false);
+    } catch (error) {
+      console.error("Failed to save GPA data:", error);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const cumulativeGPA = calculateCumulativeGPA();
+  const gpaLevel = getGPALevel(cumulativeGPA);
 
   const handleAddTerm = () => {
     setShowAddTermModal(true);
   };
 
   const handleAddExamScore = () => {
+    setEditingExam(null); // Clear any editing state
     setShowAddExamScoreModal(true);
   };
 
-  const [academicData, setAcademicData] = useState(mockAcademicData);
-
-  const calculateGPAProgress = () => {
-    const current = academicData.gpa.current;
-    const target = academicData.gpa.target;
-    return (current / target) * 100;
+  const getExamProgress = (exam: Exam) => {
+    return (parseFloat(exam.score) / parseFloat(exam.max_score)) * 100;
   };
 
-  const getExamProgress = (exam: any) => {
-    return (exam.score / exam.maxScore) * 100;
+  const handleEditExam = (exam: Exam) => {
+    setEditingExam(exam);
+    setShowAddExamScoreModal(true);
+  };
+
+  const handleDeleteExam = async (examId: string) => {
+    if (!confirm("Are you sure you want to delete this exam score?")) {
+      return;
+    }
+
+    try {
+      await academicApi.deleteExam(examId);
+      setExams((prev) => prev.filter((exam) => exam.id !== examId));
+    } catch (error) {
+      console.error("Failed to delete exam:", error);
+    }
   };
 
   // Memoize exam dates to avoid multiple function calls
@@ -261,15 +278,26 @@ export default function AcademyPage() {
 
               {/* Edit Button */}
               <button
-                onClick={() => setIsEditingGPA(!isEditingGPA)}
+                onClick={() => {
+                  if (isEditingGPA) {
+                    saveGPAData();
+                  } else {
+                    setIsEditingGPA(true);
+                  }
+                }}
+                disabled={saving || loading}
                 className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
                   isEditingGPA
                     ? "bg-[#FEEBD8] text-[#141414] hover:bg-[#E5D5B7]"
                     : "bg-neutral-700/50 text-[#FEEBD8] hover:bg-neutral-700"
-                }`}
+                } ${saving || loading ? "opacity-50 cursor-not-allowed" : ""}`}
               >
-                <FaEdit size={12} />
-                {isEditingGPA ? "Save" : "Edit"}
+                {saving ? (
+                  <FaSpinner className="animate-spin" size={12} />
+                ) : (
+                  <FaEdit size={12} />
+                )}
+                {saving ? "Saving..." : isEditingGPA ? "Save" : "Edit"}
               </button>
             </div>
 
@@ -484,9 +512,18 @@ export default function AcademyPage() {
                     <FaTrophy className="text-[#141414]" size={18} />
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold text-[#FEEBD8]">
-                      Exam Scores
-                    </h3>
+                    <div className="flex items-center gap-3">
+                      <h3 className="text-xl font-semibold text-[#FEEBD8]">
+                        Exam Scores
+                      </h3>
+                      <span className="px-2 py-1 bg-[#FEEBD8]/10 border border-[#FEEBD8]/20 rounded-full text-xs font-medium text-[#FEEBD8]/80">
+                        {loading
+                          ? "..."
+                          : `${exams.length} ${
+                              exams.length === 1 ? "exam" : "exams"
+                            }`}
+                      </span>
+                    </div>
                     <p className="text-[#FEEBD8]/70 text-sm mt-1">
                       Track your standardized test performance
                     </p>
@@ -502,53 +539,95 @@ export default function AcademyPage() {
               </div>
 
               <div className="space-y-4">
-                {academicData.exams.map((exam) => (
-                  <div
-                    key={exam.id}
-                    className="bg-neutral-800/50 rounded-lg p-4 border border-neutral-700/30"
-                  >
-                    <div className="flex justify-between items-start mb-3">
-                      <div>
-                        <h4 className="font-medium text-[#FEEBD8] text-sm">
-                          {exam.name}
-                        </h4>
-                        <p className="text-[#FEEBD8]/60 text-xs mt-1">
-                          {new Date(exam.date).toLocaleDateString()}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-lg font-semibold text-[#FEEBD8]">
-                          {exam.score}/{exam.maxScore}
-                        </div>
-                        <div className="text-xs text-[#FEEBD8]/60">
-                          {getExamProgress(exam).toFixed(0)}%
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="mb-2">
-                      <div className="flex justify-between text-xs text-[#FEEBD8]/60 mb-1">
-                        <span>Progress</span>
-                        <span>{getExamProgress(exam).toFixed(0)}%</span>
-                      </div>
-                      <div className="w-full bg-neutral-700 rounded-full h-2">
-                        <div
-                          className="bg-[#FEEBD8] h-2 rounded-full transition-all duration-300"
-                          style={{ width: `${getExamProgress(exam)}%` }}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="flex justify-between items-center text-xs">
-                      <span className="text-[#FEEBD8]/60">
-                        Target: {exam.target}
-                      </span>
-                      <span className="text-gray-400">
-                        Attempts: {exam.attempts}
-                      </span>
-                    </div>
+                {loading ? (
+                  <div className="text-center py-8">
+                    <FaSpinner className="animate-spin text-[#FEEBD8] text-xl mx-auto mb-2" />
+                    <p className="text-[#FEEBD8]/60">Loading exam scores...</p>
                   </div>
-                ))}
+                ) : exams.length === 0 ? (
+                  <div className="text-center py-8">
+                    <FaTrophy className="text-[#FEEBD8]/40 text-3xl mx-auto mb-3" />
+                    <p className="text-[#FEEBD8]/60">No exam scores yet</p>
+                    <p className="text-[#FEEBD8]/40 text-sm">
+                      Add your first exam score to get started
+                    </p>
+                  </div>
+                ) : (
+                  exams.map((exam) => (
+                    <div
+                      key={exam.id}
+                      className="bg-neutral-800/50 rounded-lg p-4 border border-neutral-700/30 hover:border-[#FEEBD8]/30 transition-colors group"
+                    >
+                      <div className="flex justify-between items-start mb-3">
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between">
+                            <h4 className="font-medium text-[#FEEBD8] text-sm">
+                              {exam.name}
+                            </h4>
+                            <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                              <button
+                                onClick={() => handleEditExam(exam)}
+                                className="p-1.5 rounded-lg bg-blue-600/50 hover:bg-blue-600 text-white transition-colors"
+                                title="Edit exam"
+                              >
+                                <FaEdit size={12} />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteExam(exam.id)}
+                                className="p-1.5 rounded-lg bg-red-600/50 hover:bg-red-600 text-white transition-colors"
+                                title="Delete exam"
+                              >
+                                <FaTrash size={12} />
+                              </button>
+                            </div>
+                          </div>
+                          <p className="text-[#FEEBD8]/60 text-xs mt-1">
+                            {exam.exam_date
+                              ? new Date(
+                                  exam.exam_date + "-01"
+                                ).toLocaleDateString("en-US", {
+                                  year: "numeric",
+                                  month: "long",
+                                })
+                              : "Date not specified"}
+                          </p>
+                        </div>
+                        <div className="text-right ml-3">
+                          <div className="text-lg font-semibold text-[#FEEBD8]">
+                            {exam.score}/{exam.max_score}
+                          </div>
+                          <div className="text-xs text-[#FEEBD8]/60">
+                            {getExamProgress(exam).toFixed(0)}%
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="mb-2">
+                        <div className="flex justify-between text-xs text-[#FEEBD8]/60 mb-1">
+                          <span>Progress</span>
+                          <span>{getExamProgress(exam).toFixed(0)}%</span>
+                        </div>
+                        <div className="w-full bg-neutral-700 rounded-full h-2">
+                          <div
+                            className="bg-[#FEEBD8] h-2 rounded-full transition-all duration-300"
+                            style={{ width: `${getExamProgress(exam)}%` }}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex justify-between items-center text-xs">
+                        <span className="text-[#FEEBD8]/60">
+                          Type: {exam.type}
+                        </span>
+                        {exam.notes && (
+                          <span className="text-gray-400 truncate ml-2">
+                            {exam.notes}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
 
@@ -689,7 +768,6 @@ export default function AcademyPage() {
           onClose={() => setShowAddTermModal(false)}
           onSave={(termData) => {
             // Handle term save
-            console.log("Term saved:", termData);
             setShowAddTermModal(false);
           }}
         />
@@ -697,11 +775,45 @@ export default function AcademyPage() {
       {showAddExamScoreModal && (
         <AddExamScoreModal
           isOpen={showAddExamScoreModal}
-          onClose={() => setShowAddExamScoreModal(false)}
-          onSave={(examData) => {
-            // Handle exam save
-            console.log("Exam saved:", examData);
+          examToEdit={editingExam}
+          onClose={() => {
             setShowAddExamScoreModal(false);
+            setEditingExam(null);
+          }}
+          onSave={async (examData) => {
+            try {
+              // Convert the modal data to API format
+              const apiExamData = {
+                type: examData.testType as any, // Map testType to API type
+                name: examData.subject || examData.testType, // Use subject if available, otherwise testType
+                score: examData.score.toString(),
+                max_score: examData.maxScore.toString(),
+                exam_date: examData.testDate, // Already in YYYY-MM format from month input
+                notes: examData.notes || undefined,
+              };
+
+              if (editingExam) {
+                // Update existing exam
+                const updatedExam = await academicApi.updateExam(
+                  editingExam.id,
+                  apiExamData
+                );
+                setExams((prev) =>
+                  prev.map((exam) =>
+                    exam.id === editingExam.id ? updatedExam : exam
+                  )
+                );
+              } else {
+                // Create new exam
+                const newExam = await academicApi.createExam(apiExamData);
+                setExams((prev) => [...prev, newExam]);
+              }
+
+              setShowAddExamScoreModal(false);
+              setEditingExam(null);
+            } catch (error) {
+              console.error("Failed to save exam:", error);
+            }
           }}
         />
       )}

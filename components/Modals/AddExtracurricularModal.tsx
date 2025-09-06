@@ -135,8 +135,6 @@ export default function AddExtracurricularModal({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("AddExtracurricular handleSubmit called");
-    console.log("Form data being submitted:", formData);
 
     // Basic validation
     if (!formData.activity_name.trim()) {

@@ -66,10 +66,6 @@ async function makeRequest<T>(
   body?: any,
   context?: string
 ): Promise<T> {
-  console.log(`=== ${method} ${url} ===`);
-  console.log("Request context:", context);
-  console.log("Request body:", body);
-
   const token = getAuthToken();
   if (!token && !url.includes("/login") && !url.includes("/register")) {
     throw new ApiError("No authentication token found. Please log in again.");
@@ -89,8 +85,6 @@ async function makeRequest<T>(
       headers,
       body: body ? JSON.stringify(body) : undefined,
     });
-
-    console.log("Response status:", response.status);
 
     if (response.status === 401) {
       localStorage.removeItem("auth-token");

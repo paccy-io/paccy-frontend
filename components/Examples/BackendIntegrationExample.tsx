@@ -39,7 +39,6 @@ export function CollegeApplicationExample() {
       });
 
       showSuccess(`Created application for ${application.name}!`);
-      console.log("Created application:", application);
     } catch (error) {
       showError(
         error instanceof ApiError
@@ -62,7 +61,6 @@ export function CollegeApplicationExample() {
       });
 
       showSuccess("Checklist created successfully!");
-      console.log("Created checklist:", checklist);
     } catch (error) {
       showError(
         error instanceof ApiError ? error.message : "Failed to create checklist"
@@ -90,7 +88,6 @@ export function CollegeApplicationExample() {
       });
 
       showSuccess("Task created successfully!");
-      console.log("Created task:", task);
     } catch (error) {
       showError(
         error instanceof ApiError ? error.message : "Failed to create task"
@@ -102,7 +99,6 @@ export function CollegeApplicationExample() {
   const loadApplications = async () => {
     try {
       const applications = await api.collegeApplications.getAll();
-      console.log("All applications:", applications);
       showSuccess(`Loaded ${applications.length} applications`);
     } catch (error) {
       showError(

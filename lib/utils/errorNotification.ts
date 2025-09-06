@@ -108,8 +108,6 @@ export const showApiError = (error: unknown, context?: string) => {
 export const showApiSuccess = (message: string) => {
   if (globalSuccessCallback) {
     globalSuccessCallback(message, 4000); // Show success for 4 seconds
-  } else {
-    console.log("API Success:", message);
   }
 };
 
@@ -119,12 +117,5 @@ export const logApiError = (
   context?: string,
   requestDetails?: any
 ) => {
-  if (process.env.NODE_ENV === "development") {
-    console.group(`🚨 API Error${context ? ` - ${context}` : ""}`);
-    console.error("Error:", error);
-    if (requestDetails) {
-      console.log("Request details:", requestDetails);
-    }
-    console.groupEnd();
-  }
+  // Silently handle errors in production
 };

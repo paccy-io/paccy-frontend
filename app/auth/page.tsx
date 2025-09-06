@@ -94,7 +94,6 @@ function AuthContent() {
         });
         if (response.ok) {
           const loginData = await response.json();
-          console.log("Login successful:", loginData); // Debug log
 
           // Check if user is verified from backend response
           const isVerified =
@@ -142,8 +141,6 @@ function AuthContent() {
             setError("No authentication token received. Please try again.");
           }
         } else {
-          console.log("Login failed with status:", response.status); // Debug log
-
           let errorMessage = "Login failed. Please try again.";
 
           // Handle different HTTP status codes
@@ -162,7 +159,6 @@ function AuthContent() {
 
           try {
             const errorData = await response.json();
-            console.log("Login error data:", errorData); // Debug log
 
             // Handle different error response structures
             if (errorData.message) {
@@ -260,8 +256,6 @@ function AuthContent() {
             "Registration successful! Please check your email to verify your account."
           );
         } else {
-          console.log("Registration failed with status:", response.status); // Debug log
-
           let errorMessage = "Registration failed. Please try again.";
 
           // Handle different HTTP status codes
@@ -282,7 +276,6 @@ function AuthContent() {
 
           try {
             const errorData = await response.json();
-            console.log("Registration error data:", errorData); // Debug log
 
             // Handle different error response structures
             if (errorData.message) {
