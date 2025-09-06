@@ -324,7 +324,8 @@ export default function Dashboard() {
       description: "Import pre-built university application templates",
       icon: <FaClipboardList className="w-8 h-8" />,
       link: "/dashboard/templates",
-      stats: "8 Countries • 50+ Templates",
+      stats: dataLoading ? "Loading..." : "8 Available Templates",
+      new: true,
     },
     {
       title: "Settings",
@@ -440,6 +441,10 @@ export default function Dashboard() {
                     {section.demo ? (
                       <div className="bg-amber-500/20 text-amber-300 text-xs px-2 py-1 rounded-full font-medium">
                         Demo
+                      </div>
+                    ) : section.new ? (
+                      <div className="bg-green-500/20 text-green-300 text-xs px-2 py-1 rounded-full font-medium">
+                        New
                       </div>
                     ) : (
                       <FaArrowRight className="text-[#FEEBD8]/40 group-hover:text-[#FEEBD8] group-hover:translate-x-1 transition-all" />
