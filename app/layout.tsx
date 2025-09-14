@@ -48,27 +48,27 @@ export const metadata: Metadata = {
       { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
     ],
     apple: [
-      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
     ],
     other: [
       {
         rel: "mask-icon",
         url: "/safari-pinned-tab.svg",
-        color: "#FEEBD8"
-      }
-    ]
+        color: "#FEEBD8",
+      },
+    ],
   },
   manifest: "/site.webmanifest",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Paccy"
+    title: "Paccy",
   },
   other: {
     "theme-color": "#FEEBD8",
     "msapplication-TileColor": "#141414",
-    "msapplication-config": "/browserconfig.xml"
-  }
+    "msapplication-config": "/browserconfig.xml",
+  },
 };
 
 const geistSans = Geist({
@@ -99,17 +99,50 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        {/* Google Analytics */}
+        <script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-VC35HKDM18"
+        ></script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-VC35HKDM18');
+            `,
+          }}
+        />
+
         {/* Additional favicon and PWA meta tags */}
         <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="icon" href="/favicon-16x16.png" sizes="16x16" type="image/png" />
-        <link rel="icon" href="/favicon-32x32.png" sizes="32x32" type="image/png" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
+        <link
+          rel="icon"
+          href="/favicon-16x16.png"
+          sizes="16x16"
+          type="image/png"
+        />
+        <link
+          rel="icon"
+          href="/favicon-32x32.png"
+          sizes="32x32"
+          type="image/png"
+        />
+        <link
+          rel="apple-touch-icon"
+          href="/apple-touch-icon.png"
+          sizes="180x180"
+        />
         <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#FEEBD8" />
         <link rel="manifest" href="/site.webmanifest" />
-        
+
         <meta name="theme-color" content="#FEEBD8" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta
+          name="apple-mobile-web-app-status-bar-style"
+          content="black-translucent"
+        />
         <meta name="apple-mobile-web-app-title" content="Paccy" />
         <meta name="msapplication-TileColor" content="#141414" />
         <meta name="msapplication-config" content="/browserconfig.xml" />
