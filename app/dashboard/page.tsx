@@ -357,7 +357,7 @@ export default function Dashboard() {
         <div className="max-w-screen-2xl mx-auto mb-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-white">
+              <h1 className="text-2xl md:text-4xl font-extrabold text-white">
                 Welcome back, {currentUser?.name || "Student"}! 👋
               </h1>
               <p className="text-white/60 text-sm md:text-base">

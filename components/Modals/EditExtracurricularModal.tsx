@@ -325,7 +325,7 @@ const EditExtracurricularModal: React.FC<EditExtracurricularModalProps> = ({
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-[#141414] border border-neutral-700/50 rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between p-6 border-b border-neutral-700/50">
-          <h2 className="text-xl font-semibold text-[#FEEBD8] flex items-center gap-2">
+          <h2 className="text-xl font-semibold text-white flex items-center gap-2">
             <FaUsers className="text-purple-400" />
             Edit Extracurricular Activity
           </h2>
@@ -341,7 +341,7 @@ const EditExtracurricularModal: React.FC<EditExtracurricularModalProps> = ({
           {/* Basic Information */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-[#FEEBD8] text-sm font-medium mb-2">
+              <label className="block text-white text-sm font-medium mb-2">
                 Activity Name *
               </label>
               <input
@@ -350,13 +350,13 @@ const EditExtracurricularModal: React.FC<EditExtracurricularModalProps> = ({
                 onChange={(e) =>
                   setFormData({ ...formData, activity_name: e.target.value })
                 }
-                className="w-full bg-[#1A1A1A] border border-neutral-700/50 rounded-lg px-3 py-2 text-white placeholder-neutral-400 focus:outline-none focus:border-[#FEEBD8] transition-colors"
+                className="w-full bg-[#1A1A1A] border border-neutral-700/50 rounded-lg px-3 py-2 text-white placeholder-neutral-400 focus:outline-none focus:border-blue-500 transition-colors"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-[#FEEBD8] text-sm font-medium mb-2">
+              <label className="block text-white text-sm font-medium mb-2">
                 Category *
               </label>
               <select
@@ -367,7 +367,7 @@ const EditExtracurricularModal: React.FC<EditExtracurricularModalProps> = ({
                     category: e.target.value as ExtracurricularCategory,
                   })
                 }
-                className="w-full bg-[#1A1A1A] border border-neutral-700/50 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-[#FEEBD8] transition-colors"
+                className="w-full bg-[#1A1A1A] border border-neutral-700/50 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
                 required
               >
                 {categoryOptions.map((option) => (
@@ -381,7 +381,7 @@ const EditExtracurricularModal: React.FC<EditExtracurricularModalProps> = ({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-[#FEEBD8] text-sm font-medium mb-2">
+              <label className="block text-white text-sm font-medium mb-2">
                 Role/Position *
               </label>
               <input
@@ -390,13 +390,13 @@ const EditExtracurricularModal: React.FC<EditExtracurricularModalProps> = ({
                 onChange={(e) =>
                   setFormData({ ...formData, position: e.target.value })
                 }
-                className="w-full bg-[#1A1A1A] border border-neutral-700/50 rounded-lg px-3 py-2 text-white placeholder-neutral-400 focus:outline-none focus:border-[#FEEBD8] transition-colors"
+                className="w-full bg-[#1A1A1A] border border-neutral-700/50 rounded-lg px-3 py-2 text-white placeholder-neutral-400 focus:outline-none focus:border-blue-500 transition-colors"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-[#FEEBD8] text-sm font-medium mb-2">
+              <label className="block text-white text-sm font-medium mb-2">
                 Hours per Week *
               </label>
               <input
@@ -406,7 +406,7 @@ const EditExtracurricularModal: React.FC<EditExtracurricularModalProps> = ({
                 className={`w-full bg-[#1A1A1A] border rounded-lg px-3 py-2 text-white placeholder-neutral-400 focus:outline-none transition-colors ${
                   hoursError
                     ? "border-red-500 focus:border-red-500"
-                    : "border-neutral-700/50 focus:border-[#FEEBD8]"
+                    : "border-neutral-700/50 focus:border-blue-500 transition-colors"
                 }`}
                 placeholder="e.g., 5, 10, 2.5"
               />
@@ -422,7 +422,7 @@ const EditExtracurricularModal: React.FC<EditExtracurricularModalProps> = ({
           {/* Date Range */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="text-[#FEEBD8] text-sm font-medium mb-2 flex items-center gap-2">
+              <label className="text-white text-sm font-medium mb-2 flex items-center gap-2">
                 <FaCalendarAlt className="text-blue-400" />
                 Start Date *
               </label>
@@ -431,7 +431,7 @@ const EditExtracurricularModal: React.FC<EditExtracurricularModalProps> = ({
                   value={startYear}
                   onChange={(e) => setStartYear(e.target.value)}
                   required
-                  className="w-full bg-[#1A1A1A] border border-neutral-700/50 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-[#FEEBD8] transition-colors"
+                  className="w-full bg-[#1A1A1A] border border-neutral-700/50 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
                 >
                   <option value="">Year</option>
                   {generateYears().map((year) => (
@@ -444,7 +444,7 @@ const EditExtracurricularModal: React.FC<EditExtracurricularModalProps> = ({
                   value={startMonth}
                   onChange={(e) => setStartMonth(e.target.value)}
                   required
-                  className="w-full bg-[#1A1A1A] border border-neutral-700/50 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-[#FEEBD8] transition-colors"
+                  className="w-full bg-[#1A1A1A] border border-neutral-700/50 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
                 >
                   <option value="">Month</option>
                   {months.map((month) => (
@@ -457,7 +457,7 @@ const EditExtracurricularModal: React.FC<EditExtracurricularModalProps> = ({
             </div>
 
             <div>
-              <label className="text-[#FEEBD8] text-sm font-medium mb-2 flex items-center gap-2">
+              <label className="text-white text-sm font-medium mb-2 flex items-center gap-2">
                 <FaCalendarAlt className="text-blue-400" />
                 End Date
               </label>
@@ -467,9 +467,9 @@ const EditExtracurricularModal: React.FC<EditExtracurricularModalProps> = ({
                     type="checkbox"
                     checked={isOngoing}
                     onChange={(e) => setIsOngoing(e.target.checked)}
-                    className="w-4 h-4 text-[#FEEBD8] bg-[#1A1A1A] border border-neutral-700/50 rounded focus:ring-[#FEEBD8]"
+                    className="w-4 h-4 text-white bg-[#1A1A1A] border border-neutral-700/50 rounded focus:ring-blue-500"
                   />
-                  <label className="text-sm text-[#FEEBD8]/70">
+                  <label className="text-sm text-white/70">
                     Currently ongoing
                   </label>
                 </div>
@@ -478,7 +478,7 @@ const EditExtracurricularModal: React.FC<EditExtracurricularModalProps> = ({
                     <select
                       value={endYear}
                       onChange={(e) => setEndYear(e.target.value)}
-                      className="w-full bg-[#1A1A1A] border border-neutral-700/50 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-[#FEEBD8] transition-colors"
+                      className="w-full bg-[#1A1A1A] border border-neutral-700/50 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
                     >
                       <option value="">Year</option>
                       {generateYears().map((year) => (
@@ -490,7 +490,7 @@ const EditExtracurricularModal: React.FC<EditExtracurricularModalProps> = ({
                     <select
                       value={endMonth}
                       onChange={(e) => setEndMonth(e.target.value)}
-                      className="w-full bg-[#1A1A1A] border border-neutral-700/50 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-[#FEEBD8] transition-colors"
+                      className="w-full bg-[#1A1A1A] border border-neutral-700/50 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
                     >
                       <option value="">Month</option>
                       {months.map((month) => (
@@ -508,7 +508,7 @@ const EditExtracurricularModal: React.FC<EditExtracurricularModalProps> = ({
           {/* Location and Website */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="text-[#FEEBD8] text-sm font-medium mb-2 flex items-center gap-2">
+              <label className="text-white text-sm font-medium mb-2 flex items-center gap-2">
                 <FaMapMarkerAlt className="text-green-400" />
                 Location (Optional)
               </label>
@@ -518,13 +518,13 @@ const EditExtracurricularModal: React.FC<EditExtracurricularModalProps> = ({
                 onChange={(e) =>
                   setFormData({ ...formData, location: e.target.value })
                 }
-                className="w-full bg-[#1A1A1A] border border-neutral-700/50 rounded-lg px-3 py-2 text-white placeholder-neutral-400 focus:outline-none focus:border-[#FEEBD8] transition-colors"
+                className="w-full bg-[#1A1A1A] border border-neutral-700/50 rounded-lg px-3 py-2 text-white placeholder-neutral-400 focus:outline-none focus:border-blue-500 transition-colors"
                 placeholder="City, State"
               />
             </div>
 
             <div>
-              <label className="text-[#FEEBD8] text-sm font-medium mb-2 flex items-center gap-2">
+              <label className="text-white text-sm font-medium mb-2 flex items-center gap-2">
                 <FaGlobe className="text-cyan-400" />
                 Website (Optional)
               </label>
@@ -534,7 +534,7 @@ const EditExtracurricularModal: React.FC<EditExtracurricularModalProps> = ({
                 onChange={(e) =>
                   setFormData({ ...formData, website: e.target.value })
                 }
-                className="w-full bg-[#1A1A1A] border border-neutral-700/50 rounded-lg px-3 py-2 text-white placeholder-neutral-400 focus:outline-none focus:border-[#FEEBD8] transition-colors"
+                className="w-full bg-[#1A1A1A] border border-neutral-700/50 rounded-lg px-3 py-2 text-white placeholder-neutral-400 focus:outline-none focus:border-blue-500 transition-colors"
                 placeholder="https://..."
               />
             </div>
@@ -542,7 +542,7 @@ const EditExtracurricularModal: React.FC<EditExtracurricularModalProps> = ({
 
           {/* Description */}
           <div>
-            <label className="block text-[#FEEBD8] text-sm font-medium mb-2">
+            <label className="block text-white text-sm font-medium mb-2">
               Description
             </label>
             <textarea
@@ -550,14 +550,14 @@ const EditExtracurricularModal: React.FC<EditExtracurricularModalProps> = ({
               onChange={(e) =>
                 setFormData({ ...formData, description: e.target.value })
               }
-              className="w-full bg-[#1A1A1A] border border-neutral-700/50 rounded-lg px-3 py-2 text-white placeholder-neutral-400 focus:outline-none focus:border-[#FEEBD8] transition-colors h-24 resize-none"
+              className="w-full bg-[#1A1A1A] border border-neutral-700/50 rounded-lg px-3 py-2 text-white placeholder-neutral-400 focus:outline-none focus:border-blue-500 transition-colors h-24 resize-none"
               placeholder="Describe your role and responsibilities..."
             />
           </div>
 
           {/* Achievements */}
           <div>
-            <label className="text-[#FEEBD8] text-sm font-medium mb-2 flex items-center gap-2">
+            <label className="text-white text-sm font-medium mb-2 flex items-center gap-2">
               <FaTrophy className="text-yellow-400" />
               Achievements & Awards
             </label>
@@ -583,14 +583,14 @@ const EditExtracurricularModal: React.FC<EditExtracurricularModalProps> = ({
                   type="text"
                   value={newAchievement}
                   onChange={(e) => setNewAchievement(e.target.value)}
-                  className="flex-1 bg-[#1A1A1A] border border-neutral-700/50 rounded-lg px-3 py-2 text-white placeholder-neutral-400 focus:outline-none focus:border-[#FEEBD8] transition-colors"
+                  className="flex-1 bg-[#1A1A1A] border border-neutral-700/50 rounded-lg px-3 py-2 text-white placeholder-neutral-400 focus:outline-none focus:border-blue-500 transition-colors"
                   placeholder="Add an achievement..."
                   onKeyPress={(e) => e.key === "Enter" && addAchievement()}
                 />
                 <button
                   type="button"
                   onClick={addAchievement}
-                  className="bg-[#FEEBD8] text-[#141414] px-4 py-2 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors"
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors"
                 >
                   <FaPlus />
                 </button>
@@ -600,7 +600,7 @@ const EditExtracurricularModal: React.FC<EditExtracurricularModalProps> = ({
 
           {/* Skills */}
           <div>
-            <label className="block text-[#FEEBD8] text-sm font-medium mb-2">
+            <label className="block text-white text-sm font-medium mb-2">
               Skills Developed
             </label>
             <div className="space-y-2">
@@ -627,14 +627,14 @@ const EditExtracurricularModal: React.FC<EditExtracurricularModalProps> = ({
                   type="text"
                   value={newSkill}
                   onChange={(e) => setNewSkill(e.target.value)}
-                  className="flex-1 bg-[#1A1A1A] border border-neutral-700/50 rounded-lg px-3 py-2 text-white placeholder-neutral-400 focus:outline-none focus:border-[#FEEBD8] transition-colors"
+                  className="flex-1 bg-[#1A1A1A] border border-neutral-700/50 rounded-lg px-3 py-2 text-white placeholder-neutral-400 focus:outline-none focus:border-blue-500 transition-colors"
                   placeholder="Add a skill..."
                   onKeyPress={(e) => e.key === "Enter" && addSkill()}
                 />
                 <button
                   type="button"
                   onClick={addSkill}
-                  className="bg-[#FEEBD8] text-[#141414] px-4 py-2 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors"
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors"
                 >
                   <FaPlus />
                 </button>
@@ -653,7 +653,7 @@ const EditExtracurricularModal: React.FC<EditExtracurricularModalProps> = ({
             </button>
             <button
               type="submit"
-              className="flex-1 bg-[#FEEBD8] text-[#141414] px-4 py-2 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors"
+              className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors"
             >
               Save Changes
             </button>

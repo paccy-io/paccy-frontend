@@ -348,21 +348,21 @@ export default function AddExamScoreModal({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-[#141414] border border-neutral-700 rounded-lg max-w-lg w-full max-h-[90vh] overflow-hidden">
+      <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-hidden">
         {/* Header */}
-        <div className="p-6 border-b border-neutral-700">
+        <div className="p-6 border-b border-neutral-700/50">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-neutral-800">
-                <FaChartLine className="text-[#FEEBD8]" size={18} />
+                <FaChartLine className="text-white" size={18} />
               </div>
-              <h2 className="text-xl font-semibold text-[#FEEBD8]">
+              <h2 className="text-xl font-semibold text-white">
                 {examToEdit ? "Edit Exam Score" : "Add Exam Score"}
               </h2>
             </div>
             <button
               onClick={onClose}
-              className="text-[#FEEBD8]/60 hover:text-[#FEEBD8] transition-colors"
+              className="text-white/60 hover:text-white transition-colors"
             >
               <FaTimes size={18} />
             </button>
@@ -370,7 +370,7 @@ export default function AddExamScoreModal({
         </div>
 
         {/* Tabs */}
-        <div className="border-b border-neutral-700">
+        <div className="border-b border-neutral-700/50">
           <div className="flex">
             {tabs.map((tab) => {
               const Icon = tab.icon;
@@ -380,8 +380,8 @@ export default function AddExamScoreModal({
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium transition-colors ${
                     activeTab === tab.id
-                      ? "text-[#FEEBD8] border-b-2 border-[#FEEBD8] bg-neutral-800/50"
-                      : "text-[#FEEBD8]/60 hover:text-[#FEEBD8] hover:bg-neutral-800/30"
+                      ? "text-white border-b-2 border-blue-500 bg-neutral-800/50"
+                      : "text-white/60 hover:text-white hover:bg-neutral-800/30"
                   }`}
                 >
                   <Icon size={14} />
@@ -398,7 +398,7 @@ export default function AddExamScoreModal({
             {activeTab === "basic" && (
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+                  <label className="block text-sm font-medium text-white/70 mb-2">
                     Test Type *
                   </label>
                   <select
@@ -406,7 +406,7 @@ export default function AddExamScoreModal({
                     value={formData.testType}
                     onChange={handleChange}
                     required
-                    className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                    className="w-full bg-neutral-800 border border-neutral-700/50 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
                   >
                     {testTypes.map((type) => (
                       <option key={type} value={type}>
@@ -418,14 +418,14 @@ export default function AddExamScoreModal({
 
                 {getSubjectOptions().length > 0 ? (
                   <div>
-                    <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+                    <label className="block text-sm font-medium text-white/70 mb-2">
                       Subject
                     </label>
                     <select
                       name="subject"
                       value={formData.subject}
                       onChange={handleChange}
-                      className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                      className="w-full bg-neutral-800 border border-neutral-700/50 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
                     >
                       <option value="">Select Subject</option>
                       {getSubjectOptions().map((subject) => (
@@ -437,7 +437,7 @@ export default function AddExamScoreModal({
                   </div>
                 ) : (
                   <div>
-                    <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+                    <label className="block text-sm font-medium text-white/70 mb-2">
                       Name (Optional)
                     </label>
                     <input
@@ -445,7 +445,7 @@ export default function AddExamScoreModal({
                       name="subject"
                       value={formData.subject}
                       onChange={handleChange}
-                      className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                      className="w-full bg-neutral-800 border border-neutral-700/50 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
                       placeholder="e.g., Math, Reading, Science"
                     />
                   </div>
@@ -458,12 +458,12 @@ export default function AddExamScoreModal({
               <div className="space-y-6">
                 {/* Total Score Section */}
                 <div>
-                  <h3 className="text-base font-medium text-[#FEEBD8] mb-3">
+                  <h3 className="text-base font-medium text-white mb-3">
                     Total Score
                   </h3>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+                      <label className="block text-sm font-medium text-white/70 mb-2">
                         Score *
                       </label>
                       <input
@@ -474,10 +474,10 @@ export default function AddExamScoreModal({
                         required
                         min="0"
                         max={formData.maxScore}
-                        className={`w-full bg-neutral-800 border rounded-lg px-3 py-2 text-[#FEEBD8] focus:outline-none transition-colors ${
+                        className={`w-full bg-neutral-800 border rounded-lg px-3 py-2 text-white focus:outline-none transition-colors ${
                           errors.score
                             ? "border-red-500 focus:border-red-500"
-                            : "border-neutral-700 focus:border-[#FEEBD8]"
+                            : "border-neutral-700/50 focus:border-blue-500 transition-colors"
                         }`}
                         placeholder={`0 - ${formData.maxScore}`}
                       />
@@ -489,7 +489,7 @@ export default function AddExamScoreModal({
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+                      <label className="block text-sm font-medium text-white/70 mb-2">
                         Max Score *
                       </label>
                       <input
@@ -499,10 +499,10 @@ export default function AddExamScoreModal({
                         onChange={handleChange}
                         required
                         min="1"
-                        className={`w-full bg-neutral-800 border rounded-lg px-3 py-2 text-[#FEEBD8] focus:outline-none transition-colors ${
+                        className={`w-full bg-neutral-800 border rounded-lg px-3 py-2 text-white focus:outline-none transition-colors ${
                           errors.maxScore
                             ? "border-red-500 focus:border-red-500"
-                            : "border-neutral-700 focus:border-[#FEEBD8]"
+                            : "border-neutral-700/50 focus:border-blue-500 transition-colors"
                         }`}
                       />
                       {errors.maxScore && (
@@ -516,13 +516,13 @@ export default function AddExamScoreModal({
                   {formData.score > 0 && (
                     <div className="bg-neutral-800 rounded-lg p-3 mt-3">
                       <div className="text-center">
-                        <div className="text-lg font-semibold text-[#FEEBD8] mb-1">
+                        <div className="text-lg font-semibold text-white mb-1">
                           {getScorePercentage()}% •{" "}
                           <span className={getScoreCategory().color}>
                             {getScoreCategory().label}
                           </span>
                         </div>
-                        <div className="text-sm text-[#FEEBD8]/70">
+                        <div className="text-sm text-white/70">
                           {formData.score} / {formData.maxScore}
                         </div>
                       </div>
@@ -536,7 +536,7 @@ export default function AddExamScoreModal({
             {activeTab === "details" && (
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+                  <label className="block text-sm font-medium text-white/70 mb-2">
                     Exam Date (Month & Year) *
                   </label>
                   <input
@@ -545,10 +545,10 @@ export default function AddExamScoreModal({
                     value={formData.testDate}
                     onChange={handleChange}
                     required
-                    className={`w-full bg-neutral-800 border rounded-lg px-3 py-2 text-[#FEEBD8] focus:outline-none transition-colors ${
+                    className={`w-full bg-neutral-800 border rounded-lg px-3 py-2 text-white focus:outline-none transition-colors ${
                       errors.testDate
                         ? "border-red-500 focus:border-red-500"
-                        : "border-neutral-700 focus:border-[#FEEBD8]"
+                        : "border-neutral-700/50 focus:border-blue-500 transition-colors"
                     }`}
                     placeholder="YYYY-MM"
                   />
@@ -557,13 +557,13 @@ export default function AddExamScoreModal({
                       {errors.testDate}
                     </p>
                   )}
-                  <p className="text-[#FEEBD8]/50 text-xs mt-1">
+                  <p className="text-white/50 text-xs mt-1">
                     Select the month and year when you took this exam
                   </p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+                  <label className="block text-sm font-medium text-white/70 mb-2">
                     Notes (recommended for subscores)
                   </label>
                   <textarea
@@ -571,7 +571,7 @@ export default function AddExamScoreModal({
                     value={formData.notes}
                     onChange={handleChange}
                     rows={4}
-                    className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                    className="w-full bg-neutral-800 border border-neutral-700/50 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
                     placeholder="Any additional notes about this test score..."
                   />
                 </div>
@@ -580,12 +580,12 @@ export default function AddExamScoreModal({
           </div>
 
           {/* Footer */}
-          <div className="p-6 border-t border-neutral-700">
+          <div className="p-6 border-t border-neutral-700/50">
             <div className="flex gap-3">
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 bg-neutral-700 text-[#FEEBD8] px-4 py-2 rounded-lg font-medium hover:bg-neutral-600 transition-colors"
+                className="flex-1 bg-neutral-700 text-white px-4 py-2 rounded-lg font-medium hover:bg-neutral-600 transition-colors"
               >
                 Cancel
               </button>
@@ -596,7 +596,7 @@ export default function AddExamScoreModal({
                   formData.score === 0 ||
                   !formData.testDate
                 }
-                className="flex-1 bg-[#FEEBD8] text-[#141414] px-4 py-2 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {examToEdit ? "Update Score" : "Add Score"}
               </button>

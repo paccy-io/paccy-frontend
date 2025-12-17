@@ -185,12 +185,12 @@ export default function EditEventModal({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-[#141414] border border-neutral-700 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="p-6 border-b border-neutral-700">
+      <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="p-6 border-b border-neutral-700/50">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <FaEdit className="text-blue-400 text-xl" />
-              <h2 className="text-xl font-bold text-[#FEEBD8]">Edit Event</h2>
+              <h2 className="text-xl font-bold text-white">Edit Event</h2>
             </div>
             <div className="flex items-center gap-2">
               <button
@@ -202,7 +202,7 @@ export default function EditEventModal({
               </button>
               <button
                 onClick={onClose}
-                className="text-[#FEEBD8]/60 hover:text-[#FEEBD8] transition-colors p-2"
+                className="text-white/60 hover:text-white transition-colors p-2"
               >
                 <FaTimes size={20} />
               </button>
@@ -214,7 +214,7 @@ export default function EditEventModal({
           {/* Basic Information */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+              <label className="block text-sm font-medium text-white/70 mb-2">
                 Event Title *
               </label>
               <input
@@ -223,7 +223,7 @@ export default function EditEventModal({
                 value={formData.title}
                 onChange={handleChange}
                 required
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                className="w-full bg-neutral-800 border border-neutral-700/50 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
                 placeholder="e.g., Stanford Application Deadline"
               />
             </div>
@@ -236,7 +236,7 @@ export default function EditEventModal({
             />
 
             <div>
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+              <label className="block text-sm font-medium text-white/70 mb-2">
                 Time
               </label>
               <input
@@ -244,19 +244,19 @@ export default function EditEventModal({
                 name="time"
                 value={formData.time}
                 onChange={handleChange}
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                className="w-full bg-neutral-800 border border-neutral-700/50 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+              <label className="block text-sm font-medium text-white/70 mb-2">
                 Event Type
               </label>
               <select
                 name="type"
                 value={formData.type}
                 onChange={handleChange}
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                className="w-full bg-neutral-800 border border-neutral-700/50 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
               >
                 {eventTypes.map((type) => (
                   <option key={type.value} value={type.value}>
@@ -267,14 +267,14 @@ export default function EditEventModal({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+              <label className="block text-sm font-medium text-white/70 mb-2">
                 Priority
               </label>
               <select
                 name="priority"
                 value={formData.priority}
                 onChange={handleChange}
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                className="w-full bg-neutral-800 border border-neutral-700/50 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
               >
                 {priorities.map((priority) => (
                   <option key={priority.value} value={priority.value}>
@@ -285,7 +285,7 @@ export default function EditEventModal({
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+              <label className="block text-sm font-medium text-white/70 mb-2">
                 Related College (Optional)
               </label>
               <select
@@ -293,7 +293,7 @@ export default function EditEventModal({
                 value={formData.college_id}
                 onChange={handleChange}
                 disabled={loading}
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8] disabled:opacity-50"
+                className="w-full bg-neutral-800 border border-neutral-700/50 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500 disabled:opacity-50"
               >
                 <option value="">No specific college</option>
                 {collegeApplications.map((app) => {
@@ -322,7 +322,7 @@ export default function EditEventModal({
 
           {/* Description */}
           <div>
-            <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+            <label className="block text-sm font-medium text-white/70 mb-2">
               Description
             </label>
             <textarea
@@ -330,23 +330,23 @@ export default function EditEventModal({
               value={formData.description}
               onChange={handleChange}
               rows={4}
-              className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+              className="w-full bg-neutral-800 border border-neutral-700/50 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
               placeholder="Add any additional details about this event..."
             />
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-3 pt-4 border-t border-neutral-700">
+          <div className="flex gap-3 pt-4 border-t border-neutral-700/50">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 bg-neutral-700 text-[#FEEBD8] px-6 py-3 rounded-lg font-medium hover:bg-neutral-600 transition-colors"
+              className="flex-1 bg-neutral-700 text-white px-6 py-3 rounded-lg font-medium hover:bg-neutral-600 transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="flex-1 bg-[#FEEBD8] text-[#141414] px-6 py-3 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors"
+              className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
             >
               Save Changes
             </button>
@@ -361,18 +361,18 @@ export default function EditEventModal({
             <div className="p-6">
               <div className="flex items-center gap-3 mb-4">
                 <FaTrash className="text-red-400 text-xl" />
-                <h3 className="text-lg font-bold text-[#FEEBD8]">
+                <h3 className="text-lg font-bold text-white">
                   Delete Event
                 </h3>
               </div>
-              <p className="text-[#FEEBD8]/70 mb-6">
+              <p className="text-white/70 mb-6">
                 Are you sure you want to delete "{event?.title}"? This action
                 cannot be undone.
               </p>
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowDeleteConfirm(false)}
-                  className="flex-1 bg-neutral-700 text-[#FEEBD8] px-4 py-2 rounded-lg font-medium hover:bg-neutral-600 transition-colors"
+                  className="flex-1 bg-neutral-700 text-white px-4 py-2 rounded-lg font-medium hover:bg-neutral-600 transition-colors"
                 >
                   Cancel
                 </button>

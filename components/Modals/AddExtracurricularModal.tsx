@@ -281,13 +281,13 @@ export default function AddExtracurricularModal({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <FaStar className="text-purple-400 text-xl" />
-              <h2 className="text-xl font-bold text-[#FEEBD8]">
+              <h2 className="text-xl font-bold text-white">
                 Add Extracurricular Activity
               </h2>
             </div>
             <button
               onClick={onClose}
-              className="text-[#FEEBD8]/60 hover:text-[#FEEBD8] transition-colors"
+              className="text-white/60 hover:text-white transition-colors"
             >
               <FaTimes size={20} />
             </button>
@@ -298,7 +298,7 @@ export default function AddExtracurricularModal({
           {/* Basic Information */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+              <label className="block text-sm font-medium text-white/70 mb-2">
                 Activity Name *
               </label>
               <input
@@ -307,20 +307,20 @@ export default function AddExtracurricularModal({
                 value={formData.activity_name}
                 onChange={handleChange}
                 required
-                className="w-full bg-[#1A1A1A] border border-neutral-700/50 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8] transition-colors"
+                className="w-full bg-[#1A1A1A] border border-neutral-700/50 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
                 placeholder="e.g., Student Government, Debate Club, Varsity Basketball"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+              <label className="block text-sm font-medium text-white/70 mb-2">
                 Category
               </label>
               <select
                 name="category"
                 value={formData.category}
                 onChange={handleChange}
-                className="w-full bg-[#1A1A1A] border border-neutral-700/50 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8] transition-colors"
+                className="w-full bg-[#1A1A1A] border border-neutral-700/50 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
               >
                 {categories.map((category) => (
                   <option key={category.value} value={category.value}>
@@ -331,7 +331,7 @@ export default function AddExtracurricularModal({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+              <label className="block text-sm font-medium text-white/70 mb-2">
                 Your Role/Position
               </label>
               <input
@@ -339,7 +339,7 @@ export default function AddExtracurricularModal({
                 name="position"
                 value={formData.position}
                 onChange={handleChange}
-                className="w-full bg-[#1A1A1A] border border-neutral-700/50 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8] transition-colors"
+                className="w-full bg-[#1A1A1A] border border-neutral-700/50 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
                 placeholder="e.g., President, Member, Captain, Volunteer"
               />
             </div>
@@ -348,7 +348,7 @@ export default function AddExtracurricularModal({
             <div className="md:col-span-2">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-[#FEEBD8]/70 mb-2 flex items-center gap-2">
+                  <label className="text-sm font-medium text-white/70 mb-2 flex items-center gap-2">
                     <FaCalendar className="text-blue-400" />
                     Start Date *
                   </label>
@@ -357,7 +357,7 @@ export default function AddExtracurricularModal({
                       value={startYear}
                       onChange={(e) => setStartYear(e.target.value)}
                       required
-                      className="w-full bg-[#1A1A1A] border border-neutral-700/50 rounded-lg px-3 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8] transition-colors"
+                      className="w-full bg-[#1A1A1A] border border-neutral-700/50 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
                     >
                       <option value="">Year</option>
                       {generateYears().map((year) => (
@@ -370,7 +370,7 @@ export default function AddExtracurricularModal({
                       value={startMonth}
                       onChange={(e) => setStartMonth(e.target.value)}
                       required
-                      className="w-full bg-[#1A1A1A] border border-neutral-700/50 rounded-lg px-3 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8] transition-colors"
+                      className="w-full bg-[#1A1A1A] border border-neutral-700/50 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
                     >
                       <option value="">Month</option>
                       {months.map((month) => (
@@ -383,7 +383,7 @@ export default function AddExtracurricularModal({
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium text-[#FEEBD8]/70 mb-2 flex items-center gap-2">
+                  <label className="text-sm font-medium text-white/70 mb-2 flex items-center gap-2">
                     <FaCalendar className="text-blue-400" />
                     End Date
                   </label>
@@ -393,9 +393,9 @@ export default function AddExtracurricularModal({
                         type="checkbox"
                         checked={isOngoing}
                         onChange={(e) => setIsOngoing(e.target.checked)}
-                        className="w-4 h-4 text-[#FEEBD8] bg-[#1A1A1A] border border-neutral-700/50 rounded focus:ring-[#FEEBD8]"
+                        className="w-4 h-4 text-white bg-[#1A1A1A] border border-neutral-700/50 rounded focus:ring-blue-500"
                       />
-                      <label className="text-sm text-[#FEEBD8]/70">
+                      <label className="text-sm text-white/70">
                         Currently ongoing
                       </label>
                     </div>
@@ -404,7 +404,7 @@ export default function AddExtracurricularModal({
                         <select
                           value={endYear}
                           onChange={(e) => setEndYear(e.target.value)}
-                          className="w-full bg-[#1A1A1A] border border-neutral-700/50 rounded-lg px-3 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8] transition-colors"
+                          className="w-full bg-[#1A1A1A] border border-neutral-700/50 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
                         >
                           <option value="">Year</option>
                           {generateYears().map((year) => (
@@ -416,7 +416,7 @@ export default function AddExtracurricularModal({
                         <select
                           value={endMonth}
                           onChange={(e) => setEndMonth(e.target.value)}
-                          className="w-full bg-[#1A1A1A] border border-neutral-700/50 rounded-lg px-3 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8] transition-colors"
+                          className="w-full bg-[#1A1A1A] border border-neutral-700/50 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
                         >
                           <option value="">Month</option>
                           {months.map((month) => (
@@ -433,7 +433,7 @@ export default function AddExtracurricularModal({
             </div>
 
             <div>
-              <label className="text-sm font-medium text-[#FEEBD8]/70 mb-2 flex items-center gap-2">
+              <label className="text-sm font-medium text-white/70 mb-2 flex items-center gap-2">
                 <FaMapMarkerAlt className="text-green-400" />
                 Location (Optional)
               </label>
@@ -442,13 +442,13 @@ export default function AddExtracurricularModal({
                 name="location"
                 value={formData.location}
                 onChange={handleChange}
-                className="w-full bg-[#1A1A1A] border border-neutral-700/50 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8] transition-colors"
+                className="w-full bg-[#1A1A1A] border border-neutral-700/50 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
                 placeholder="e.g., City, State"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+              <label className="block text-sm font-medium text-white/70 mb-2">
                 Hours per Week *
               </label>
               <input
@@ -456,10 +456,10 @@ export default function AddExtracurricularModal({
                 name="hours_per_week"
                 value={hoursInputValue}
                 onChange={handleHoursChange}
-                className={`w-full bg-[#1A1A1A] border rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none transition-colors ${
+                className={`w-full bg-[#1A1A1A] border rounded-lg px-4 py-2 text-white focus:outline-none transition-colors ${
                   hoursError
                     ? "border-red-500 focus:border-red-500"
-                    : "border-neutral-700/50 focus:border-[#FEEBD8]"
+                    : "border-neutral-700/50 focus:border-blue-500 transition-colors"
                 }`}
                 placeholder="e.g., 5, 10, 2.5"
               />
@@ -474,7 +474,7 @@ export default function AddExtracurricularModal({
 
           {/* Description */}
           <div>
-            <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+            <label className="block text-sm font-medium text-white/70 mb-2">
               Description
             </label>
             <textarea
@@ -482,14 +482,14 @@ export default function AddExtracurricularModal({
               value={formData.description}
               onChange={handleChange}
               rows={3}
-              className="w-full bg-[#1A1A1A] border border-neutral-700/50 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8] transition-colors"
+              className="w-full bg-[#1A1A1A] border border-neutral-700/50 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
               placeholder="Describe what you do in this activity, your responsibilities, and what you've learned..."
             />
           </div>
 
           {/* Achievements */}
           <div>
-            <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+            <label className="block text-sm font-medium text-white/70 mb-2">
               Achievements & Awards
             </label>
             <div className="flex gap-2 mb-3">
@@ -498,7 +498,7 @@ export default function AddExtracurricularModal({
                 value={newAchievement}
                 onChange={(e) => setNewAchievement(e.target.value)}
                 placeholder="Add an achievement or award"
-                className="flex-1 bg-[#1A1A1A] border border-neutral-700/50 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8] transition-colors"
+                className="flex-1 bg-[#1A1A1A] border border-neutral-700/50 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
                 onKeyPress={(e) =>
                   e.key === "Enter" && (e.preventDefault(), addAchievement())
                 }
@@ -506,7 +506,7 @@ export default function AddExtracurricularModal({
               <button
                 type="button"
                 onClick={addAchievement}
-                className="bg-[#FEEBD8] text-[#141414] px-4 py-2 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors flex items-center gap-2"
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center gap-2"
               >
                 <FaPlus size={12} />
                 Add
@@ -522,7 +522,7 @@ export default function AddExtracurricularModal({
                     >
                       <div className="flex items-center gap-2">
                         <FaAward className="text-yellow-400" size={14} />
-                        <span className="text-[#FEEBD8]">{achievement}</span>
+                        <span className="text-white">{achievement}</span>
                       </div>
                       <button
                         type="button"
@@ -539,7 +539,7 @@ export default function AddExtracurricularModal({
 
           {/* Skills */}
           <div>
-            <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+            <label className="block text-sm font-medium text-white/70 mb-2">
               Skills Developed
             </label>
 
@@ -552,8 +552,8 @@ export default function AddExtracurricularModal({
                   onClick={() => addSkill(skill)}
                   className={`px-3 py-1 rounded-full text-sm transition-colors ${
                     formData.skills.includes(skill)
-                      ? "bg-[#FEEBD8] text-[#141414]"
-                      : "bg-[#1A1A1A] text-[#FEEBD8]/70 hover:bg-neutral-600 border border-neutral-700/50"
+                      ? "bg-blue-600 text-white"
+                      : "bg-[#1A1A1A] text-white/70 hover:bg-neutral-600 border border-neutral-700/50"
                   }`}
                 >
                   {skill}
@@ -568,7 +568,7 @@ export default function AddExtracurricularModal({
                 value={customSkill}
                 onChange={(e) => setCustomSkill(e.target.value)}
                 placeholder="Add custom skill"
-                className="flex-1 bg-[#1A1A1A] border border-neutral-700/50 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8] transition-colors"
+                className="flex-1 bg-[#1A1A1A] border border-neutral-700/50 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
                 onKeyPress={(e) =>
                   e.key === "Enter" && (e.preventDefault(), addCustomSkill())
                 }
@@ -576,7 +576,7 @@ export default function AddExtracurricularModal({
               <button
                 type="button"
                 onClick={addCustomSkill}
-                className="bg-[#FEEBD8] text-[#141414] px-4 py-2 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors"
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors"
               >
                 Add
               </button>
@@ -607,19 +607,19 @@ export default function AddExtracurricularModal({
 
           {/* Preview */}
           <div className="bg-[#1A1A1A] rounded-lg p-4 border border-neutral-700/50">
-            <h4 className="text-[#FEEBD8] font-medium mb-3">Preview</h4>
+            <h4 className="text-white font-medium mb-3">Preview</h4>
             <div className="space-y-2 text-sm">
               <div className="flex items-center gap-2">
                 <FaStar className="text-purple-400" size={14} />
-                <span className="text-[#FEEBD8] font-medium">
+                <span className="text-white font-medium">
                   {formData.activity_name || "Activity Name"}
                 </span>
-                <span className="text-[#FEEBD8]/50">•</span>
-                <span className="text-[#FEEBD8]/70">
+                <span className="text-white/50">•</span>
+                <span className="text-white/70">
                   {formData.position || "Role"}
                 </span>
               </div>
-              <div className="flex items-center gap-4 text-[#FEEBD8]/60">
+              <div className="flex items-center gap-4 text-white/60">
                 <span className="flex items-center gap-1">
                   <FaCalendar size={12} />
                   {formData.start_date
@@ -636,7 +636,7 @@ export default function AddExtracurricularModal({
                 </span>
               </div>
               {formData.description && (
-                <p className="text-[#FEEBD8]/70 mt-2">{formData.description}</p>
+                <p className="text-white/70 mt-2">{formData.description}</p>
               )}
             </div>
           </div>
@@ -646,13 +646,13 @@ export default function AddExtracurricularModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 bg-neutral-700 text-[#FEEBD8] px-6 py-3 rounded-lg font-medium hover:bg-neutral-600 transition-colors"
+              className="flex-1 bg-neutral-700 text-white px-6 py-3 rounded-lg font-medium hover:bg-neutral-600 transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="flex-1 bg-[#FEEBD8] text-[#141414] px-6 py-3 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors"
+              className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
             >
               Add Activity
             </button>

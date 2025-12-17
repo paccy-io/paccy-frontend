@@ -107,13 +107,13 @@ export default function ImportTemplateModal({
         <div className="bg-[#141414] border border-neutral-700/50 rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-neutral-700/50">
-            <h2 className="text-xl font-semibold text-[#FEEBD8]">
+            <h2 className="text-xl font-semibold text-white">
               Import Template
             </h2>
             <button
               onClick={handleClose}
               disabled={importing}
-              className="text-[#FEEBD8]/60 hover:text-[#FEEBD8] transition-colors disabled:opacity-50"
+              className="text-white/60 hover:text-white transition-colors disabled:opacity-50"
             >
               <FaTimes size={20} />
             </button>
@@ -126,15 +126,15 @@ export default function ImportTemplateModal({
               <div className="flex items-center gap-3 mb-2">
                 <span className="text-2xl">{template.flag}</span>
                 <div>
-                  <h3 className="font-semibold text-[#FEEBD8]">
+                  <h3 className="font-semibold text-white">
                     {template.name}
                   </h3>
-                  <p className="text-[#FEEBD8]/60 text-sm">
+                  <p className="text-white/60 text-sm">
                     {template.country}
                   </p>
                 </div>
               </div>
-              <p className="text-[#FEEBD8]/70 text-sm">
+              <p className="text-white/70 text-sm">
                 {template.description}
               </p>
             </div>
@@ -143,26 +143,26 @@ export default function ImportTemplateModal({
             <div className="space-y-4">
               {/* College Application Selection */}
               <div>
-                <label className="block text-[#FEEBD8]/70 text-sm mb-2">
+                <label className="block text-white/70 text-sm mb-2">
                   <FaUniversity className="inline mr-2" />
                   Select College Application *
                 </label>
 
                 {loadingApplications ? (
-                  <div className="w-full p-3 bg-neutral-800 border border-neutral-600 rounded-lg text-[#FEEBD8]/60 flex items-center gap-2">
-                    <div className="w-4 h-4 border-2 border-[#FEEBD8]/30 border-t-[#FEEBD8] rounded-full animate-spin"></div>
+                  <div className="w-full p-3 bg-neutral-800 border border-neutral-600 rounded-lg text-white/60 flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-blue-500/30 border-t-blue-500 rounded-full animate-spin"></div>
                     Loading your college applications...
                   </div>
                 ) : collegeApplications.length === 0 ? (
                   <div className="space-y-3">
-                    <div className="w-full p-3 bg-neutral-800 border border-neutral-600 rounded-lg text-[#FEEBD8]/60">
+                    <div className="w-full p-3 bg-neutral-800 border border-neutral-600 rounded-lg text-white/60">
                       No college applications found
                     </div>
-                    <p className="text-[#FEEBD8]/60 text-sm">
+                    <p className="text-white/60 text-sm">
                       You need to create at least one college application before
                       importing templates.{" "}
                       <button
-                        className="text-[#FEEBD8] hover:underline inline-flex items-center gap-1"
+                        className="text-white hover:underline inline-flex items-center gap-1"
                         onClick={() => {
                           // This could navigate to create college application page
                           alert(
@@ -180,7 +180,7 @@ export default function ImportTemplateModal({
                     <select
                       value={selectedApplicationId}
                       onChange={(e) => setSelectedApplicationId(e.target.value)}
-                      className="w-full p-3 bg-neutral-800 border border-neutral-600 rounded-lg text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]/50 appearance-none pr-10"
+                      className="w-full p-3 bg-neutral-800 border border-neutral-600 rounded-lg text-white focus:outline-none focus:border-blue-500/50 appearance-none pr-10"
                       disabled={importing}
                     >
                       <option value="">Choose a college application...</option>
@@ -195,7 +195,7 @@ export default function ImportTemplateModal({
                         </option>
                       ))}
                     </select>
-                    <FaChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#FEEBD8]/60 pointer-events-none" />
+                    <FaChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white/60 pointer-events-none" />
                   </div>
                 )}
 
@@ -203,10 +203,10 @@ export default function ImportTemplateModal({
                   <div className="mt-2 p-3 bg-neutral-800/50 rounded-lg border border-neutral-600/50">
                     <div className="flex items-center justify-between">
                       <div>
-                        <h4 className="text-[#FEEBD8] font-medium">
+                        <h4 className="text-white font-medium">
                           {selectedApplication.name}
                         </h4>
-                        <div className="flex items-center gap-4 mt-1 text-sm text-[#FEEBD8]/60">
+                        <div className="flex items-center gap-4 mt-1 text-sm text-white/60">
                           {selectedApplication.location && (
                             <span>{selectedApplication.location}</span>
                           )}
@@ -225,11 +225,11 @@ export default function ImportTemplateModal({
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-[#FEEBD8]/60 text-sm">
+                        <div className="text-white/60 text-sm">
                           {selectedApplication.checklists?.length || 0} existing
                           checklists
                         </div>
-                        <div className="text-[#FEEBD8]/60 text-sm">
+                        <div className="text-white/60 text-sm">
                           Progress: {selectedApplication.progress || 0}%
                         </div>
                       </div>
@@ -241,10 +241,10 @@ export default function ImportTemplateModal({
 
             {/* What will be imported */}
             <div className="mt-6 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
-              <h4 className="text-[#FEEBD8] font-medium mb-2">
+              <h4 className="text-white font-medium mb-2">
                 What will be imported:
               </h4>
-              <ul className="text-[#FEEBD8]/70 text-sm space-y-1">
+              <ul className="text-white/70 text-sm space-y-1">
                 <li>• {template.checklists.length} pre-built checklists</li>
                 <li>
                   •{" "}
@@ -265,7 +265,7 @@ export default function ImportTemplateModal({
               <button
                 onClick={handleClose}
                 disabled={importing}
-                className="flex-1 px-4 py-3 border border-neutral-600 rounded-lg text-[#FEEBD8] hover:bg-neutral-800 transition-colors disabled:opacity-50"
+                className="flex-1 px-4 py-3 border border-neutral-600 rounded-lg text-white hover:bg-neutral-800 transition-colors disabled:opacity-50"
               >
                 Cancel
               </button>
@@ -277,7 +277,7 @@ export default function ImportTemplateModal({
                   !selectedApplicationId ||
                   collegeApplications.length === 0
                 }
-                className="flex-1 bg-[#FEEBD8] text-[#141414] py-3 px-4 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="flex-1 bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {importing ? (
                   <>

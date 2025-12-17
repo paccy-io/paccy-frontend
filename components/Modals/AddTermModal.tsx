@@ -161,21 +161,21 @@ export default function AddTermModal({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-[#141414] border border-neutral-700 rounded-lg max-w-lg w-full max-h-[90vh] overflow-hidden">
+      <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-hidden">
         {/* Header */}
-        <div className="p-6 border-b border-neutral-700">
+        <div className="p-6 border-b border-neutral-700/50">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-neutral-800">
-                <FaGraduationCap className="text-[#FEEBD8]" size={18} />
+                <FaGraduationCap className="text-white" size={18} />
               </div>
-              <h2 className="text-xl font-semibold text-[#FEEBD8]">
+              <h2 className="text-xl font-semibold text-white">
                 Add Academic Term
               </h2>
             </div>
             <button
               onClick={onClose}
-              className="text-[#FEEBD8]/60 hover:text-[#FEEBD8] transition-colors"
+              className="text-white/60 hover:text-white transition-colors"
             >
               <FaTimes size={18} />
             </button>
@@ -183,7 +183,7 @@ export default function AddTermModal({
         </div>
 
         {/* Tabs */}
-        <div className="border-b border-neutral-700">
+        <div className="border-b border-neutral-700/50">
           <div className="flex">
             {tabs.map((tab) => {
               const Icon = tab.icon;
@@ -193,8 +193,8 @@ export default function AddTermModal({
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium transition-colors ${
                     activeTab === tab.id
-                      ? "text-[#FEEBD8] border-b-2 border-[#FEEBD8] bg-neutral-800/50"
-                      : "text-[#FEEBD8]/60 hover:text-[#FEEBD8] hover:bg-neutral-800/30"
+                      ? "text-white border-b-2 border-blue-500 bg-neutral-800/50"
+                      : "text-white/60 hover:text-white hover:bg-neutral-800/30"
                   }`}
                 >
                   <Icon size={14} />
@@ -212,7 +212,7 @@ export default function AddTermModal({
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+                    <label className="block text-sm font-medium text-white/70 mb-2">
                       Season *
                     </label>
                     <select
@@ -220,7 +220,7 @@ export default function AddTermModal({
                       value={formData.season}
                       onChange={handleChange}
                       required
-                      className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                      className="w-full bg-neutral-800 border border-neutral-700/50 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
                     >
                       {seasonOptions.map((season) => (
                         <option key={season} value={season}>
@@ -231,7 +231,7 @@ export default function AddTermModal({
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+                    <label className="block text-sm font-medium text-white/70 mb-2">
                       Year *
                     </label>
                     <input
@@ -242,10 +242,10 @@ export default function AddTermModal({
                       required
                       min="2020"
                       max="2030"
-                      className={`w-full bg-neutral-800 border rounded-lg px-3 py-2 text-[#FEEBD8] focus:outline-none transition-colors ${
+                      className={`w-full bg-neutral-800 border rounded-lg px-3 py-2 text-white focus:outline-none transition-colors ${
                         errors.year
                           ? "border-red-500 focus:border-red-500"
-                          : "border-neutral-700 focus:border-[#FEEBD8]"
+                          : "border-neutral-700/50 focus:border-blue-500 transition-colors"
                       }`}
                     />
                     {errors.year && (
@@ -255,7 +255,7 @@ export default function AddTermModal({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+                  <label className="block text-sm font-medium text-white/70 mb-2">
                     Term Name
                   </label>
                   <input
@@ -263,23 +263,23 @@ export default function AddTermModal({
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
-                    className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                    className="w-full bg-neutral-800 border border-neutral-700/50 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
                     placeholder="Auto-generated"
                   />
-                  <p className="text-xs text-[#FEEBD8]/50 mt-1">
+                  <p className="text-xs text-white/50 mt-1">
                     Auto-generated from season and year
                   </p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+                  <label className="block text-sm font-medium text-white/70 mb-2">
                     Status
                   </label>
                   <select
                     name="status"
                     value={formData.status}
                     onChange={handleChange}
-                    className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                    className="w-full bg-neutral-800 border border-neutral-700/50 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
                   >
                     {statusOptions.map((status) => (
                       <option key={status} value={status}>
@@ -316,7 +316,7 @@ export default function AddTermModal({
 
                 {getTermDuration() && (
                   <div className="bg-neutral-800 rounded-lg p-3">
-                    <div className="flex items-center gap-2 text-[#FEEBD8]/70">
+                    <div className="flex items-center gap-2 text-white/70">
                       <FaCalendarAlt size={14} />
                       <span>Duration: {getTermDuration()}</span>
                     </div>
@@ -329,7 +329,7 @@ export default function AddTermModal({
             {activeTab === "academic" && (
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+                  <label className="block text-sm font-medium text-white/70 mb-2">
                     Target GPA
                   </label>
                   <input
@@ -340,10 +340,10 @@ export default function AddTermModal({
                     step="0.01"
                     min="0"
                     max="4"
-                    className={`w-full bg-neutral-800 border rounded-lg px-3 py-2 text-[#FEEBD8] focus:outline-none transition-colors ${
+                    className={`w-full bg-neutral-800 border rounded-lg px-3 py-2 text-white focus:outline-none transition-colors ${
                       errors.gpa
                         ? "border-red-500 focus:border-red-500"
-                        : "border-neutral-700 focus:border-[#FEEBD8]"
+                        : "border-neutral-700/50 focus:border-blue-500 transition-colors"
                     }`}
                     placeholder="0.00 - 4.00"
                   />
@@ -353,7 +353,7 @@ export default function AddTermModal({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+                  <label className="block text-sm font-medium text-white/70 mb-2">
                     Planned Credits
                   </label>
                   <input
@@ -363,10 +363,10 @@ export default function AddTermModal({
                     onChange={handleChange}
                     min="0"
                     max="30"
-                    className={`w-full bg-neutral-800 border rounded-lg px-3 py-2 text-[#FEEBD8] focus:outline-none transition-colors ${
+                    className={`w-full bg-neutral-800 border rounded-lg px-3 py-2 text-white focus:outline-none transition-colors ${
                       errors.credits
                         ? "border-red-500 focus:border-red-500"
-                        : "border-neutral-700 focus:border-[#FEEBD8]"
+                        : "border-neutral-700/50 focus:border-blue-500 transition-colors"
                     }`}
                     placeholder="0 - 30"
                   />
@@ -378,9 +378,9 @@ export default function AddTermModal({
                 </div>
 
                 <div className="bg-neutral-800 rounded-lg p-3">
-                  <div className="text-sm text-[#FEEBD8]/70">
+                  <div className="text-sm text-white/70">
                     Course Load:{" "}
-                    <span className="text-[#FEEBD8]">
+                    <span className="text-white">
                       {formData.credits === 0
                         ? "Not Set"
                         : formData.credits < 12
@@ -396,19 +396,19 @@ export default function AddTermModal({
           </div>
 
           {/* Footer */}
-          <div className="p-6 border-t border-neutral-700">
+          <div className="p-6 border-t border-neutral-700/50">
             <div className="flex gap-3">
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 bg-neutral-700 text-[#FEEBD8] px-4 py-2 rounded-lg font-medium hover:bg-neutral-600 transition-colors"
+                className="flex-1 bg-neutral-700 text-white px-4 py-2 rounded-lg font-medium hover:bg-neutral-600 transition-colors"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={Object.keys(errors).length > 0}
-                className="flex-1 bg-[#FEEBD8] text-[#141414] px-4 py-2 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Add Term
               </button>

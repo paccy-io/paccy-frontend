@@ -141,7 +141,7 @@ export default function AddEssayModal({
                 value={formData.title}
                 onChange={handleChange}
                 required
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
+                className="w-full bg-neutral-800 border border-neutral-700/50 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
                 placeholder="e.g., Personal Statement for Stanford"
               />
             </div>
@@ -156,7 +156,7 @@ export default function AddEssayModal({
                 onChange={handleChange}
                 required
                 disabled={loading}
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500 disabled:opacity-50 transition-colors"
+                className="w-full bg-neutral-800 border border-neutral-700/50 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500 disabled:opacity-50 transition-colors"
               >
                 <option value="">Select a college application...</option>
                 {collegeApplications.map((app) => {
@@ -191,7 +191,7 @@ export default function AddEssayModal({
                 name="status"
                 value={formData.status}
                 onChange={handleChange}
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
+                className="w-full bg-neutral-800 border border-neutral-700/50 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
               >
                 <option value={EssayStatus.NOT_STARTED}>Not Started</option>
                 <option value={EssayStatus.IN_PROGRESS}>In Progress</option>
@@ -213,7 +213,7 @@ export default function AddEssayModal({
               value={formData.prompt}
               onChange={handleChange}
               rows={3}
-              className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
+              className="w-full bg-neutral-800 border border-neutral-700/50 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
               placeholder="Paste the essay prompt here..."
             />
           </div>
@@ -228,7 +228,7 @@ export default function AddEssayModal({
               value={formData.content}
               onChange={handleChange}
               rows={12}
-              className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
+              className="w-full bg-neutral-800 border border-neutral-700/50 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
               placeholder="Start writing your essay here..."
             />
             <div className="mt-2 text-sm text-white/60">

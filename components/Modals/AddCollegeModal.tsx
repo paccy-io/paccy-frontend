@@ -322,15 +322,15 @@ export default function AddCollegeModal({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-[#141414] border border-neutral-700 rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+      <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl shadow-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-[#FEEBD8] flex items-center gap-2">
+          <h2 className="text-2xl font-bold text-white flex items-center gap-2">
             <FaUniversity className="text-blue-400" />
             Add College Application
           </h2>
           <button
             onClick={onClose}
-            className="text-[#FEEBD8] hover:text-white transition-colors"
+            className="text-white hover:text-white transition-colors"
           >
             <FaTimes size={24} />
           </button>
@@ -339,7 +339,7 @@ export default function AddCollegeModal({
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* University Search */}
           <div ref={universityDropdownRef}>
-            <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+            <label className="block text-sm font-medium text-white/70 mb-2">
               University Name
             </label>
             <div className="relative">
@@ -353,19 +353,19 @@ export default function AddCollegeModal({
                   setShowCustomUniversity(false);
                 }}
                 onFocus={() => setShowUniversityDropdown(true)}
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-3 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                className="w-full bg-neutral-800 border border-neutral-700/50 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors"
               />
 
               {showUniversityDropdown && filteredUniversities.length > 0 && (
-                <div className="absolute z-50 w-full mt-1 bg-neutral-800 border border-neutral-700 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                <div className="absolute z-50 w-full mt-1 bg-neutral-800 border border-neutral-700/50 rounded-lg shadow-lg max-h-60 overflow-y-auto">
                   {filteredUniversities.map((university, index) => (
                     <div
                       key={index}
                       onClick={() => handleUniversitySelect(university)}
-                      className="px-4 py-3 text-[#FEEBD8] hover:bg-neutral-700 cursor-pointer border-b border-neutral-700 last:border-b-0"
+                      className="px-4 py-3 text-white hover:bg-neutral-700 cursor-pointer border-b border-neutral-700/50 last:border-b-0"
                     >
                       <div className="font-medium">{university.name}</div>
-                      <div className="text-sm text-[#FEEBD8]/70">
+                      <div className="text-sm text-white/70">
                         {university["state-province"] &&
                           `${university["state-province"]}, `}
                         {university.country}
@@ -377,7 +377,7 @@ export default function AddCollegeModal({
 
               {isLoadingUniversities && (
                 <div className="absolute right-3 top-3">
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#FEEBD8]"></div>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500"></div>
                 </div>
               )}
             </div>
@@ -396,7 +396,7 @@ export default function AddCollegeModal({
           {/* Custom University Name */}
           {showCustomUniversity && (
             <div>
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+              <label className="block text-sm font-medium text-white/70 mb-2">
                 Custom University Name
               </label>
               <input
@@ -404,7 +404,7 @@ export default function AddCollegeModal({
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-3 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                className="w-full bg-neutral-800 border border-neutral-700/50 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors"
                 placeholder="Enter university name..."
               />
             </div>
@@ -412,7 +412,7 @@ export default function AddCollegeModal({
 
           {/* Location */}
           <div>
-            <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+            <label className="block text-sm font-medium text-white/70 mb-2">
               <FaMapMarkerAlt className="inline mr-2" />
               Location
             </label>
@@ -421,14 +421,14 @@ export default function AddCollegeModal({
               name="location"
               value={formData.location}
               onChange={handleChange}
-              className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-3 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+              className="w-full bg-neutral-800 border border-neutral-700/50 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors"
               placeholder="City, State/Country"
             />
           </div>
 
           {/* Major Selection */}
           <div ref={majorDropdownRef}>
-            <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+            <label className="block text-sm font-medium text-white/70 mb-2">
               <FaGraduationCap className="inline mr-2" />
               Major
             </label>
@@ -443,16 +443,16 @@ export default function AddCollegeModal({
                   setShowMajorDropdown(true);
                 }}
                 onFocus={() => setShowMajorDropdown(true)}
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-3 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                className="w-full bg-neutral-800 border border-neutral-700/50 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors"
               />
 
               {showMajorDropdown && filteredMajors.length > 0 && (
-                <div className="absolute z-50 w-full mt-1 bg-neutral-800 border border-neutral-700 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                <div className="absolute z-50 w-full mt-1 bg-neutral-800 border border-neutral-700/50 rounded-lg shadow-lg max-h-60 overflow-y-auto">
                   {filteredMajors.slice(0, 10).map((major, index) => (
                     <div
                       key={index}
                       onClick={() => handleMajorSelect(major)}
-                      className="px-4 py-2 text-[#FEEBD8] hover:bg-neutral-700 cursor-pointer"
+                      className="px-4 py-2 text-white hover:bg-neutral-700 cursor-pointer"
                     >
                       {major}
                     </div>
@@ -463,14 +463,14 @@ export default function AddCollegeModal({
 
             {/* Popular Majors Quick Selection */}
             <div className="mt-3">
-              <p className="text-xs text-[#FEEBD8]/50 mb-2">Popular majors:</p>
+              <p className="text-xs text-white/50 mb-2">Popular majors:</p>
               <div className="flex flex-wrap gap-2">
                 {POPULAR_MAJORS.map((major) => (
                   <button
                     key={major}
                     type="button"
                     onClick={() => handleMajorSelect(major)}
-                    className="px-3 py-1 text-xs bg-neutral-700 text-[#FEEBD8]/80 rounded-md hover:bg-neutral-600 transition-colors"
+                    className="px-3 py-1 text-xs bg-neutral-700 text-white/80 rounded-md hover:bg-neutral-600 transition-colors"
                   >
                     {major}
                   </button>
@@ -482,14 +482,14 @@ export default function AddCollegeModal({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Status */}
             <div>
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+              <label className="block text-sm font-medium text-white/70 mb-2">
                 Status
               </label>
               <select
                 name="status"
                 value={formData.status}
                 onChange={handleChange}
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-3 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                className="w-full bg-neutral-800 border border-neutral-700/50 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors"
               >
                 <option value="Researching">Researching</option>
                 <option value="Applied">Applied</option>
@@ -501,7 +501,7 @@ export default function AddCollegeModal({
 
             {/* Deadline */}
             <div>
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+              <label className="block text-sm font-medium text-white/70 mb-2">
                 <FaCalendar className="inline mr-2" />
                 Application Deadline
               </label>
@@ -519,7 +519,7 @@ export default function AddCollegeModal({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Application Fee */}
             <div>
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+              <label className="block text-sm font-medium text-white/70 mb-2">
                 <FaDollarSign className="inline mr-2" />
                 Application Fee ($)
               </label>
@@ -528,10 +528,10 @@ export default function AddCollegeModal({
                 name="applicationFee"
                 value={applicationFeeInputValue}
                 onChange={handleApplicationFeeChange}
-                className={`w-full bg-neutral-800 border rounded-lg px-4 py-3 text-[#FEEBD8] focus:outline-none transition-colors ${
+                className={`w-full bg-neutral-800 border rounded-lg px-4 py-3 text-white focus:outline-none transition-colors ${
                   applicationFeeError
                     ? "border-red-500 focus:border-red-500"
-                    : "border-neutral-700 focus:border-[#FEEBD8]"
+                    : "border-neutral-700/50 focus:border-blue-500 transition-colors"
                 }`}
                 placeholder="e.g., 75"
               />
@@ -545,7 +545,7 @@ export default function AddCollegeModal({
 
             {/* Acceptance Rate */}
             <div>
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+              <label className="block text-sm font-medium text-white/70 mb-2">
                 Acceptance Rate (%)
               </label>
               <input
@@ -553,10 +553,10 @@ export default function AddCollegeModal({
                 name="acceptance"
                 value={acceptanceInputValue}
                 onChange={handleAcceptanceChange}
-                className={`w-full bg-neutral-800 border rounded-lg px-4 py-3 text-[#FEEBD8] focus:outline-none transition-colors ${
+                className={`w-full bg-neutral-800 border rounded-lg px-4 py-3 text-white focus:outline-none transition-colors ${
                   acceptanceError
                     ? "border-red-500 focus:border-red-500"
-                    : "border-neutral-700 focus:border-[#FEEBD8]"
+                    : "border-neutral-700/50 focus:border-blue-500 transition-colors"
                 }`}
                 placeholder="0 - 100"
               />
@@ -570,7 +570,7 @@ export default function AddCollegeModal({
 
             {/* Ranking */}
             <div>
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+              <label className="block text-sm font-medium text-white/70 mb-2">
                 Ranking
               </label>
               <input
@@ -578,10 +578,10 @@ export default function AddCollegeModal({
                 name="ranking"
                 value={rankingInputValue}
                 onChange={handleRankingChange}
-                className={`w-full bg-neutral-800 border rounded-lg px-4 py-3 text-[#FEEBD8] focus:outline-none transition-colors ${
+                className={`w-full bg-neutral-800 border rounded-lg px-4 py-3 text-white focus:outline-none transition-colors ${
                   rankingError
                     ? "border-red-500 focus:border-red-500"
-                    : "border-neutral-700 focus:border-[#FEEBD8]"
+                    : "border-neutral-700/50 focus:border-blue-500 transition-colors"
                 }`}
                 placeholder="e.g., 5"
               />
@@ -597,14 +597,14 @@ export default function AddCollegeModal({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Application Type */}
             <div>
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+              <label className="block text-sm font-medium text-white/70 mb-2">
                 Application Type
               </label>
               <select
                 name="applicationType"
                 value={formData.applicationType}
                 onChange={handleChange}
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-3 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                className="w-full bg-neutral-800 border border-neutral-700/50 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors"
               >
                 <option value="early_decision">Early Decision</option>
                 <option value="early_action">Early Action</option>
@@ -615,14 +615,14 @@ export default function AddCollegeModal({
 
             {/* Priority Level */}
             <div>
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+              <label className="block text-sm font-medium text-white/70 mb-2">
                 Priority Level
               </label>
               <select
                 name="priorityLevel"
                 value={formData.priorityLevel}
                 onChange={handleChange}
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-3 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                className="w-full bg-neutral-800 border border-neutral-700/50 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors"
               >
                 <option value="">Select Priority Level</option>
                 <option value="Safety">Safety</option>
@@ -633,11 +633,11 @@ export default function AddCollegeModal({
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-3 pt-4 border-t border-neutral-700">
+          <div className="flex gap-3 pt-4 border-t border-neutral-700/50">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 bg-neutral-700 text-[#FEEBD8] px-6 py-3 rounded-lg font-medium hover:bg-neutral-600 transition-colors"
+              className="flex-1 bg-neutral-700 text-white px-6 py-3 rounded-lg font-medium hover:bg-neutral-600 transition-colors"
             >
               Cancel
             </button>
@@ -646,7 +646,7 @@ export default function AddCollegeModal({
               disabled={
                 !!(applicationFeeError || acceptanceError || rankingError)
               }
-              className="flex-1 bg-[#FEEBD8] text-[#141414] px-6 py-3 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Add College
             </button>

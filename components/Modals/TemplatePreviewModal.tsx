@@ -134,17 +134,17 @@ export default function TemplatePreviewModal({
           <div className="flex items-center gap-3">
             <span className="text-3xl">{template.flag}</span>
             <div>
-              <h2 className="text-xl font-semibold text-[#FEEBD8]">
+              <h2 className="text-xl font-semibold text-white">
                 Template Preview
               </h2>
-              <p className="text-[#FEEBD8]/60 text-sm">
+              <p className="text-white/60 text-sm">
                 {template.name} - {template.country}
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="text-[#FEEBD8]/60 hover:text-[#FEEBD8] transition-colors"
+            className="text-white/60 hover:text-white transition-colors"
           >
             <FaTimes size={20} />
           </button>
@@ -154,10 +154,10 @@ export default function TemplatePreviewModal({
         <div className="p-6">
           {/* Template Info */}
           <div className="mb-6 p-4 bg-neutral-800/50 rounded-lg border border-neutral-600/50">
-            <h3 className="font-semibold text-[#FEEBD8] mb-2">
+            <h3 className="font-semibold text-white mb-2">
               What you'll get:
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-[#FEEBD8]/70">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-white/70">
               <div className="flex items-center gap-2">
                 <FaCheckCircle className="text-green-400" />
                 <span>{template.checklists.length} organized checklists</span>
@@ -184,10 +184,10 @@ export default function TemplatePreviewModal({
             <div className="flex items-start gap-3">
               <FaFlag className="text-blue-400 mt-1" />
               <div>
-                <h4 className="text-[#FEEBD8] font-medium mb-1">
+                <h4 className="text-white font-medium mb-1">
                   Preview Mode
                 </h4>
-                <p className="text-[#FEEBD8]/70 text-sm">
+                <p className="text-white/70 text-sm">
                   This shows exactly how the checklists and tasks will appear in
                   your college application after import. All deadlines will be
                   automatically calculated based on your application deadline.
@@ -209,7 +209,7 @@ export default function TemplatePreviewModal({
                     <div className="flex items-center gap-3">
                       <button
                         onClick={() => toggleChecklist(index)}
-                        className="text-[#FEEBD8]/60 hover:text-[#FEEBD8] transition-colors"
+                        className="text-white/60 hover:text-white transition-colors"
                       >
                         {expandedChecklists.has(index) ? (
                           <FaChevronDown size={16} />
@@ -219,7 +219,7 @@ export default function TemplatePreviewModal({
                       </button>
                       <div>
                         <div className="flex items-center gap-2 mb-1">
-                          <h3 className="text-lg font-semibold text-[#FEEBD8]">
+                          <h3 className="text-lg font-semibold text-white">
                             {checklist.name}
                           </h3>
                           <span
@@ -230,13 +230,13 @@ export default function TemplatePreviewModal({
                             {checklist.category.replace(/_/g, " ")}
                           </span>
                         </div>
-                        <p className="text-[#FEEBD8]/60 text-sm mt-1">
+                        <p className="text-white/60 text-sm mt-1">
                           {checklist.description}
                         </p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="text-[#FEEBD8]/60 text-sm">
+                      <div className="text-white/60 text-sm">
                         {checklist.tasks.length} tasks
                       </div>
                     </div>
@@ -257,7 +257,7 @@ export default function TemplatePreviewModal({
                               {/* Task Header */}
                               <div className="flex items-center gap-3 mb-2">
                                 <div className="w-5 h-5 border-2 border-neutral-500 rounded"></div>
-                                <h4 className="text-[#FEEBD8] font-medium">
+                                <h4 className="text-white font-medium">
                                   {task.name}
                                 </h4>
                                 <span
@@ -272,7 +272,7 @@ export default function TemplatePreviewModal({
                               {/* Task Details */}
                               <div className="ml-8 space-y-2">
                                 {/* Deadline */}
-                                <div className="flex items-center gap-2 text-sm text-[#FEEBD8]/70">
+                                <div className="flex items-center gap-2 text-sm text-white/70">
                                   <FaCalendar />
                                   <span>
                                     {formatDeadline(task.deadline_days_before)}
@@ -280,7 +280,7 @@ export default function TemplatePreviewModal({
                                 </div>
 
                                 {/* Responsible */}
-                                <div className="flex items-center gap-2 text-sm text-[#FEEBD8]/70">
+                                <div className="flex items-center gap-2 text-sm text-white/70">
                                   {getResponsibleIcon(task.responsible)}
                                   <span className="capitalize">
                                     {task.responsible.replace(/_/g, " ")}
@@ -288,7 +288,7 @@ export default function TemplatePreviewModal({
                                 </div>
 
                                 {/* Type & Component */}
-                                <div className="flex items-center gap-4 text-sm text-[#FEEBD8]/70">
+                                <div className="flex items-center gap-4 text-sm text-white/70">
                                   <div className="flex items-center gap-2">
                                     <FaTag />
                                     <span className="capitalize">
@@ -305,7 +305,7 @@ export default function TemplatePreviewModal({
 
                                 {/* Notes */}
                                 {task.notes && (
-                                  <div className="flex items-start gap-2 text-sm text-[#FEEBD8]/70">
+                                  <div className="flex items-start gap-2 text-sm text-white/70">
                                     <FaStickyNote className="mt-1" />
                                     <span>{task.notes}</span>
                                   </div>
@@ -321,7 +321,7 @@ export default function TemplatePreviewModal({
 
                 {!expandedChecklists.has(index) && (
                   <div className="px-4 pb-4">
-                    <div className="text-center py-2 text-[#FEEBD8]/60 text-sm">
+                    <div className="text-center py-2 text-white/60 text-sm">
                       Click to expand and view {checklist.tasks.length} tasks
                     </div>
                   </div>
@@ -332,7 +332,7 @@ export default function TemplatePreviewModal({
 
           {/* Footer */}
           <div className="mt-6 p-4 bg-neutral-800/50 rounded-lg border border-neutral-600/50">
-            <div className="flex items-center gap-3 text-[#FEEBD8]/70 text-sm">
+            <div className="flex items-center gap-3 text-white/70 text-sm">
               <FaExclamationTriangle className="text-yellow-400" />
               <span>
                 After importing, you can edit any checklist or task to customize
@@ -346,7 +346,7 @@ export default function TemplatePreviewModal({
         <div className="p-6 border-t border-neutral-700/50">
           <button
             onClick={onClose}
-            className="w-full bg-neutral-700 text-[#FEEBD8] py-3 px-4 rounded-lg font-medium hover:bg-neutral-600 transition-colors"
+            className="w-full bg-neutral-700 text-white py-3 px-4 rounded-lg font-medium hover:bg-neutral-600 transition-colors"
           >
             Close Preview
           </button>

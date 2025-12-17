@@ -112,12 +112,12 @@ export default function EventDetailsModal({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-[#141414] border border-neutral-700 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="p-6 border-b border-neutral-700">
+      <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="p-6 border-b border-neutral-700/50">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <FaInfoCircle className="text-blue-400 text-xl" />
-              <h2 className="text-xl font-bold text-[#FEEBD8]">
+              <h2 className="text-xl font-bold text-white">
                 Event Details
               </h2>
             </div>
@@ -138,7 +138,7 @@ export default function EventDetailsModal({
               </button>
               <button
                 onClick={onClose}
-                className="text-[#FEEBD8]/60 hover:text-[#FEEBD8] transition-colors p-2"
+                className="text-white/60 hover:text-white transition-colors p-2"
               >
                 <FaTimes size={20} />
               </button>
@@ -155,10 +155,10 @@ export default function EventDetailsModal({
               <FaFlag size={20} />
             </div>
             <div className="flex-1">
-              <h3 className="text-2xl font-bold text-[#FEEBD8] mb-2">
+              <h3 className="text-2xl font-bold text-white mb-2">
                 {event.title}
               </h3>
-              <div className="flex items-center gap-4 text-[#FEEBD8]/70">
+              <div className="flex items-center gap-4 text-white/70">
                 <span className="bg-neutral-800 px-3 py-1 rounded-full text-sm">
                   {eventTypeLabels[event.type]}
                 </span>
@@ -177,7 +177,7 @@ export default function EventDetailsModal({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Date & Time */}
             <div className="space-y-4">
-              <h4 className="text-lg font-semibold text-[#FEEBD8] border-b border-neutral-700 pb-2">
+              <h4 className="text-lg font-semibold text-white border-b border-neutral-700/50 pb-2">
                 Schedule
               </h4>
 
@@ -185,10 +185,10 @@ export default function EventDetailsModal({
                 <div className="flex items-center gap-3">
                   <FaCalendar className="text-green-400" />
                   <div>
-                    <p className="text-[#FEEBD8] font-medium">
+                    <p className="text-white font-medium">
                       {formatDate(event.date)}
                     </p>
-                    <p className="text-[#FEEBD8]/60 text-sm">Date</p>
+                    <p className="text-white/60 text-sm">Date</p>
                   </div>
                 </div>
               ) : (
@@ -205,10 +205,10 @@ export default function EventDetailsModal({
                 <div className="flex items-center gap-3">
                   <FaClock className="text-blue-400" />
                   <div>
-                    <p className="text-[#FEEBD8] font-medium">
+                    <p className="text-white font-medium">
                       {formatTime(getTimeFromDate(event.date)!)}
                     </p>
-                    <p className="text-[#FEEBD8]/60 text-sm">Time</p>
+                    <p className="text-white/60 text-sm">Time</p>
                   </div>
                 </div>
               )}
@@ -216,7 +216,7 @@ export default function EventDetailsModal({
 
             {/* College Information */}
             <div className="space-y-4">
-              <h4 className="text-lg font-semibold text-[#FEEBD8] border-b border-neutral-700 pb-2">
+              <h4 className="text-lg font-semibold text-white border-b border-neutral-700/50 pb-2">
                 Details
               </h4>
 
@@ -224,10 +224,10 @@ export default function EventDetailsModal({
                 <div className="flex items-center gap-3">
                   <FaUniversity className="text-purple-400" />
                   <div>
-                    <p className="text-[#FEEBD8] font-medium">
+                    <p className="text-white font-medium">
                       {event.college}
                     </p>
-                    <p className="text-[#FEEBD8]/60 text-sm">Related College</p>
+                    <p className="text-white/60 text-sm">Related College</p>
                   </div>
                 </div>
               ) : (
@@ -247,11 +247,11 @@ export default function EventDetailsModal({
           {/* Description */}
           {event.description && (
             <div className="space-y-4">
-              <h4 className="text-lg font-semibold text-[#FEEBD8] border-b border-neutral-700 pb-2">
+              <h4 className="text-lg font-semibold text-white border-b border-neutral-700/50 pb-2">
                 Description
               </h4>
               <div className="bg-neutral-800 rounded-lg p-4">
-                <p className="text-[#FEEBD8]/80 whitespace-pre-wrap leading-relaxed">
+                <p className="text-white/80 whitespace-pre-wrap leading-relaxed">
                   {event.description}
                 </p>
               </div>
@@ -259,16 +259,16 @@ export default function EventDetailsModal({
           )}
 
           {/* Action Buttons */}
-          <div className="flex gap-3 pt-4 border-t border-neutral-700">
+          <div className="flex gap-3 pt-4 border-t border-neutral-700/50">
             <button
               onClick={onClose}
-              className="flex-1 bg-neutral-700 text-[#FEEBD8] px-6 py-3 rounded-lg font-medium hover:bg-neutral-600 transition-colors"
+              className="flex-1 bg-neutral-700 text-white px-6 py-3 rounded-lg font-medium hover:bg-neutral-600 transition-colors"
             >
               Close
             </button>
             <button
               onClick={onEdit}
-              className="flex-1 bg-[#FEEBD8] text-[#141414] px-6 py-3 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors flex items-center justify-center gap-2"
+              className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
             >
               <FaEdit size={16} />
               Edit Event
@@ -284,18 +284,18 @@ export default function EventDetailsModal({
             <div className="p-6">
               <div className="flex items-center gap-3 mb-4">
                 <FaTrash className="text-red-400 text-xl" />
-                <h3 className="text-lg font-bold text-[#FEEBD8]">
+                <h3 className="text-lg font-bold text-white">
                   Delete Event
                 </h3>
               </div>
-              <p className="text-[#FEEBD8]/70 mb-6">
+              <p className="text-white/70 mb-6">
                 Are you sure you want to delete "{event?.title}"? This action
                 cannot be undone.
               </p>
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowDeleteConfirm(false)}
-                  className="flex-1 bg-neutral-700 text-[#FEEBD8] px-4 py-2 rounded-lg font-medium hover:bg-neutral-600 transition-colors"
+                  className="flex-1 bg-neutral-700 text-white px-4 py-2 rounded-lg font-medium hover:bg-neutral-600 transition-colors"
                 >
                   Cancel
                 </button>

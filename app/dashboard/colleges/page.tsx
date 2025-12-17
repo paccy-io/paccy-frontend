@@ -605,43 +605,43 @@ export default function CollegeTracker() {
           <div className="flex items-center space-x-4 mb-8">
             <button
               onClick={() => setShowAddCollegeForm(false)}
-              className="text-[#FEEBD8]/70 hover:text-[#FEEBD8] transition-colors"
+              className="text-white/70 hover:text-white transition-colors"
             >
               <FaArrowLeft size={20} />
             </button>
             <div>
-              <h1 className="text-4xl font-bold text-[#FEEBD8]">
+              <h1 className="text-4xl font-bold text-white">
                 Add College Application
               </h1>
-              <p className="text-[#FEEBD8]/70 mt-2">
+              <p className="text-white/70 mt-2">
                 Search for your university or add a custom one
               </p>
             </div>
           </div>
 
           <div className="max-w-2xl mx-auto">
-            <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-8">
+            <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-8 shadow-2xl">
               <div className="space-y-6">
                 {/* University Search */}
                 <div>
-                  <label className="block text-lg font-medium text-[#FEEBD8] mb-4">
+                  <label className="block text-lg font-medium text-white mb-4">
                     Find Your University
                   </label>
 
                   <div className="relative">
                     <div className="relative">
-                      <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[#FEEBD8]/50" />
+                      <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/50" />
                       <input
                         type="text"
                         placeholder="Search for universities worldwide..."
                         value={universitySearch}
                         onChange={(e) => setUniversitySearch(e.target.value)}
-                        className="w-full bg-neutral-800 border border-neutral-700 rounded-lg pl-12 pr-4 py-4 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8] text-lg"
+                        className="w-full bg-neutral-800 border border-neutral-700/50 rounded-lg pl-12 pr-4 py-4 text-white focus:outline-none focus:border-blue-500 text-lg transition-colors"
                         disabled={isLoadingUniversities}
                       />
                       {isLoadingUniversities && (
                         <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
-                          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#FEEBD8]"></div>
+                          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500"></div>
                         </div>
                       )}
                     </div>
@@ -649,17 +649,17 @@ export default function CollegeTracker() {
                     {/* University Dropdown */}
                     {showUniversityDropdown &&
                       filteredUniversities.length > 0 && (
-                        <div className="absolute top-full left-0 right-0 mt-1 bg-neutral-800 border border-neutral-700 rounded-lg shadow-lg z-10 max-h-64 overflow-y-auto">
+                        <div className="absolute top-full left-0 right-0 mt-1 bg-neutral-800 border border-neutral-700/50 rounded-lg shadow-lg z-10 max-h-64 overflow-y-auto">
                           {filteredUniversities.map((university, index) => (
                             <button
                               key={index}
                               onClick={() => handleUniversitySelect(university)}
-                              className="w-full text-left px-4 py-3 hover:bg-neutral-700 transition-colors border-b border-neutral-700 last:border-b-0"
+                              className="w-full text-left px-4 py-3 hover:bg-neutral-700 transition-colors border-b border-neutral-700/50 last:border-b-0"
                             >
-                              <div className="text-[#FEEBD8] font-medium">
+                              <div className="text-white font-medium">
                                 {university.name}
                               </div>
-                              <div className="text-[#FEEBD8]/60 text-sm">
+                              <div className="text-white/60 text-sm">
                                 {university["state-province"] &&
                                   `${university["state-province"]}, `}
                                 {university.country}
@@ -675,10 +675,10 @@ export default function CollegeTracker() {
                       <div className="flex items-center gap-3">
                         <FaUniversity className="text-green-400" />
                         <div>
-                          <div className="text-[#FEEBD8] font-medium">
+                          <div className="text-white font-medium">
                             {selectedUniversity.name}
                           </div>
-                          <div className="text-[#FEEBD8]/70 text-sm">
+                          <div className="text-white/70 text-sm">
                             {selectedUniversity["state-province"] &&
                               `${selectedUniversity["state-province"]}, `}
                             {selectedUniversity.country}
@@ -702,7 +702,7 @@ export default function CollegeTracker() {
                 {/* Custom University Option */}
                 {!showCustomUniversity && (
                   <div className="text-center">
-                    <div className="text-[#FEEBD8]/50 text-sm mb-4">or</div>
+                    <div className="text-white/50 text-sm mb-4">or</div>
 
                     <button
                       type="button"
@@ -716,7 +716,7 @@ export default function CollegeTracker() {
 
                 {showCustomUniversity && (
                   <div>
-                    <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+                    <label className="block text-sm font-medium text-white/70 mb-2">
                       Custom University Name
                     </label>
                     <input
@@ -724,12 +724,12 @@ export default function CollegeTracker() {
                       placeholder="Enter university name..."
                       value={customUniversityName}
                       onChange={(e) => setCustomUniversityName(e.target.value)}
-                      className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-3 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                      className="w-full bg-neutral-800 border border-neutral-700/50 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors"
                     />
                     <button
                       type="button"
                       onClick={() => setShowCustomUniversity(false)}
-                      className="mt-2 text-sm text-[#FEEBD8]/70 hover:text-[#FEEBD8] underline"
+                      className="mt-2 text-sm text-white/70 hover:text-white underline"
                     >
                       Back to university search
                     </button>
@@ -738,7 +738,7 @@ export default function CollegeTracker() {
 
                 {/* Major Selection */}
                 <div ref={majorDropdownRef}>
-                  <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+                  <label className="block text-sm font-medium text-white/70 mb-2">
                     Major
                   </label>
                   <div className="relative">
@@ -751,11 +751,11 @@ export default function CollegeTracker() {
                         setShowMajorDropdown(true);
                       }}
                       onFocus={() => setShowMajorDropdown(true)}
-                      className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-3 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                      className="w-full bg-neutral-800 border border-neutral-700/50 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors"
                     />
 
                     {showMajorDropdown && filteredMajors.length > 0 && (
-                      <div className="absolute z-50 w-full mt-1 bg-neutral-800 border border-neutral-700 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                      <div className="absolute z-50 w-full mt-1 bg-neutral-800 border border-neutral-700/50 rounded-lg shadow-lg max-h-60 overflow-y-auto">
                         {filteredMajors.slice(0, 10).map((major, index) => (
                           <div
                             key={index}
@@ -763,7 +763,7 @@ export default function CollegeTracker() {
                               setMajorInput(major);
                               setShowMajorDropdown(false);
                             }}
-                            className="px-4 py-2 text-[#FEEBD8] hover:bg-neutral-700 cursor-pointer"
+                            className="px-4 py-2 text-white hover:bg-neutral-700 cursor-pointer"
                           >
                             {major}
                           </div>
@@ -774,7 +774,7 @@ export default function CollegeTracker() {
 
                   {/* Popular Majors Quick Selection */}
                   <div className="mt-3">
-                    <p className="text-xs text-[#FEEBD8]/50 mb-2">
+                    <p className="text-xs text-white/50 mb-2">
                       Popular majors:
                     </p>
                     <div className="flex flex-wrap gap-2">
@@ -786,7 +786,7 @@ export default function CollegeTracker() {
                             setMajorInput(major);
                             setShowMajorDropdown(false);
                           }}
-                          className="px-3 py-1 text-xs bg-neutral-700 text-[#FEEBD8]/80 rounded-md hover:bg-neutral-600 transition-colors"
+                          className="px-3 py-1 text-xs bg-neutral-700 text-white/80 rounded-md hover:bg-neutral-600 transition-colors"
                         >
                           {major}
                         </button>
@@ -799,13 +799,13 @@ export default function CollegeTracker() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Application Type */}
                   <div>
-                    <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+                    <label className="block text-sm font-medium text-white/70 mb-2">
                       Application Type
                     </label>
                     <select
                       value={applicationType}
                       onChange={(e) => setApplicationType(e.target.value)}
-                      className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-3 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                      className="w-full bg-neutral-800 border border-neutral-700/50 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors"
                     >
                       <option value="">Select Application Type</option>
                       <option value={ApplicationType.EARLY_DECISION}>
@@ -825,13 +825,13 @@ export default function CollegeTracker() {
 
                   {/* Priority Level */}
                   <div>
-                    <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+                    <label className="block text-sm font-medium text-white/70 mb-2">
                       Priority Level
                     </label>
                     <select
                       value={priority}
                       onChange={(e) => setPriority(e.target.value)}
-                      className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-3 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                      className="w-full bg-neutral-800 border border-neutral-700/50 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors"
                     >
                       <option value="">Select Priority</option>
                       <option value={Priority.REACH}>Reach</option>
@@ -857,7 +857,7 @@ export default function CollegeTracker() {
                       setShowAddCollegeForm(false);
                       resetForm();
                     }}
-                    className="flex-1 bg-neutral-700 text-[#FEEBD8] px-6 py-3 rounded-lg font-medium hover:bg-neutral-600 transition-colors"
+                    className="flex-1 bg-neutral-700 text-white px-6 py-3 rounded-lg font-medium hover:bg-neutral-600 transition-colors"
                   >
                     Cancel
                   </button>
@@ -867,7 +867,7 @@ export default function CollegeTracker() {
                       (!selectedUniversity && !customUniversityName.trim()) ||
                       !majorInput.trim()
                     }
-                    className="flex-1 bg-[#FEEBD8] text-[#141414] px-6 py-3 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Create Application
                   </button>
@@ -930,7 +930,7 @@ export default function CollegeTracker() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-4 hover:border-[#FEEBD8]/30 transition-all hover:shadow-lg hover:shadow-[#FEEBD8]/5">
+          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-4 hover:border-blue-500/30 transition-all hover:shadow-lg hover:shadow-blue-500/5">
             <div className="flex items-center justify-between mb-2">
               <FaUniversity className="text-xl text-blue-400" />
             </div>
@@ -1201,8 +1201,8 @@ export default function CollegeTracker() {
         {/* Edit/Delete Modal - Moved outside grid */}
         {editingCollegeId && (
           <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-            <div className="bg-[#141414] border border-neutral-700 rounded-xl p-6 max-w-md w-full">
-              <h3 className="text-xl font-bold text-[#FEEBD8] mb-4">
+            <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6 max-w-md w-full shadow-2xl">
+              <h3 className="text-xl font-bold text-white mb-4">
                 Edit Application
               </h3>
               <div className="flex flex-col gap-3">
@@ -1324,11 +1324,11 @@ export default function CollegeTracker() {
           <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-12 text-center">
             {colleges.length === 0 ? (
               <>
-                <FaUniversity className="text-5xl text-[#FEEBD8]/30 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-[#FEEBD8] mb-2">
+                <FaUniversity className="text-5xl text-white/30 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-white mb-2">
                   No applications yet
                 </h3>
-                <p className="text-[#FEEBD8]/60 mb-6">
+                <p className="text-white/60 mb-6">
                   Start tracking your college applications to stay organized
                 </p>
                 <button
@@ -1340,8 +1340,8 @@ export default function CollegeTracker() {
               </>
             ) : (
               <>
-                <FaSearch className="text-4xl text-[#FEEBD8]/30 mx-auto mb-4" />
-                <p className="text-[#FEEBD8]/60 text-lg">
+                <FaSearch className="text-4xl text-white/30 mx-auto mb-4" />
+                <p className="text-white/60 text-lg">
                   No applications match your search criteria
                 </p>
               </>

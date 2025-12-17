@@ -148,18 +148,18 @@ export default function AddDocumentModal({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-[#141414] border border-neutral-700 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="p-6 border-b border-neutral-700">
+      <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="p-6 border-b border-neutral-700/50">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <FaFile className="text-yellow-400 text-xl" />
-              <h2 className="text-xl font-bold text-[#FEEBD8]">
+              <h2 className="text-xl font-bold text-white">
                 Add New Document
               </h2>
             </div>
             <button
               onClick={onClose}
-              className="text-[#FEEBD8]/60 hover:text-[#FEEBD8] transition-colors"
+              className="text-white/60 hover:text-white transition-colors"
             >
               <FaTimes size={20} />
             </button>
@@ -169,10 +169,10 @@ export default function AddDocumentModal({
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           {/* File Upload */}
           <div>
-            <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+            <label className="block text-sm font-medium text-white/70 mb-2">
               Upload File
             </label>
-            <div className="border-2 border-dashed border-neutral-600 rounded-lg p-6 text-center hover:border-[#FEEBD8]/50 transition-colors">
+            <div className="border-2 border-dashed border-neutral-600 rounded-lg p-6 text-center hover:border-blue-500/50 transition-colors">
               <input
                 type="file"
                 onChange={handleFileChange}
@@ -184,13 +184,13 @@ export default function AddDocumentModal({
                 htmlFor="file-upload"
                 className="cursor-pointer flex flex-col items-center gap-2"
               >
-                <FaUpload className="text-[#FEEBD8]/60 text-2xl" />
-                <span className="text-[#FEEBD8]/70">
+                <FaUpload className="text-white/60 text-2xl" />
+                <span className="text-white/70">
                   {selectedFile
                     ? selectedFile.name
                     : "Click to upload or drag and drop"}
                 </span>
-                <span className="text-[#FEEBD8]/50 text-sm">
+                <span className="text-white/50 text-sm">
                   PDF, DOC, DOCX, TXT, JPG, PNG up to 10MB
                 </span>
               </label>
@@ -200,7 +200,7 @@ export default function AddDocumentModal({
           {/* Basic Information */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+              <label className="block text-sm font-medium text-white/70 mb-2">
                 Document Name *
               </label>
               <input
@@ -209,20 +209,20 @@ export default function AddDocumentModal({
                 value={formData.name}
                 onChange={handleChange}
                 required
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                className="w-full bg-neutral-800 border border-neutral-700/50 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
                 placeholder="e.g., Personal Statement Final"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+              <label className="block text-sm font-medium text-white/70 mb-2">
                 Document Type
               </label>
               <select
                 name="type"
                 value={formData.type}
                 onChange={handleChange}
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                className="w-full bg-neutral-800 border border-neutral-700/50 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
               >
                 {documentTypes.map((type) => (
                   <option key={type} value={type}>
@@ -233,14 +233,14 @@ export default function AddDocumentModal({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+              <label className="block text-sm font-medium text-white/70 mb-2">
                 Related College
               </label>
               <select
                 name="college"
                 value={formData.college}
                 onChange={handleChange}
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                className="w-full bg-neutral-800 border border-neutral-700/50 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
               >
                 <option value="">All Colleges</option>
                 {colleges.map((college) => (
@@ -252,14 +252,14 @@ export default function AddDocumentModal({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+              <label className="block text-sm font-medium text-white/70 mb-2">
                 Status
               </label>
               <select
                 name="status"
                 value={formData.status}
                 onChange={handleChange}
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                className="w-full bg-neutral-800 border border-neutral-700/50 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
               >
                 <option value="Pending">Pending</option>
                 <option value="In Review">In Review</option>
@@ -272,7 +272,7 @@ export default function AddDocumentModal({
 
           {/* Tags */}
           <div>
-            <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+            <label className="block text-sm font-medium text-white/70 mb-2">
               Tags
             </label>
 
@@ -285,8 +285,8 @@ export default function AddDocumentModal({
                   onClick={() => addTag(tag)}
                   className={`px-3 py-1 rounded-full text-sm transition-colors ${
                     formData.tags.includes(tag)
-                      ? "bg-[#FEEBD8] text-[#141414]"
-                      : "bg-neutral-700 text-[#FEEBD8]/70 hover:bg-neutral-600"
+                      ? "bg-blue-600 text-white"
+                      : "bg-neutral-700 text-white/70 hover:bg-neutral-600"
                   }`}
                 >
                   {tag}
@@ -301,7 +301,7 @@ export default function AddDocumentModal({
                 value={customTag}
                 onChange={(e) => setCustomTag(e.target.value)}
                 placeholder="Add custom tag"
-                className="flex-1 bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                className="flex-1 bg-neutral-800 border border-neutral-700/50 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
                 onKeyPress={(e) =>
                   e.key === "Enter" && (e.preventDefault(), addCustomTag())
                 }
@@ -309,7 +309,7 @@ export default function AddDocumentModal({
               <button
                 type="button"
                 onClick={addCustomTag}
-                className="bg-[#FEEBD8] text-[#141414] px-4 py-2 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors"
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors"
               >
                 Add
               </button>
@@ -340,10 +340,10 @@ export default function AddDocumentModal({
           {/* File Info Preview */}
           {selectedFile && (
             <div className="bg-neutral-800 rounded-lg p-4">
-              <h4 className="text-[#FEEBD8] font-medium mb-2">
+              <h4 className="text-white font-medium mb-2">
                 File Information
               </h4>
-              <div className="space-y-1 text-sm text-[#FEEBD8]/70">
+              <div className="space-y-1 text-sm text-white/70">
                 <p>Name: {selectedFile.name}</p>
                 <p>Size: {(selectedFile.size / (1024 * 1024)).toFixed(2)} MB</p>
                 <p>Type: {selectedFile.type}</p>
@@ -352,17 +352,17 @@ export default function AddDocumentModal({
           )}
 
           {/* Action Buttons */}
-          <div className="flex gap-3 pt-4 border-t border-neutral-700">
+          <div className="flex gap-3 pt-4 border-t border-neutral-700/50">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 bg-neutral-700 text-[#FEEBD8] px-6 py-3 rounded-lg font-medium hover:bg-neutral-600 transition-colors"
+              className="flex-1 bg-neutral-700 text-white px-6 py-3 rounded-lg font-medium hover:bg-neutral-600 transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="flex-1 bg-[#FEEBD8] text-[#141414] px-6 py-3 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors"
+              className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
             >
               Add Document
             </button>

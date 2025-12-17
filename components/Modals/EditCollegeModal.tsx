@@ -186,16 +186,16 @@ export default function EditCollegeModal({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-[#141414] border border-neutral-700 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="p-6 border-b border-neutral-700">
+      <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="p-6 border-b border-neutral-700/50">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <FaUniversity className="text-blue-400 text-xl" />
-              <h2 className="text-xl font-bold text-[#FEEBD8]">Edit College</h2>
+              <h2 className="text-xl font-bold text-white">Edit College</h2>
             </div>
             <button
               onClick={onClose}
-              className="text-[#FEEBD8]/60 hover:text-[#FEEBD8] transition-colors"
+              className="text-white/60 hover:text-white transition-colors"
             >
               <FaTimes size={20} />
             </button>
@@ -206,7 +206,7 @@ export default function EditCollegeModal({
           {/* Basic Information */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+              <label className="block text-sm font-medium text-white/70 mb-2">
                 College Name *
               </label>
               <input
@@ -215,13 +215,13 @@ export default function EditCollegeModal({
                 value={formData.name}
                 onChange={handleChange}
                 required
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                className="w-full bg-neutral-800 border border-neutral-700/50 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
                 placeholder="e.g., Stanford University"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+              <label className="block text-sm font-medium text-white/70 mb-2">
                 Location
               </label>
               <input
@@ -229,20 +229,20 @@ export default function EditCollegeModal({
                 name="location"
                 value={formData.location}
                 onChange={handleChange}
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                className="w-full bg-neutral-800 border border-neutral-700/50 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
                 placeholder="e.g., Stanford, CA"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+              <label className="block text-sm font-medium text-white/70 mb-2">
                 Application Status
               </label>
               <select
                 name="status"
                 value={formData.status}
                 onChange={handleChange}
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                className="w-full bg-neutral-800 border border-neutral-700/50 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
               >
                 <option value="Researching">Researching</option>
                 <option value="Planning">Planning to Apply</option>
@@ -265,7 +265,7 @@ export default function EditCollegeModal({
             />
 
             <div>
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+              <label className="block text-sm font-medium text-white/70 mb-2">
                 Application Fee ($)
               </label>
               <input
@@ -273,10 +273,10 @@ export default function EditCollegeModal({
                 name="applicationFee"
                 value={applicationFeeInputValue}
                 onChange={handleApplicationFeeChange}
-                className={`w-full bg-neutral-800 border rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none transition-colors ${
+                className={`w-full bg-neutral-800 border rounded-lg px-4 py-2 text-white focus:outline-none transition-colors ${
                   applicationFeeError
                     ? "border-red-500 focus:border-red-500"
-                    : "border-neutral-700 focus:border-[#FEEBD8]"
+                    : "border-neutral-700/50 focus:border-blue-500 transition-colors"
                 }`}
                 placeholder="e.g., 75"
               />
@@ -289,7 +289,7 @@ export default function EditCollegeModal({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+              <label className="block text-sm font-medium text-white/70 mb-2">
                 Acceptance Rate (%)
               </label>
               <input
@@ -297,10 +297,10 @@ export default function EditCollegeModal({
                 name="acceptance"
                 value={acceptanceInputValue}
                 onChange={handleAcceptanceChange}
-                className={`w-full bg-neutral-800 border rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none transition-colors ${
+                className={`w-full bg-neutral-800 border rounded-lg px-4 py-2 text-white focus:outline-none transition-colors ${
                   acceptanceError
                     ? "border-red-500 focus:border-red-500"
-                    : "border-neutral-700 focus:border-[#FEEBD8]"
+                    : "border-neutral-700/50 focus:border-blue-500 transition-colors"
                 }`}
                 placeholder="0 - 100"
               />
@@ -313,7 +313,7 @@ export default function EditCollegeModal({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+              <label className="block text-sm font-medium text-white/70 mb-2">
                 US News Ranking
               </label>
               <input
@@ -321,10 +321,10 @@ export default function EditCollegeModal({
                 name="ranking"
                 value={rankingInputValue}
                 onChange={handleRankingChange}
-                className={`w-full bg-neutral-800 border rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none transition-colors ${
+                className={`w-full bg-neutral-800 border rounded-lg px-4 py-2 text-white focus:outline-none transition-colors ${
                   rankingError
                     ? "border-red-500 focus:border-red-500"
-                    : "border-neutral-700 focus:border-[#FEEBD8]"
+                    : "border-neutral-700/50 focus:border-blue-500 transition-colors"
                 }`}
                 placeholder="e.g., 5"
               />
@@ -337,7 +337,7 @@ export default function EditCollegeModal({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+              <label className="block text-sm font-medium text-white/70 mb-2">
                 Intended Major
               </label>
               <input
@@ -345,7 +345,7 @@ export default function EditCollegeModal({
                 name="major"
                 value={formData.major}
                 onChange={handleChange}
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                className="w-full bg-neutral-800 border border-neutral-700/50 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
                 placeholder="e.g., Computer Science"
               />
             </div>
@@ -353,7 +353,7 @@ export default function EditCollegeModal({
 
           {/* Notes */}
           <div>
-            <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+            <label className="block text-sm font-medium text-white/70 mb-2">
               Notes
             </label>
             <textarea
@@ -361,17 +361,17 @@ export default function EditCollegeModal({
               value={formData.notes}
               onChange={handleChange}
               rows={4}
-              className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+              className="w-full bg-neutral-800 border border-neutral-700/50 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
               placeholder="Add any additional notes about this college..."
             />
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-3 pt-4 border-t border-neutral-700">
+          <div className="flex gap-3 pt-4 border-t border-neutral-700/50">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 bg-neutral-700 text-[#FEEBD8] px-6 py-3 rounded-lg font-medium hover:bg-neutral-600 transition-colors"
+              className="flex-1 bg-neutral-700 text-white px-6 py-3 rounded-lg font-medium hover:bg-neutral-600 transition-colors"
             >
               Cancel
             </button>
@@ -380,7 +380,7 @@ export default function EditCollegeModal({
               disabled={
                 !!(applicationFeeError || acceptanceError || rankingError)
               }
-              className="flex-1 bg-[#FEEBD8] text-[#141414] px-6 py-3 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Save Changes
             </button>
