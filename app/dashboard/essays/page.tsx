@@ -212,6 +212,7 @@ function EssayManagerContent() {
         status: EssayStatus.NOT_STARTED,
         prompt: "",
         content: "",
+        college_application_id: "",
       });
       showSuccess("Essay created successfully!");
       router.push(`/dashboard/essays/${createdEssay.id}`);

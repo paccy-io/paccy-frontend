@@ -16,8 +16,11 @@ import {
   FaBars,
   FaTimes,
   FaDollarSign,
+  FaMoon,
+  FaSun,
 } from "react-icons/fa";
 import { MdDashboard, MdSchool } from "react-icons/md";
+import { useTheme } from "../ThemeProvider";
 
 interface NavItem {
   title: string;
@@ -64,6 +67,7 @@ const navItems: NavItem[] = [
 export default function Sidebar({ userData }: SidebarProps) {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
+  const { theme, toggleTheme } = useTheme();
 
   const isActive = (link: string) => pathname === link;
 
@@ -83,7 +87,11 @@ export default function Sidebar({ userData }: SidebarProps) {
 
       {/* Sidebar */}
       <aside
-        className={`fixed left-0 top-0 h-screen w-56 bg-[#0f0f0f] border-r border-[#2a2a2a] pt-6 transition-transform duration-300 z-40 md:translate-x-0 ${
+        className={`fixed left-0 top-0 h-screen w-56 ${
+          theme === "dark"
+            ? "bg-[#0f0f0f] border-[#2a2a2a]"
+            : "bg-white border-gray-200"
+        } border-r pt-6 transition-all duration-300 z-40 md:translate-x-0 ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         } overflow-y-auto`}
       >
@@ -95,10 +103,18 @@ export default function Sidebar({ userData }: SidebarProps) {
                 {userData.name?.charAt(0) || "U"}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-white truncate">
+                <p
+                  className={`text-sm font-semibold truncate ${
+                    theme === "dark" ? "text-white" : "text-gray-900"
+                  }`}
+                >
                   {userData.name || "User"}
                 </p>
-                <p className="text-xs text-gray-400 truncate">
+                <p
+                  className={`text-xs truncate ${
+                    theme === "dark" ? "text-gray-400" : "text-gray-500"
+                  }`}
+                >
                   {userData.email || "Class of 2025"}
                 </p>
               </div>
@@ -115,7 +131,9 @@ export default function Sidebar({ userData }: SidebarProps) {
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${
                   isActive(item.link)
                     ? "bg-blue-500/10 text-blue-400 border border-blue-500/20"
-                    : "text-gray-300 hover:bg-[#1a1a1a] hover:text-white"
+                    : theme === "dark"
+                    ? "text-gray-300 hover:bg-[#1a1a1a] hover:text-white"
+                    : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                 }`}
               >
                 {item.icon}
@@ -123,6 +141,27 @@ export default function Sidebar({ userData }: SidebarProps) {
               </Link>
             ))}
           </nav>
+
+          {/* Theme Toggle */}
+          <div className="mt-6 pt-4 border-t border-neutral-700/30">
+            <button
+              onClick={toggleTheme}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors w-full ${
+                theme === "dark"
+                  ? "text-gray-300 hover:bg-[#1a1a1a] hover:text-white"
+                  : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+              }`}
+            >
+              {theme === "dark" ? (
+                <FaSun className="w-5 h-5" />
+              ) : (
+                <FaMoon className="w-5 h-5" />
+              )}
+              <span className="font-medium text-sm">
+                {theme === "dark" ? "Light Mode" : "Dark Mode"}
+              </span>
+            </button>
+          </div>
         </div>
       </aside>
 

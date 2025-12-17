@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "../../components/AuthProvider";
+import { useTheme } from "../../components/ThemeProvider";
 import { collegeApplicationsApi } from "../../lib/api/college-applications";
 import { essaysApi } from "../../lib/api/essays";
 import { extracurricularsApi } from "../../lib/api/extracurriculars";
@@ -35,6 +36,7 @@ import {
   FaChevronRight,
 } from "react-icons/fa";
 import { FaClock } from "react-icons/fa6";
+import StatsCard from "../../components/Dashboard/StatsCard";
 
 // Quick actions - static UI data (not backend data)
 const quickActions = [
@@ -71,6 +73,7 @@ const quickActions = [
 export default function Dashboard() {
   const router = useRouter();
   const { isAuthenticated, user, loading, verifyTokenAndFetchUser } = useAuth();
+  const { theme } = useTheme();
 
   // State for real data from backend
   const [applications, setApplications] = useState<CollegeApplication[]>([]);
@@ -334,12 +337,24 @@ export default function Dashboard() {
   // Show loading state - only while auth is loading
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+      <div
+        className={`min-h-screen flex items-center justify-center transition-colors duration-300 ${
+          theme === "dark" ? "bg-[#0a0a0a]" : "bg-gray-50"
+        }`}
+      >
         <div className="text-center">
-          <div className="text-white text-lg mb-4">
+          <div
+            className={`text-lg mb-4 ${
+              theme === "dark" ? "text-white" : "text-gray-900"
+            }`}
+          >
             Loading your dashboard...
           </div>
-          <div className="text-white/60 text-sm">
+          <div
+            className={`text-sm ${
+              theme === "dark" ? "text-white/60" : "text-gray-600"
+            }`}
+          >
             This should only take a moment
           </div>
         </div>
@@ -350,17 +365,29 @@ export default function Dashboard() {
   const currentUser = getCurrentUser();
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a]">
+    <div
+      className={`min-h-screen transition-colors duration-300 ${
+        theme === "dark" ? "bg-[#0a0a0a]" : "bg-gray-50"
+      }`}
+    >
       {/* Dashboard Content */}
       <div className="p-6 md:p-8 mt-8">
         {/* Welcome Section */}
         <div className="max-w-screen-2xl mx-auto mb-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl md:text-4xl font-extrabold text-white">
+              <h1
+                className={`text-2xl md:text-4xl font-extrabold ${
+                  theme === "dark" ? "text-white" : "text-gray-900"
+                }`}
+              >
                 Welcome back, {currentUser?.name || "Student"}! 👋
               </h1>
-              <p className="text-white/60 text-sm md:text-base">
+              <p
+                className={`text-sm md:text-base ${
+                  theme === "dark" ? "text-white/60" : "text-gray-600"
+                }`}
+              >
                 Let's continue building your future together.
               </p>
             </div>
@@ -376,97 +403,66 @@ export default function Dashboard() {
         <div className="max-w-screen-2xl mx-auto">
           {/* Stats Cards - Real Data Only */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-4 hover:border-white/30 transition-all hover:shadow-lg hover:shadow-[white]/5">
-              <div className="flex items-center justify-between mb-2">
-                <div className="p-2 bg-blue-500/10 rounded-lg">
-                  <FaUniversity className="text-xl text-blue-400" />
-                </div>
-                {dataLoading && (
-                  <FaSpinner className="text-white/50 animate-spin text-sm" />
-                )}
-              </div>
-              <div className="text-2xl font-bold text-white mb-0.5">
-                {dataLoading ? "..." : getActiveApplicationsCount()}
-              </div>
-              <div className="text-white/70 text-xs">Active Applications</div>
-              {!dataLoading && getActiveApplicationsCount() === 0 && (
-                <div className="mt-1.5 text-xs text-white/50">
-                  Start by adding your first college!
-                </div>
-              )}
-            </div>
+            <StatsCard
+              icon={<FaUniversity />}
+              value={getActiveApplicationsCount()}
+              label="Active Applications"
+              loading={dataLoading}
+              emptyMessage="Start by adding your first college!"
+              iconColor="blue"
+            />
 
-            <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-4 hover:border-white/30 transition-all hover:shadow-lg hover:shadow-[white]/5">
-              <div className="flex items-center justify-between mb-2">
-                <div className="p-2 bg-purple-500/10 rounded-lg">
-                  <FaPen className="text-xl text-purple-400" />
-                </div>
-                {dataLoading && (
-                  <FaSpinner className="text-white/50 animate-spin text-sm" />
-                )}
-              </div>
-              <div className="text-2xl font-bold text-white mb-0.5">
-                {dataLoading ? "..." : getTotalEssaysCount()}
-              </div>
-              <div className="text-white/70 text-xs">Total Essays</div>
-              {!dataLoading && getEssaysInProgressCount() > 0 && (
-                <div className="mt-1.5 text-xs text-amber-400">
-                  {getEssaysInProgressCount()} in progress
-                </div>
-              )}
-            </div>
+            <StatsCard
+              icon={<FaPen />}
+              value={getTotalEssaysCount()}
+              label="Total Essays"
+              loading={dataLoading}
+              emptyMessage={
+                !dataLoading && getEssaysInProgressCount() > 0
+                  ? `${getEssaysInProgressCount()} in progress`
+                  : undefined
+              }
+              iconColor="purple"
+            />
 
-            <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-4 hover:border-white/30 transition-all hover:shadow-lg hover:shadow-[white]/5">
-              <div className="flex items-center justify-between mb-2">
-                <div className="p-2 bg-amber-500/10 rounded-lg">
-                  <FaTrophy className="text-xl text-amber-400" />
-                </div>
-                {dataLoading && (
-                  <FaSpinner className="text-white/50 animate-spin text-sm" />
-                )}
-              </div>
-              <div className="text-2xl font-bold text-white mb-0.5">
-                {dataLoading ? "..." : extracurriculars.length}
-              </div>
-              <div className="text-white/70 text-xs">Extracurriculars</div>
-              {!dataLoading &&
+            <StatsCard
+              icon={<FaTrophy />}
+              value={extracurriculars.length}
+              label="Extracurriculars"
+              loading={dataLoading}
+              emptyMessage={
+                !dataLoading &&
                 extracurriculars.length > 0 &&
-                getTotalExtracurricularHours() > 0 && (
-                  <div className="mt-1.5 text-xs text-amber-400">
-                    {getTotalExtracurricularHours()} hours/week total
-                  </div>
-                )}
-              {!dataLoading && extracurriculars.length === 0 && (
-                <div className="mt-1.5 text-xs text-white/50">
-                  Showcase your activities
-                </div>
-              )}
-            </div>
+                getTotalExtracurricularHours() > 0
+                  ? `${getTotalExtracurricularHours()} hours/week total`
+                  : extracurriculars.length === 0
+                  ? "Showcase your activities"
+                  : undefined
+              }
+              iconColor="orange"
+            />
 
-            <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-4 hover:border-white/30 transition-all hover:shadow-lg hover:shadow-[white]/5">
-              <div className="flex items-center justify-between mb-2">
-                <div className="p-2 bg-green-500/10 rounded-lg">
-                  <FaCalendar className="text-xl text-green-400" />
-                </div>
-                {dataLoading && (
-                  <FaSpinner className="text-white/50 animate-spin text-sm" />
-                )}
-              </div>
-              <div className="text-2xl font-bold text-white mb-0.5">
-                {dataLoading ? "..." : getUpcomingDeadlinesCount()}
-              </div>
-              <div className="text-white/70 text-xs">Upcoming Deadlines</div>
-              {!dataLoading && getUpcomingDeadlinesCount() > 0 && (
-                <div className="mt-1.5 text-xs text-green-400">
-                  Next 30 days
-                </div>
-              )}
-            </div>
+            <StatsCard
+              icon={<FaCalendar />}
+              value={getUpcomingDeadlinesCount()}
+              label="Upcoming Deadlines"
+              loading={dataLoading}
+              emptyMessage={
+                !dataLoading && getUpcomingDeadlinesCount() > 0
+                  ? "Next 30 days"
+                  : undefined
+              }
+              iconColor="green"
+            />
           </div>
 
           {/* Progress Overview */}
           <div className="mb-10">
-            <h2 className="text-2xl font-semibold text-white mb-5 flex items-center gap-2">
+            <h2
+              className={`text-2xl font-semibold mb-5 flex items-center gap-2 ${
+                theme === "dark" ? "text-white" : "text-gray-900"
+              }`}
+            >
               <div className="p-2 bg-green-500/10 rounded-lg">
                 <FaCheckCircle className="text-xl text-green-400" />
               </div>
@@ -474,21 +470,41 @@ export default function Dashboard() {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {/* Application Status Breakdown */}
-              <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-5">
+              <div
+                className={`rounded-xl p-5 border transition-all duration-300 ${
+                  theme === "dark"
+                    ? "bg-gradient-to-br from-[#141414] to-[#1a1a1a] border-neutral-700/50"
+                    : "bg-white border-gray-200"
+                }`}
+              >
                 <div className="flex items-center gap-2 mb-4">
                   <div className="p-2 bg-blue-500/10 rounded-lg">
                     <FaUniversity className="text-lg text-blue-400" />
                   </div>
-                  <h3 className="font-semibold text-white">
+                  <h3
+                    className={`font-semibold ${
+                      theme === "dark" ? "text-white" : "text-gray-900"
+                    }`}
+                  >
                     Application Status
                   </h3>
                 </div>
                 {dataLoading ? (
                   <div className="flex justify-center py-4">
-                    <FaSpinner className="text-white/50 animate-spin" />
+                    <FaSpinner
+                      className={`animate-spin ${
+                        theme === "dark" ? "text-white/50" : "text-gray-400"
+                      }`}
+                    />
                   </div>
                 ) : applications.length === 0 ? (
-                  <p className="text-white/60 text-sm">No applications yet</p>
+                  <p
+                    className={`text-sm ${
+                      theme === "dark" ? "text-white/60" : "text-gray-500"
+                    }`}
+                  >
+                    No applications yet
+                  </p>
                 ) : (
                   <div className="space-y-2">
                     {[
@@ -521,21 +537,49 @@ export default function Dashboard() {
               </div>
 
               {/* Essay Progress */}
-              <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-5">
+              <div
+                className={`rounded-xl p-5 ${
+                  theme === "dark"
+                    ? "bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50"
+                    : "bg-white border border-gray-200"
+                }`}
+              >
                 <div className="flex items-center gap-2 mb-4">
                   <FaPen className="text-lg text-purple-400" />
-                  <h3 className="font-semibold text-white">Essay Progress</h3>
+                  <h3
+                    className={`font-semibold ${
+                      theme === "dark" ? "text-white" : "text-gray-900"
+                    }`}
+                  >
+                    Essay Progress
+                  </h3>
                 </div>
                 {dataLoading ? (
                   <div className="flex justify-center py-4">
-                    <FaSpinner className="text-white/50 animate-spin" />
+                    <FaSpinner
+                      className={`animate-spin ${
+                        theme === "dark" ? "text-white/50" : "text-gray-400"
+                      }`}
+                    />
                   </div>
                 ) : essays.length === 0 ? (
-                  <p className="text-white/60 text-sm">No essays yet</p>
+                  <p
+                    className={`text-sm ${
+                      theme === "dark" ? "text-white/60" : "text-gray-500"
+                    }`}
+                  >
+                    No essays yet
+                  </p>
                 ) : (
                   <div className="space-y-3">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-white/70">Completed</span>
+                      <span
+                        className={
+                          theme === "dark" ? "text-white/70" : "text-gray-600"
+                        }
+                      >
+                        Completed
+                      </span>
                       <span className="text-green-400 font-semibold">
                         {
                           essays.filter(
@@ -545,7 +589,13 @@ export default function Dashboard() {
                       </span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-white/70">In Progress</span>
+                      <span
+                        className={
+                          theme === "dark" ? "text-white/70" : "text-gray-600"
+                        }
+                      >
+                        In Progress
+                      </span>
                       <span className="text-blue-400 font-semibold">
                         {
                           essays.filter(
@@ -554,7 +604,11 @@ export default function Dashboard() {
                         }
                       </span>
                     </div>
-                    <div className="w-full bg-neutral-700/50 rounded-full h-2 mt-3">
+                    <div
+                      className={`w-full rounded-full h-2 mt-3 ${
+                        theme === "dark" ? "bg-neutral-700/50" : "bg-gray-200"
+                      }`}
+                    >
                       <div
                         className="bg-gradient-to-r from-purple-500 to-purple-600 h-2 rounded-full transition-all"
                         style={{
@@ -575,16 +629,32 @@ export default function Dashboard() {
               </div>
 
               {/* Next Deadline */}
-              <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-5">
+              <div
+                className={`rounded-xl p-5 ${
+                  theme === "dark"
+                    ? "bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50"
+                    : "bg-white border border-gray-200"
+                }`}
+              >
                 <div className="flex items-center gap-2 mb-4">
                   <div className="p-2 bg-amber-500/10 rounded-lg">
                     <FaClock className="text-lg text-amber-400" />
                   </div>
-                  <h3 className="font-semibold text-white">Next Deadline</h3>
+                  <h3
+                    className={`font-semibold ${
+                      theme === "dark" ? "text-white" : "text-gray-900"
+                    }`}
+                  >
+                    Next Deadline
+                  </h3>
                 </div>
                 {dataLoading ? (
                   <div className="flex justify-center py-4">
-                    <FaSpinner className="text-white/50 animate-spin" />
+                    <FaSpinner
+                      className={`animate-spin ${
+                        theme === "dark" ? "text-white/50" : "text-gray-400"
+                      }`}
+                    />
                   </div>
                 ) : (
                   (() => {
@@ -615,7 +685,11 @@ export default function Dashboard() {
 
                     if (!nextDeadline) {
                       return (
-                        <p className="text-white/60 text-sm">
+                        <p
+                          className={`text-sm ${
+                            theme === "dark" ? "text-white/60" : "text-gray-500"
+                          }`}
+                        >
                           No upcoming deadlines
                         </p>
                       );
@@ -629,7 +703,11 @@ export default function Dashboard() {
                     return (
                       <Link
                         href={nextDeadline.link}
-                        className="block group hover:bg-white/5 -m-2 p-2 rounded-lg transition-colors"
+                        className={`block group -m-2 p-2 rounded-lg transition-colors ${
+                          theme === "dark"
+                            ? "hover:bg-white/5"
+                            : "hover:bg-gray-50"
+                        }`}
                       >
                         <div className="flex items-start gap-3">
                           {nextDeadline.type === "application" ? (
@@ -638,10 +716,22 @@ export default function Dashboard() {
                             <FaCalendar className="text-green-400 mt-1 flex-shrink-0" />
                           )}
                           <div className="flex-1">
-                            <p className="text-white font-semibold text-sm group-hover:text-blue-400 transition-colors line-clamp-1">
+                            <p
+                              className={`font-semibold text-sm group-hover:text-blue-400 transition-colors line-clamp-1 ${
+                                theme === "dark"
+                                  ? "text-white"
+                                  : "text-gray-900"
+                              }`}
+                            >
                               {nextDeadline.name}
                             </p>
-                            <p className="text-white/60 text-xs mt-1">
+                            <p
+                              className={`text-xs mt-1 ${
+                                theme === "dark"
+                                  ? "text-white/60"
+                                  : "text-gray-600"
+                              }`}
+                            >
                               {nextDeadline.date.toLocaleDateString("en-US", {
                                 month: "short",
                                 day: "numeric",
@@ -693,15 +783,37 @@ export default function Dashboard() {
                 </div>
                 {dataLoading ? (
                   <div className="flex items-center justify-center py-12">
-                    <FaSpinner className="text-white/50 animate-spin text-3xl" />
+                    <FaSpinner
+                      className={`animate-spin text-3xl ${
+                        theme === "dark" ? "text-white/50" : "text-gray-400"
+                      }`}
+                    />
                   </div>
                 ) : applications.length === 0 ? (
-                  <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-12 text-center">
-                    <FaUniversity className="text-5xl text-white/30 mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold text-white mb-2">
+                  <div
+                    className={`rounded-xl p-12 text-center ${
+                      theme === "dark"
+                        ? "bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50"
+                        : "bg-white border border-gray-200"
+                    }`}
+                  >
+                    <FaUniversity
+                      className={`text-5xl mx-auto mb-4 ${
+                        theme === "dark" ? "text-white/30" : "text-gray-300"
+                      }`}
+                    />
+                    <h3
+                      className={`text-xl font-semibold mb-2 ${
+                        theme === "dark" ? "text-white" : "text-gray-900"
+                      }`}
+                    >
                       No applications yet
                     </h3>
-                    <p className="text-white/60 mb-4">
+                    <p
+                      className={`mb-4 ${
+                        theme === "dark" ? "text-white/60" : "text-gray-600"
+                      }`}
+                    >
                       Start tracking your college applications to stay organized
                     </p>
                     <Link
@@ -712,7 +824,13 @@ export default function Dashboard() {
                     </Link>
                   </div>
                 ) : (
-                  <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-4">
+                  <div
+                    className={`rounded-xl p-4 ${
+                      theme === "dark"
+                        ? "bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50"
+                        : "bg-white border border-gray-200"
+                    }`}
+                  >
                     <div className="space-y-3">
                       {applications
                         .sort((a, b) => {
@@ -842,7 +960,11 @@ export default function Dashboard() {
                             <Link
                               key={app.id}
                               href={`/dashboard/colleges/${app.id}`}
-                              className="group flex items-center gap-4 p-5 bg-white/[0.02] border border-neutral-700/30 rounded-2xl hover:border-white/20 hover:bg-white/[0.04] transition-all"
+                              className={`group flex items-center gap-4 p-5 rounded-2xl transition-all ${
+                                theme === "dark"
+                                  ? "bg-white/[0.02] border border-neutral-700/30 hover:border-white/20 hover:bg-white/[0.04]"
+                                  : "bg-gray-50 border border-gray-200 hover:border-blue-300 hover:bg-blue-50"
+                              }`}
                             >
                               {/* College Icon */}
                               <div className="flex-shrink-0">
@@ -850,7 +972,11 @@ export default function Dashboard() {
                                   <img
                                     src={faviconUrl}
                                     alt={`${app.name} logo`}
-                                    className="w-14 h-14 rounded-xl object-cover bg-white/5 border border-neutral-700/50"
+                                    className={`w-14 h-14 rounded-xl object-cover ${
+                                      theme === "dark"
+                                        ? "bg-white/5 border border-neutral-700/50"
+                                        : "bg-gray-100 border border-gray-200"
+                                    }`}
                                     onError={(e) => {
                                       e.currentTarget.style.display = "none";
                                       const fallback = e.currentTarget
@@ -884,10 +1010,22 @@ export default function Dashboard() {
 
                               {/* College Info */}
                               <div className="flex-1 min-w-0">
-                                <h4 className="text-lg font-bold text-white mb-1 group-hover:text-blue-400 transition-colors">
+                                <h4
+                                  className={`text-lg font-bold mb-1 group-hover:text-blue-400 transition-colors ${
+                                    theme === "dark"
+                                      ? "text-white"
+                                      : "text-gray-900"
+                                  }`}
+                                >
                                   {app.name}
                                 </h4>
-                                <p className="text-sm text-white/50">
+                                <p
+                                  className={`text-sm ${
+                                    theme === "dark"
+                                      ? "text-white/50"
+                                      : "text-gray-500"
+                                  }`}
+                                >
                                   {app.major || "Undecided"} •{" "}
                                   {app.application_type
                                     ?.replace(/_/g, " ")
@@ -911,10 +1049,22 @@ export default function Dashboard() {
                                           ⚠
                                         </span>
                                       )}
-                                    <span className="text-white/40 uppercase text-xs font-semibold tracking-wider">
+                                    <span
+                                      className={`uppercase text-xs font-semibold tracking-wider ${
+                                        theme === "dark"
+                                          ? "text-white/40"
+                                          : "text-gray-400"
+                                      }`}
+                                    >
                                       DEADLINE
                                     </span>
-                                    <span className="text-white font-semibold">
+                                    <span
+                                      className={`font-semibold ${
+                                        theme === "dark"
+                                          ? "text-white"
+                                          : "text-gray-900"
+                                      }`}
+                                    >
                                       {new Date(
                                         app.deadline
                                       ).toLocaleDateString("en-US", {
@@ -966,7 +1116,11 @@ export default function Dashboard() {
                     }).length === 0 ? (
                     <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-8 text-center">
                       <FaCalendar className="text-4xl text-white/30 mx-auto mb-3" />
-                      <p className="text-white/60 text-sm mb-3">
+                      <p
+                        className={`text-sm mb-3 ${
+                          theme === "dark" ? "text-white/60" : "text-gray-600"
+                        }`}
+                      >
                         No upcoming deadlines
                       </p>
                       <Link
@@ -977,8 +1131,18 @@ export default function Dashboard() {
                       </Link>
                     </div>
                   ) : (
-                    <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-4">
-                      <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                    <div
+                      className={`rounded-xl p-4 ${
+                        theme === "dark"
+                          ? "bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50"
+                          : "bg-white border border-gray-200"
+                      }`}
+                    >
+                      <h3
+                        className={`text-lg font-semibold mb-4 flex items-center gap-2 ${
+                          theme === "dark" ? "text-white" : "text-gray-900"
+                        }`}
+                      >
                         <FaCalendar className="text-green-400" />
                         Upcoming Deadlines
                       </h3>
@@ -1018,7 +1182,11 @@ export default function Dashboard() {
                               <Link
                                 key={event.id}
                                 href={`/dashboard/calendar`}
-                                className="flex items-start gap-3 p-3 bg-white/[0.02] border border-neutral-700/30 rounded-xl hover:border-white/20 hover:bg-white/[0.04] transition-all group"
+                                className={`flex items-start gap-3 p-3 rounded-xl transition-all group ${
+                                  theme === "dark"
+                                    ? "bg-white/[0.02] border border-neutral-700/30 hover:border-white/20 hover:bg-white/[0.04]"
+                                    : "bg-gray-50 border border-gray-200 hover:border-blue-300 hover:bg-blue-50"
+                                }`}
                               >
                                 {/* Date Box */}
                                 <div
@@ -1045,10 +1213,22 @@ export default function Dashboard() {
 
                                 {/* Event Details */}
                                 <div className="flex-1 min-w-0">
-                                  <h4 className="text-sm font-bold text-white mb-0.5 group-hover:text-blue-400 transition-colors line-clamp-1">
+                                  <h4
+                                    className={`text-sm font-bold mb-0.5 group-hover:text-blue-400 transition-colors line-clamp-1 ${
+                                      theme === "dark"
+                                        ? "text-white"
+                                        : "text-gray-900"
+                                    }`}
+                                  >
                                     {event.title}
                                   </h4>
-                                  <p className="text-xs text-white/50 leading-relaxed line-clamp-2">
+                                  <p
+                                    className={`text-xs leading-relaxed line-clamp-2 ${
+                                      theme === "dark"
+                                        ? "text-white/50"
+                                        : "text-gray-500"
+                                    }`}
+                                  >
                                     {event.description ||
                                       "No description provided."}
                                   </p>
@@ -1085,12 +1265,26 @@ export default function Dashboard() {
                 </div>
                 {dataLoading ? (
                   <div className="flex items-center justify-center py-8">
-                    <FaSpinner className="text-white/50 animate-spin text-2xl" />
+                    <FaSpinner
+                      className={`animate-spin text-2xl ${
+                        theme === "dark" ? "text-white/50" : "text-gray-400"
+                      }`}
+                    />
                   </div>
                 ) : essays.length === 0 ? (
                   <div className="text-center py-8">
-                    <FaPen className="text-4xl text-white/30 mx-auto mb-3" />
-                    <p className="text-white/60 text-sm mb-3">No essays yet</p>
+                    <FaPen
+                      className={`text-4xl mx-auto mb-3 ${
+                        theme === "dark" ? "text-white/30" : "text-gray-300"
+                      }`}
+                    />
+                    <p
+                      className={`text-sm mb-3 ${
+                        theme === "dark" ? "text-white/60" : "text-gray-600"
+                      }`}
+                    >
+                      No essays yet
+                    </p>
                     <Link
                       href="/dashboard/essays"
                       className="text-purple-400 text-sm hover:text-purple-300 inline-flex items-center gap-1"
@@ -1105,14 +1299,30 @@ export default function Dashboard() {
                       <Link
                         key={essay.id}
                         href={`/dashboard/essays/${essay.id}`}
-                        className="block p-3 bg-white/[0.02] border border-neutral-700/30 rounded-lg hover:border-white/20 hover:bg-white/[0.04] transition-colors"
+                        className={`block p-3 rounded-lg transition-colors ${
+                          theme === "dark"
+                            ? "bg-white/[0.02] border border-neutral-700/30 hover:border-white/20 hover:bg-white/[0.04]"
+                            : "bg-gray-50 border border-gray-200 hover:border-blue-300 hover:bg-blue-50"
+                        }`}
                       >
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
-                            <h4 className="font-medium text-white mb-1 line-clamp-1">
+                            <h4
+                              className={`font-medium mb-1 line-clamp-1 ${
+                                theme === "dark"
+                                  ? "text-white"
+                                  : "text-gray-900"
+                              }`}
+                            >
                               {essay.title}
                             </h4>
-                            <p className="text-xs text-white/60">
+                            <p
+                              className={`text-xs ${
+                                theme === "dark"
+                                  ? "text-white/60"
+                                  : "text-gray-600"
+                              }`}
+                            >
                               {essay.content?.split(/\s+/).length || 0} words •{" "}
                               {essay.college_name || "Common App"}
                             </p>
@@ -1138,9 +1348,19 @@ export default function Dashboard() {
               </div>
 
               {/* Extracurriculars */}
-              <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6">
+              <div
+                className={`rounded-xl p-6 ${
+                  theme === "dark"
+                    ? "bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50"
+                    : "bg-white border border-gray-200"
+                }`}
+              >
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+                  <h3
+                    className={`text-lg font-semibold flex items-center gap-2 ${
+                      theme === "dark" ? "text-white" : "text-gray-900"
+                    }`}
+                  >
                     <div className="p-2 bg-amber-500/10 rounded-lg">
                       <FaTrophy className="text-amber-400" />
                     </div>
@@ -1155,12 +1375,24 @@ export default function Dashboard() {
                 </div>
                 {dataLoading ? (
                   <div className="flex items-center justify-center py-8">
-                    <FaSpinner className="text-white/50 animate-spin text-2xl" />
+                    <FaSpinner
+                      className={`animate-spin text-2xl ${
+                        theme === "dark" ? "text-white/50" : "text-gray-400"
+                      }`}
+                    />
                   </div>
                 ) : extracurriculars.length === 0 ? (
                   <div className="text-center py-8">
-                    <FaTrophy className="text-4xl text-white/30 mx-auto mb-3" />
-                    <p className="text-white/60 text-sm mb-3">
+                    <FaTrophy
+                      className={`text-4xl mx-auto mb-3 ${
+                        theme === "dark" ? "text-white/30" : "text-gray-300"
+                      }`}
+                    />
+                    <p
+                      className={`text-sm mb-3 ${
+                        theme === "dark" ? "text-white/60" : "text-gray-600"
+                      }`}
+                    >
                       No activities yet
                     </p>
                     <Link
@@ -1176,14 +1408,30 @@ export default function Dashboard() {
                       <Link
                         key={activity.id}
                         href={`/dashboard/extracurriculars/${activity.id}`}
-                        className="block p-3 bg-white/[0.02] border border-neutral-700/30 rounded-lg hover:border-white/20 hover:bg-white/[0.04] transition-colors"
+                        className={`block p-3 rounded-lg transition-colors ${
+                          theme === "dark"
+                            ? "bg-white/[0.02] border border-neutral-700/30 hover:border-white/20 hover:bg-white/[0.04]"
+                            : "bg-gray-50 border border-gray-200 hover:border-blue-300 hover:bg-blue-50"
+                        }`}
                       >
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
-                            <h4 className="font-medium text-white mb-1 line-clamp-1">
+                            <h4
+                              className={`font-medium mb-1 line-clamp-1 ${
+                                theme === "dark"
+                                  ? "text-white"
+                                  : "text-gray-900"
+                              }`}
+                            >
                               {activity.activity_name}
                             </h4>
-                            <p className="text-xs text-white/60">
+                            <p
+                              className={`text-xs ${
+                                theme === "dark"
+                                  ? "text-white/60"
+                                  : "text-gray-600"
+                              }`}
+                            >
                               {activity.category
                                 ?.replace(/_/g, " ")
                                 .replace(/\b\w/g, (l) => l.toUpperCase())}
@@ -1206,24 +1454,46 @@ export default function Dashboard() {
 
           {/* Profile Completion - Real User Data */}
           {currentUser && currentUser.profileCompletion < 100 && (
-            <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-white/20 rounded-xl p-8 shadow-xl">
+            <div
+              className={`rounded-xl p-8 shadow-xl ${
+                theme === "dark"
+                  ? "bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-white/20"
+                  : "bg-white border border-gray-200"
+              }`}
+            >
               <div className="flex items-start justify-between mb-6">
                 <div>
-                  <h3 className="text-2xl font-semibold text-white mb-2 flex items-center gap-2">
+                  <h3
+                    className={`text-2xl font-semibold mb-2 flex items-center gap-2 ${
+                      theme === "dark" ? "text-white" : "text-gray-900"
+                    }`}
+                  >
                     <FaCog className="text-xl" />
                     Complete Your Profile
                   </h3>
-                  <p className="text-white/70 text-sm">
+                  <p
+                    className={`text-sm ${
+                      theme === "dark" ? "text-white/70" : "text-gray-600"
+                    }`}
+                  >
                     A complete profile helps us provide better recommendations
                   </p>
                 </div>
-                <div className="text-3xl font-bold text-white">
+                <div
+                  className={`text-3xl font-bold ${
+                    theme === "dark" ? "text-white" : "text-gray-900"
+                  }`}
+                >
                   {currentUser.profileCompletion}%
                 </div>
               </div>
 
               <div className="mb-6">
-                <div className="w-full bg-neutral-800 rounded-full h-3 overflow-hidden">
+                <div
+                  className={`w-full rounded-full h-3 overflow-hidden ${
+                    theme === "dark" ? "bg-neutral-800" : "bg-gray-200"
+                  }`}
+                >
                   <div
                     className="bg-gradient-to-r from-[white] via-[#E5D5B7] to-[white] h-3 rounded-full transition-all duration-500 animate-pulse"
                     style={{ width: `${currentUser.profileCompletion}%` }}
@@ -1233,25 +1503,69 @@ export default function Dashboard() {
 
               {user && (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                  <div className="bg-[#0a0a0a]/50 rounded-lg p-4 border border-neutral-700/30">
-                    <div className="text-xs text-white/50 mb-1">School</div>
-                    <div className="text-white font-medium">
+                  <div
+                    className={`rounded-lg p-4 ${
+                      theme === "dark"
+                        ? "bg-[#0a0a0a]/50 border border-neutral-700/30"
+                        : "bg-gray-50 border border-gray-200"
+                    }`}
+                  >
+                    <div
+                      className={`text-xs mb-1 ${
+                        theme === "dark" ? "text-white/50" : "text-gray-500"
+                      }`}
+                    >
+                      School
+                    </div>
+                    <div
+                      className={`font-medium ${
+                        theme === "dark" ? "text-white" : "text-gray-900"
+                      }`}
+                    >
                       {currentUser.school}
                     </div>
                   </div>
-                  <div className="bg-[#0a0a0a]/50 rounded-lg p-4 border border-neutral-700/30">
-                    <div className="text-xs text-white/50 mb-1">
+                  <div
+                    className={`rounded-lg p-4 ${
+                      theme === "dark"
+                        ? "bg-[#0a0a0a]/50 border border-neutral-700/30"
+                        : "bg-gray-50 border border-gray-200"
+                    }`}
+                  >
+                    <div
+                      className={`text-xs mb-1 ${
+                        theme === "dark" ? "text-white/50" : "text-gray-500"
+                      }`}
+                    >
                       Graduation Year
                     </div>
-                    <div className="text-white font-medium">
+                    <div
+                      className={`font-medium ${
+                        theme === "dark" ? "text-white" : "text-gray-900"
+                      }`}
+                    >
                       {currentUser.graduationYear}
                     </div>
                   </div>
-                  <div className="bg-[#0a0a0a]/50 rounded-lg p-4 border border-neutral-700/30">
-                    <div className="text-xs text-white/50 mb-1">
+                  <div
+                    className={`rounded-lg p-4 ${
+                      theme === "dark"
+                        ? "bg-[#0a0a0a]/50 border border-neutral-700/30"
+                        : "bg-gray-50 border border-gray-200"
+                    }`}
+                  >
+                    <div
+                      className={`text-xs mb-1 ${
+                        theme === "dark" ? "text-white/50" : "text-gray-500"
+                      }`}
+                    >
                       Member Since
                     </div>
-                    <div className="text-white font-medium">
+                    <div
+                      className={`font-medium ${
+                        theme === "dark" ? "text-white" : "text-gray-900"
+                      }`}
+                    >
                       {currentUser.memberSince}
                     </div>
                   </div>
@@ -1274,24 +1588,52 @@ export default function Dashboard() {
             getActiveApplicationsCount() === 0 &&
             getTotalEssaysCount() === 0 &&
             extracurriculars.length === 0 && (
-              <div className="mt-8 bg-gradient-to-r from-blue-900/20 to-purple-900/20 border border-blue-500/30 rounded-xl p-8">
-                <h3 className="text-2xl font-semibold text-white mb-4 flex items-center gap-2">
+              <div
+                className={`mt-8 rounded-xl p-8 ${
+                  theme === "dark"
+                    ? "bg-gradient-to-r from-blue-900/20 to-purple-900/20 border border-blue-500/30"
+                    : "bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200"
+                }`}
+              >
+                <h3
+                  className={`text-2xl font-semibold mb-4 flex items-center gap-2 ${
+                    theme === "dark" ? "text-white" : "text-gray-900"
+                  }`}
+                >
                   <FaCheckCircle className="text-blue-400" />
                   Welcome to Paccy! 🎉
                 </h3>
-                <p className="text-white/80 mb-6 text-lg">
+                <p
+                  className={`mb-6 text-lg ${
+                    theme === "dark" ? "text-white/80" : "text-gray-700"
+                  }`}
+                >
                   You're all set to start your college application journey.
                   Here's how to get started:
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="bg-[#0a0a0a]/50 rounded-lg p-5 border border-neutral-700/30">
+                  <div
+                    className={`rounded-lg p-5 ${
+                      theme === "dark"
+                        ? "bg-[#0a0a0a]/50 border border-neutral-700/30"
+                        : "bg-white border border-gray-200"
+                    }`}
+                  >
                     <div className="text-2xl font-bold text-blue-400 mb-2">
                       1
                     </div>
-                    <h4 className="text-white font-semibold mb-2">
+                    <h4
+                      className={`font-semibold mb-2 ${
+                        theme === "dark" ? "text-white" : "text-gray-900"
+                      }`}
+                    >
                       Add Your First College
                     </h4>
-                    <p className="text-white/70 text-sm mb-3">
+                    <p
+                      className={`text-sm mb-3 ${
+                        theme === "dark" ? "text-white/70" : "text-gray-600"
+                      }`}
+                    >
                       Start tracking your dream universities
                     </p>
                     <Link
@@ -1301,14 +1643,28 @@ export default function Dashboard() {
                       Go to Colleges <FaArrowRight className="text-xs" />
                     </Link>
                   </div>
-                  <div className="bg-[#0a0a0a]/50 rounded-lg p-5 border border-neutral-700/30">
+                  <div
+                    className={`rounded-lg p-5 ${
+                      theme === "dark"
+                        ? "bg-[#0a0a0a]/50 border border-neutral-700/30"
+                        : "bg-white border border-gray-200"
+                    }`}
+                  >
                     <div className="text-2xl font-bold text-purple-400 mb-2">
                       2
                     </div>
-                    <h4 className="text-white font-semibold mb-2">
+                    <h4
+                      className={`font-semibold mb-2 ${
+                        theme === "dark" ? "text-white" : "text-gray-900"
+                      }`}
+                    >
                       Import a Template
                     </h4>
-                    <p className="text-white/70 text-sm mb-3">
+                    <p
+                      className={`text-sm mb-3 ${
+                        theme === "dark" ? "text-white/70" : "text-gray-600"
+                      }`}
+                    >
                       Get pre-built checklists for your target country
                     </p>
                     <Link
@@ -1318,14 +1674,28 @@ export default function Dashboard() {
                       Browse Templates <FaArrowRight className="text-xs" />
                     </Link>
                   </div>
-                  <div className="bg-[#0a0a0a]/50 rounded-lg p-5 border border-neutral-700/30">
+                  <div
+                    className={`rounded-lg p-5 ${
+                      theme === "dark"
+                        ? "bg-[#0a0a0a]/50 border border-neutral-700/30"
+                        : "bg-white border border-gray-200"
+                    }`}
+                  >
                     <div className="text-2xl font-bold text-green-400 mb-2">
                       3
                     </div>
-                    <h4 className="text-white font-semibold mb-2">
+                    <h4
+                      className={`font-semibold mb-2 ${
+                        theme === "dark" ? "text-white" : "text-gray-900"
+                      }`}
+                    >
                       Start Writing Essays
                     </h4>
-                    <p className="text-white/70 text-sm mb-3">
+                    <p
+                      className={`text-sm mb-3 ${
+                        theme === "dark" ? "text-white/70" : "text-gray-600"
+                      }`}
+                    >
                       Craft compelling essays for your applications
                     </p>
                     <Link

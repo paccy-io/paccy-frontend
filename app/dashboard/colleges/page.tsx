@@ -14,6 +14,8 @@ import {
   Category,
 } from "../../../lib/types";
 import { useToast } from "../../../lib/hooks/useToast";
+import { useTheme } from "../../../components/ThemeProvider";
+import { useThemeClasses } from "../../../lib/hooks/useThemeClasses";
 import {
   FaPlus,
   FaSearch,
@@ -161,6 +163,8 @@ const formatDateForBackend = (inputDate: string) => {
 export default function CollegeTracker() {
   const router = useRouter();
   const { success: showSuccess, error: showError } = useToast();
+  const { theme } = useTheme();
+  const tc = useThemeClasses();
 
   // Backend integration states
   const [colleges, setColleges] = useState<CollegeDisplay[]>([]);
@@ -1150,14 +1154,14 @@ export default function CollegeTracker() {
                   </span>
                   <span
                     className={`text-xs px-2.5 py-1 rounded-md font-medium ${
-                      college.type === ApplicationType.REACH
+                      college.priority === Priority.REACH
                         ? "bg-purple-500/10 text-purple-400 border border-purple-500/20"
-                        : college.type === ApplicationType.TARGET
+                        : college.priority === Priority.TARGET
                         ? "bg-blue-500/10 text-blue-400 border border-blue-500/20"
                         : "bg-green-500/10 text-green-400 border border-green-500/20"
                     }`}
                   >
-                    {college.type}
+                    {college.priority}
                   </span>
                 </div>
 

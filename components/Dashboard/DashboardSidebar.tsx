@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { useAuth } from "../AuthProvider";
+import { useTheme } from "../ThemeProvider";
 import { generateAvatarUrl } from "../../lib/avatar";
 import {
   FaHome,
@@ -20,6 +21,8 @@ import {
   FaTimes,
   FaChevronLeft,
   FaChevronRight,
+  FaSun,
+  FaMoon,
 } from "react-icons/fa";
 
 const menuItems = [
@@ -91,6 +94,7 @@ export default function DashboardSidebar({
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const { user } = useAuth();
+  const { theme, toggleTheme } = useTheme();
 
   const isActive = (href: string, exact?: boolean) => {
     if (exact) {
@@ -138,7 +142,11 @@ export default function DashboardSidebar({
       {/* Mobile Menu Button */}
       <button
         onClick={() => setMobileOpen(!mobileOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-white hover:border-white/30 transition-colors"
+        className={`lg:hidden fixed top-4 left-4 z-50 rounded-lg p-3 border transition-colors ${
+          theme === "dark"
+            ? "bg-[#141414] border-neutral-700/50 text-white hover:border-white/30"
+            : "bg-white border-gray-200 text-gray-900 hover:border-gray-300 shadow-md"
+        }`}
       >
         {mobileOpen ? (
           <FaTimes className="w-5 h-5" />
@@ -157,21 +165,35 @@ export default function DashboardSidebar({
 
       {/* Sidebar */}
       <aside
-        className={`fixed left-0 top-0 h-screen bg-[#0a0a0a] border-r border-neutral-800 z-40 transition-all duration-300 ${
-          collapsed ? "w-20" : "w-72"
-        } ${
+        className={`fixed left-0 top-0 h-screen border-r z-40 transition-all duration-300 ${
+          theme === "dark"
+            ? "bg-[#0a0a0a] border-neutral-800"
+            : "bg-white border-gray-200"
+        } ${collapsed ? "w-20" : "w-72"} ${
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         } lg:translate-x-0 flex flex-col`}
       >
         {/* Logo Section */}
-        <div className="h-20 flex items-center justify-between px-6 border-b border-neutral-800">
+        <div
+          className={`h-20 flex items-center justify-between px-6 border-b ${
+            theme === "dark" ? "border-neutral-800" : "border-gray-200"
+          }`}
+        >
           {!collapsed && (
             <Link href="/dashboard" className="group flex items-center">
               <div className="relative">
-                <span className="text-3xl font-bold font-climate-crisis text-white">
+                <span
+                  className={`text-3xl font-bold font-climate-crisis ${
+                    theme === "dark" ? "text-white" : "text-gray-900"
+                  }`}
+                >
                   paccy
                 </span>
-                <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-white group-hover:w-full transition-all duration-300"></div>
+                <div
+                  className={`absolute -bottom-1 left-0 w-0 h-0.5 group-hover:w-full transition-all duration-300 ${
+                    theme === "dark" ? "bg-white" : "bg-gray-900"
+                  }`}
+                ></div>
               </div>
             </Link>
           )}
@@ -180,7 +202,11 @@ export default function DashboardSidebar({
               href="/dashboard"
               className="w-full flex justify-center group"
             >
-              <span className="text-2xl font-bold font-climate-crisis text-white">
+              <span
+                className={`text-2xl font-bold font-climate-crisis ${
+                  theme === "dark" ? "text-white" : "text-gray-900"
+                }`}
+              >
                 p
               </span>
             </Link>
@@ -189,7 +215,13 @@ export default function DashboardSidebar({
 
         {/* User Card */}
         {user && !collapsed && (
-          <div className="mx-4 mt-4 mb-2 p-3 bg-white/5 border border-neutral-700/50 rounded-lg">
+          <div
+            className={`mx-4 mt-4 mb-2 p-3 border rounded-lg ${
+              theme === "dark"
+                ? "bg-white/5 border-neutral-700/50"
+                : "bg-gray-50 border-gray-200"
+            }`}
+          >
             <div className="flex items-center gap-3">
               <img
                 src={getUserAvatar()}
@@ -200,11 +232,21 @@ export default function DashboardSidebar({
                 }}
               />
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-white truncate">
+                <p
+                  className={`text-sm font-semibold truncate ${
+                    theme === "dark" ? "text-white" : "text-gray-900"
+                  }`}
+                >
                   {getUserName()}
                 </p>
                 {getClassYear() && (
-                  <p className="text-xs text-white/60">{getClassYear()}</p>
+                  <p
+                    className={`text-xs ${
+                      theme === "dark" ? "text-white/60" : "text-gray-600"
+                    }`}
+                  >
+                    {getClassYear()}
+                  </p>
                 )}
               </div>
             </div>
@@ -219,7 +261,11 @@ export default function DashboardSidebar({
               title={`${getUserName()}${
                 getClassYear() ? ` - ${getClassYear()}` : ""
               }`}
-              className="w-10 h-10 rounded-full bg-white/10 border border-neutral-700/50"
+              className={`w-10 h-10 rounded-full border ${
+                theme === "dark"
+                  ? "bg-white/10 border-neutral-700/50"
+                  : "bg-gray-100 border-gray-200"
+              }`}
               onError={(e) => {
                 e.currentTarget.src = generateAvatarUrl(getUserName());
               }}
@@ -239,16 +285,24 @@ export default function DashboardSidebar({
                     onClick={() => setMobileOpen(false)}
                     className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all group ${
                       active
-                        ? "bg-white/10 text-white border border-white/20"
-                        : "text-white/70 hover:bg-[#141414] hover:text-white"
+                        ? theme === "dark"
+                          ? "bg-white/10 text-white border border-white/20"
+                          : "bg-blue-50 text-blue-600 border border-blue-200"
+                        : theme === "dark"
+                        ? "text-white/70 hover:bg-[#141414] hover:text-white"
+                        : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                     } ${collapsed ? "justify-center" : ""}`}
                     title={collapsed ? item.label : undefined}
                   >
                     <span
                       className={
                         active
-                          ? "text-white"
-                          : "text-white/70 group-hover:text-white"
+                          ? theme === "dark"
+                            ? "text-white"
+                            : "text-blue-600"
+                          : theme === "dark"
+                          ? "text-white/70 group-hover:text-white"
+                          : "text-gray-700 group-hover:text-gray-900"
                       }
                     >
                       {item.icon}
@@ -276,11 +330,49 @@ export default function DashboardSidebar({
           </ul>
         </nav>
 
+        {/* Theme Toggle */}
+        <div
+          className={`border-t p-4 ${
+            theme === "dark" ? "border-neutral-800" : "border-gray-200"
+          }`}
+        >
+          <button
+            onClick={toggleTheme}
+            className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors ${
+              theme === "dark"
+                ? "text-white/70 hover:text-white hover:bg-[#141414]"
+                : "text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+            }`}
+            title={
+              theme === "dark" ? "Switch to light mode" : "Switch to dark mode"
+            }
+          >
+            {theme === "dark" ? (
+              <FaSun className="w-5 h-5" />
+            ) : (
+              <FaMoon className="w-5 h-5" />
+            )}
+            {!collapsed && (
+              <span className="text-sm font-medium">
+                {theme === "dark" ? "Light Mode" : "Dark Mode"}
+              </span>
+            )}
+          </button>
+        </div>
+
         {/* Collapse Toggle (Desktop Only) */}
-        <div className="hidden lg:block border-t border-neutral-800 p-4">
+        <div
+          className={`hidden lg:block border-t p-4 ${
+            theme === "dark" ? "border-neutral-800" : "border-gray-200"
+          }`}
+        >
           <button
             onClick={onToggleCollapse}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2 text-white/70 hover:text-white hover:bg-[#141414] rounded-lg transition-colors"
+            className={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+              theme === "dark"
+                ? "text-white/70 hover:text-white hover:bg-[#141414]"
+                : "text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+            }`}
             title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
             {collapsed ? (
