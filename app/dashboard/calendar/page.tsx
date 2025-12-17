@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
 import AddEventModal from "../../../components/Modals/AddEventModal";
 import EditEventModal from "../../../components/Modals/EditEventModal";
@@ -668,7 +667,7 @@ export default function Calendar() {
           data-date={dateString}
           className={`h-16 sm:h-20 md:h-24 border border-neutral-700/30 p-1 cursor-pointer transition-colors ${
             isToday
-              ? "bg-[#FEEBD8]/10 border-[#FEEBD8]/50"
+              ? "bg-blue-500/10 border-blue-500/50"
               : "hover:bg-neutral-800/30"
           } ${
             dragOverTarget === dateString
@@ -682,7 +681,7 @@ export default function Calendar() {
         >
           <div
             className={`text-xs sm:text-sm font-medium mb-1 ${
-              isToday ? "text-[#FEEBD8]" : "text-[#FEEBD8]/70"
+              isToday ? "text-white" : "text-white/70"
             }`}
           >
             {day}
@@ -724,7 +723,7 @@ export default function Calendar() {
                   e.stopPropagation();
                   handleShowAllEvents(dateString);
                 }}
-                className="text-xs text-[#FEEBD8]/50 hover:text-[#FEEBD8] hover:bg-neutral-700/30 transition-all duration-200 cursor-pointer underline rounded px-1 py-0.5 w-full text-left"
+                className="text-xs text-white/50 hover:text-white hover:bg-neutral-700/30 transition-all duration-200 cursor-pointer underline rounded px-1 py-0.5 w-full text-left"
                 title={`View all ${dayEvents.length} events`}
               >
                 +{dayEvents.length - (isMobile ? 1 : 2)} more
@@ -740,23 +739,21 @@ export default function Calendar() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a]">
-      <Navbar />
-
-      <div className="max-w-screen-2xl mx-auto px-4 md:px-10 py-8 pt-28">
+      <div className="max-w-screen-2xl mx-auto px-4 md:px-10 py-8">
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-8">
           <div className="flex items-center space-x-4">
             <Link
               href="/dashboard"
-              className="text-[#FEEBD8]/70 hover:text-[#FEEBD8] transition-colors"
+              className="text-white/70 hover:text-white transition-colors"
             >
               <FaArrowLeft size={20} />
             </Link>
             <div className="flex-1 min-w-0">
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#FEEBD8]">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white">
                 Calendar & Deadlines
               </h1>
-              <p className="text-[#FEEBD8]/70 mt-2 text-sm sm:text-base">
+              <p className="text-white/70 mt-2 text-sm sm:text-base">
                 Never miss an important date
                 {draggedEvent && (
                   <span className="ml-2 text-blue-400 text-sm">
@@ -774,8 +771,8 @@ export default function Calendar() {
                 onClick={() => setViewMode("month")}
                 className={`flex items-center justify-center space-x-2 px-3 py-2 rounded-md transition-colors flex-1 sm:flex-initial ${
                   viewMode === "month"
-                    ? "bg-[#FEEBD8] text-[#141414]"
-                    : "text-[#FEEBD8]/70 hover:text-[#FEEBD8] hover:bg-neutral-700"
+                    ? "bg-blue-500 text-white"
+                    : "text-white/70 hover:text-white hover:bg-neutral-700"
                 }`}
               >
                 <FaTh size={14} />
@@ -785,8 +782,8 @@ export default function Calendar() {
                 onClick={() => setViewMode("week")}
                 className={`flex items-center justify-center space-x-2 px-3 py-2 rounded-md transition-colors flex-1 sm:flex-initial ${
                   viewMode === "week"
-                    ? "bg-[#FEEBD8] text-[#141414]"
-                    : "text-[#FEEBD8]/70 hover:text-[#FEEBD8] hover:bg-neutral-700"
+                    ? "bg-blue-500 text-white"
+                    : "text-white/70 hover:text-white hover:bg-neutral-700"
                 }`}
               >
                 <FaColumns size={14} />
@@ -796,8 +793,8 @@ export default function Calendar() {
                 onClick={() => setViewMode("list")}
                 className={`flex items-center justify-center space-x-2 px-3 py-2 rounded-md transition-colors flex-1 sm:flex-initial ${
                   viewMode === "list"
-                    ? "bg-[#FEEBD8] text-[#141414]"
-                    : "text-[#FEEBD8]/70 hover:text-[#FEEBD8] hover:bg-neutral-700"
+                    ? "bg-blue-500 text-white"
+                    : "text-white/70 hover:text-white hover:bg-neutral-700"
                 }`}
               >
                 <FaList size={14} />
@@ -807,7 +804,7 @@ export default function Calendar() {
 
             <button
               onClick={() => setIsAddEventModalOpen(true)}
-              className="bg-[#FEEBD8] text-[#141414] px-4 sm:px-6 py-3 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors flex items-center justify-center space-x-2 whitespace-nowrap"
+              className="bg-blue-500 text-white px-4 sm:px-6 py-3 rounded-lg font-medium hover:bg-blue-600 transition-colors flex items-center justify-center space-x-2 whitespace-nowrap"
             >
               <FaPlus />
               <span>Add Event</span>
@@ -817,14 +814,24 @@ export default function Calendar() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
-            <div className="text-2xl font-bold text-[#FEEBD8] mb-1">
+          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6">
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-2 bg-blue-500/10 rounded-lg">
+                <FaCalendar className="text-blue-400" />
+              </div>
+            </div>
+            <div className="text-2xl font-bold text-white mb-1">
               {events.length}
             </div>
-            <div className="text-[#FEEBD8]/70 text-sm">Total Events</div>
+            <div className="text-white/70 text-sm">Total Events</div>
           </div>
 
-          <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
+          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6">
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-2 bg-red-500/10 rounded-lg">
+                <FaClock className="text-red-400" />
+              </div>
+            </div>
             <div className="text-2xl font-bold text-red-400 mb-1">
               {
                 events.filter(
@@ -835,24 +842,34 @@ export default function Calendar() {
                 ).length
               }
             </div>
-            <div className="text-[#FEEBD8]/70 text-sm">This Week</div>
+            <div className="text-white/70 text-sm">This Week</div>
           </div>
 
-          <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
+          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6">
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-2 bg-yellow-500/10 rounded-lg">
+                <FaExclamationTriangle className="text-yellow-400" />
+              </div>
+            </div>
             <div className="text-2xl font-bold text-yellow-400 mb-1">
               {
                 events.filter((e) => e.type === EventType.APPLICATION_DEADLINE)
                   .length
               }
             </div>
-            <div className="text-[#FEEBD8]/70 text-sm">Deadlines</div>
+            <div className="text-white/70 text-sm">Deadlines</div>
           </div>
 
-          <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
-            <div className="text-2xl font-bold text-blue-400 mb-1">
+          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6">
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-2 bg-purple-500/10 rounded-lg">
+                <FaUniversity className="text-purple-400" />
+              </div>
+            </div>
+            <div className="text-2xl font-bold text-purple-400 mb-1">
               {events.filter((e) => e.type === EventType.INTERVIEW).length}
             </div>
-            <div className="text-[#FEEBD8]/70 text-sm">Interviews</div>
+            <div className="text-white/70 text-sm">Interviews</div>
           </div>
         </div>
 
@@ -860,30 +877,30 @@ export default function Calendar() {
           {/* Calendar Views */}
           <div className="lg:col-span-2">
             {viewMode === "month" && (
-              <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-4 sm:p-6">
+              <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-4 sm:p-6">
                 {/* Calendar Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-0 mb-6">
-                  <h2 className="text-xl sm:text-2xl font-semibold text-[#FEEBD8] text-center sm:text-left">
+                  <h2 className="text-xl sm:text-2xl font-semibold text-white text-center sm:text-left">
                     {monthNames[currentMonth]} {currentYear}
                   </h2>
-                  <div className="flex items-center justify-center space-x-2">
+                  <div className="flex items-center justify-center gap-3">
                     <button
                       onClick={() => navigateMonth("prev")}
-                      className="p-2 hover:bg-neutral-700/30 rounded-lg transition-colors"
+                      className="p-3 rounded-xl border border-white/10 hover:border-blue-500/50 hover:bg-blue-500/10 transition-all duration-200 text-white/70 hover:text-white group"
                     >
-                      <FaChevronLeft className="text-[#FEEBD8]" />
+                      <FaChevronLeft className="w-4 h-4 group-hover:scale-110 transition-transform" />
                     </button>
                     <button
                       onClick={() => setCurrentDate(new Date())}
-                      className="px-3 sm:px-4 py-2 text-sm bg-neutral-700/30 hover:bg-neutral-700/50 rounded-lg transition-colors text-[#FEEBD8]"
+                      className="px-6 py-3 text-sm bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-xl transition-all duration-200 text-white font-semibold shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 hover:scale-105"
                     >
                       Today
                     </button>
                     <button
                       onClick={() => navigateMonth("next")}
-                      className="p-2 hover:bg-neutral-700/30 rounded-lg transition-colors"
+                      className="p-3 rounded-xl border border-white/10 hover:border-blue-500/50 hover:bg-blue-500/10 transition-all duration-200 text-white/70 hover:text-white group"
                     >
-                      <FaChevronRight className="text-[#FEEBD8]" />
+                      <FaChevronRight className="w-4 h-4 group-hover:scale-110 transition-transform" />
                     </button>
                   </div>
                 </div>
@@ -895,7 +912,7 @@ export default function Calendar() {
                     (day, index) => (
                       <div
                         key={day}
-                        className="bg-neutral-800 p-2 sm:p-3 text-center text-xs sm:text-sm font-medium text-[#FEEBD8]/70 border-b border-neutral-700/30"
+                        className="bg-neutral-800 p-2 sm:p-3 text-center text-xs sm:text-sm font-medium text-white/70 border-b border-neutral-700/30"
                       >
                         <span className="hidden sm:inline">{day}</span>
                         <span className="sm:hidden">{day.charAt(0)}</span>
@@ -910,10 +927,10 @@ export default function Calendar() {
             )}
 
             {viewMode === "week" && (
-              <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
+              <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6">
                 {/* Week Header */}
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-semibold text-[#FEEBD8]">
+                  <h2 className="text-2xl font-semibold text-white">
                     {getWeekStart(currentDate).toLocaleDateString("en-US", {
                       month: "long",
                       day: "numeric",
@@ -925,24 +942,24 @@ export default function Calendar() {
                       year: "numeric",
                     })}
                   </h2>
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center gap-3">
                     <button
                       onClick={() => navigateWeek("prev")}
-                      className="p-2 hover:bg-neutral-700/30 rounded-lg transition-colors"
+                      className="p-3 rounded-xl border border-white/10 hover:border-blue-500/50 hover:bg-blue-500/10 transition-all duration-200 text-white/70 hover:text-white group"
                     >
-                      <FaChevronLeft className="text-[#FEEBD8]" />
+                      <FaChevronLeft className="w-4 h-4 group-hover:scale-110 transition-transform" />
                     </button>
                     <button
                       onClick={() => setCurrentDate(new Date())}
-                      className="px-4 py-2 text-sm bg-neutral-700/30 hover:bg-neutral-700/50 rounded-lg transition-colors text-[#FEEBD8]"
+                      className="px-6 py-3 text-sm bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-xl transition-all duration-200 text-white font-semibold shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 hover:scale-105"
                     >
                       Today
                     </button>
                     <button
                       onClick={() => navigateWeek("next")}
-                      className="p-2 hover:bg-neutral-700/30 rounded-lg transition-colors"
+                      className="p-3 rounded-xl border border-white/10 hover:border-blue-500/50 hover:bg-blue-500/10 transition-all duration-200 text-white/70 hover:text-white group"
                     >
-                      <FaChevronRight className="text-[#FEEBD8]" />
+                      <FaChevronRight className="w-4 h-4 group-hover:scale-110 transition-transform" />
                     </button>
                   </div>
                 </div>
@@ -970,7 +987,7 @@ export default function Calendar() {
                           >
                             <div
                               className={`text-sm font-medium ${
-                                isToday ? "text-blue-400" : "text-[#FEEBD8]/70"
+                                isToday ? "text-blue-400" : "text-white/70"
                               }`}
                             >
                               {day.toLocaleDateString("en-US", {
@@ -979,12 +996,12 @@ export default function Calendar() {
                             </div>
                             <div
                               className={`text-xl font-bold mt-1 ${
-                                isToday ? "text-blue-400" : "text-[#FEEBD8]"
+                                isToday ? "text-blue-400" : "text-white"
                               }`}
                             >
                               {day.getDate()}
                             </div>
-                            <div className="text-xs text-[#FEEBD8]/50 mt-1">
+                            <div className="text-xs text-white/50 mt-1">
                               {dayEvents.length} event
                               {dayEvents.length !== 1 ? "s" : ""}
                             </div>
@@ -997,7 +1014,7 @@ export default function Calendar() {
                     <div className="grid grid-cols-8 gap-0 border border-neutral-700/30 rounded-lg overflow-hidden">
                       {/* All-day events row */}
                       <div className="bg-neutral-800/50 p-3 border-r border-neutral-700/30 flex items-center">
-                        <span className="text-xs font-medium text-[#FEEBD8]/70">
+                        <span className="text-xs font-medium text-white/70">
                           All Day
                         </span>
                       </div>
@@ -1065,7 +1082,7 @@ export default function Calendar() {
                             key={`hour-${startHour}`}
                             className="bg-neutral-800/50 p-3 border-r border-t border-neutral-700/30 flex items-start"
                           >
-                            <div className="text-xs font-medium text-[#FEEBD8]/70">
+                            <div className="text-xs font-medium text-white/70">
                               <div>
                                 {startHour === 0
                                   ? "12 AM"
@@ -1075,7 +1092,7 @@ export default function Calendar() {
                                   ? "12 PM"
                                   : `${startHour - 12} PM`}
                               </div>
-                              <div className="text-[#FEEBD8]/50 text-xs">
+                              <div className="text-white/50 text-xs">
                                 {endHour === 0
                                   ? "12 AM"
                                   : endHour < 12
@@ -1166,7 +1183,7 @@ export default function Calendar() {
 
                               {/* Hover indicator for adding events */}
                               <div className="absolute inset-0 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
-                                <FaPlus className="text-[#FEEBD8]/30 text-xs" />
+                                <FaPlus className="text-white/30 text-xs" />
                               </div>
                             </div>
                           );
@@ -1180,25 +1197,33 @@ export default function Calendar() {
 
                 {/* Week Summary */}
                 <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="bg-neutral-800/30 rounded-lg p-4">
-                    <h4 className="text-sm font-medium text-[#FEEBD8]/70 mb-2">
-                      This Week
-                    </h4>
-                    <div className="text-2xl font-bold text-[#FEEBD8]">
+                  <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="p-1.5 bg-blue-500/10 rounded-lg">
+                        <FaCalendar className="text-blue-400 text-xs" />
+                      </div>
+                      <h4 className="text-sm font-medium text-white/70">
+                        This Week
+                      </h4>
+                    </div>
+                    <div className="text-2xl font-bold text-white">
                       {getWeekDays().reduce((total, day) => {
                         const dateString = formatDateString(day);
                         return total + getEventsForDate(dateString).length;
                       }, 0)}
                     </div>
-                    <div className="text-xs text-[#FEEBD8]/60">
-                      Total Events
-                    </div>
+                    <div className="text-xs text-white/60">Total Events</div>
                   </div>
 
-                  <div className="bg-neutral-800/30 rounded-lg p-4">
-                    <h4 className="text-sm font-medium text-[#FEEBD8]/70 mb-2">
-                      Deadlines
-                    </h4>
+                  <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="p-1.5 bg-red-500/10 rounded-lg">
+                        <FaExclamationTriangle className="text-red-400 text-xs" />
+                      </div>
+                      <h4 className="text-sm font-medium text-white/70">
+                        Deadlines
+                      </h4>
+                    </div>
                     <div className="text-2xl font-bold text-red-400">
                       {getWeekDays().reduce((total, day) => {
                         const dateString = formatDateString(day);
@@ -1210,14 +1235,19 @@ export default function Calendar() {
                         );
                       }, 0)}
                     </div>
-                    <div className="text-xs text-[#FEEBD8]/60">This Week</div>
+                    <div className="text-xs text-white/60">This Week</div>
                   </div>
 
-                  <div className="bg-neutral-800/30 rounded-lg p-4">
-                    <h4 className="text-sm font-medium text-[#FEEBD8]/70 mb-2">
-                      Interviews
-                    </h4>
-                    <div className="text-2xl font-bold text-blue-400">
+                  <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="p-1.5 bg-purple-500/10 rounded-lg">
+                        <FaUniversity className="text-purple-400 text-xs" />
+                      </div>
+                      <h4 className="text-sm font-medium text-white/70">
+                        Interviews
+                      </h4>
+                    </div>
+                    <div className="text-2xl font-bold text-purple-400">
                       {getWeekDays().reduce((total, day) => {
                         const dateString = formatDateString(day);
                         return (
@@ -1228,23 +1258,26 @@ export default function Calendar() {
                         );
                       }, 0)}
                     </div>
-                    <div className="text-xs text-[#FEEBD8]/60">This Week</div>
+                    <div className="text-xs text-white/60">This Week</div>
                   </div>
                 </div>
               </div>
             )}
 
             {viewMode === "list" && (
-              <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
+              <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6">
                 {/* List Header */}
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-semibold text-[#FEEBD8]">
+                  <h2 className="text-2xl font-semibold text-white flex items-center gap-3">
+                    <div className="p-2 bg-blue-500/10 rounded-lg">
+                      <FaList className="text-blue-400" />
+                    </div>
                     All Events
                   </h2>
                   <div className="flex items-center space-x-2">
                     <button
                       onClick={() => setCurrentDate(new Date())}
-                      className="px-4 py-2 text-sm bg-neutral-700/30 hover:bg-neutral-700/50 rounded-lg transition-colors text-[#FEEBD8]"
+                      className="px-4 py-2.5 text-sm bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors text-white font-medium"
                     >
                       Today
                     </button>
@@ -1286,7 +1319,7 @@ export default function Calendar() {
                                   eventTypeColors[event.type]
                                 }`}
                               ></div>
-                              <h3 className="font-semibold text-[#FEEBD8]">
+                              <h3 className="font-semibold text-white">
                                 {event.title}
                               </h3>
                               <span
@@ -1302,7 +1335,7 @@ export default function Calendar() {
                               </span>
                             </div>
 
-                            <div className="flex items-center gap-4 text-sm text-[#FEEBD8]/70 mb-2">
+                            <div className="flex items-center gap-4 text-sm text-white/70 mb-2">
                               {event.date ? (
                                 <div className="flex items-center gap-1">
                                   <FaCalendar size={12} />
@@ -1331,7 +1364,7 @@ export default function Calendar() {
                             </div>
 
                             {event.description && (
-                              <p className="text-sm text-[#FEEBD8]/60 line-clamp-2">
+                              <p className="text-sm text-white/60 line-clamp-2">
                                 {event.description}
                               </p>
                             )}
@@ -1347,7 +1380,7 @@ export default function Calendar() {
                               </div>
                             )}
                             <FaGripVertical
-                              className="text-[#FEEBD8]/30"
+                              className="text-white/30"
                               size={12}
                             />
                           </div>
@@ -1358,11 +1391,11 @@ export default function Calendar() {
 
                   {events.length === 0 && (
                     <div className="text-center py-12">
-                      <FaCalendar className="mx-auto text-4xl text-[#FEEBD8]/30 mb-4" />
-                      <h3 className="text-lg font-medium text-[#FEEBD8]/70 mb-2">
+                      <FaCalendar className="mx-auto text-4xl text-white/30 mb-4" />
+                      <h3 className="text-lg font-medium text-white/70 mb-2">
                         No events yet
                       </h3>
-                      <p className="text-[#FEEBD8]/50">
+                      <p className="text-white/50">
                         Create your first event to get started
                       </p>
                     </div>
@@ -1374,8 +1407,11 @@ export default function Calendar() {
 
           {/* Upcoming Events Sidebar */}
           <div className="space-y-6">
-            <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
-              <h3 className="text-xl font-semibold text-[#FEEBD8] mb-4">
+            <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6">
+              <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                <div className="p-2 bg-blue-500/10 rounded-lg">
+                  <FaClock className="text-blue-400" />
+                </div>
                 Upcoming Events
               </h3>
               <div className="space-y-3">
@@ -1403,7 +1439,7 @@ export default function Calendar() {
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex items-center gap-2 flex-1">
-                          <FaGripVertical className="text-[#FEEBD8]/30 group-hover:text-[#FEEBD8]/60 transition-colors" />
+                          <FaGripVertical className="text-white/30 group-hover:text-white/60 transition-colors" />
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-1">
                               {event.type ===
@@ -1416,21 +1452,21 @@ export default function Calendar() {
                               {event.type === EventType.REMINDER && (
                                 <FaPen className="text-yellow-400 text-sm" />
                               )}
-                              <h4 className="font-medium text-[#FEEBD8] text-sm">
+                              <h4 className="font-medium text-white text-sm">
                                 {event.title}
                               </h4>
                             </div>
-                            <p className="text-[#FEEBD8]/60 text-xs">
+                            <p className="text-white/60 text-xs">
                               {getFormattedCollegeName(event)}
                             </p>
                             <div className="flex items-center gap-2 mt-1">
-                              <span className="text-[#FEEBD8]/70 text-xs">
+                              <span className="text-white/70 text-xs">
                                 {event.date
                                   ? new Date(event.date).toLocaleDateString()
                                   : "No date"}
                               </span>
                               {getTimeFromDate(event.date) && (
-                                <span className="text-[#FEEBD8]/70 text-xs">
+                                <span className="text-white/70 text-xs">
                                   at {getTimeFromDate(event.date)}
                                 </span>
                               )}
@@ -1447,7 +1483,7 @@ export default function Calendar() {
                               setSelectedEvent(event);
                               setIsEditEventModalOpen(true);
                             }}
-                            className="text-[#FEEBD8]/50 hover:text-[#FEEBD8] transition-colors"
+                            className="text-white/50 hover:text-white transition-colors"
                           >
                             <FaEdit size={12} />
                           </button>
@@ -1481,7 +1517,7 @@ export default function Calendar() {
             {/* Inbox Section */}
             <div
               data-drop-target="inbox"
-              className={`bg-[#141414] border border-neutral-700/50 rounded-lg p-6 transition-colors ${
+              className={`bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6 transition-colors ${
                 dragOverTarget === "inbox"
                   ? "bg-green-500/10 border-green-500/50"
                   : ""
@@ -1491,9 +1527,9 @@ export default function Calendar() {
               onDragLeave={() => setDragOverTarget(null)}
             >
               <div className="flex items-center gap-2 mb-4">
-                <FaInbox className="text-[#FEEBD8]" />
-                <h3 className="text-xl font-semibold text-[#FEEBD8]">Inbox</h3>
-                <span className="text-sm text-[#FEEBD8]/50">
+                <FaInbox className="text-white" />
+                <h3 className="text-xl font-semibold text-white">Inbox</h3>
+                <span className="text-sm text-white/50">
                   ({getUndatedEvents().length} undated)
                 </span>
                 {dragOverTarget === "inbox" && (
@@ -1504,7 +1540,7 @@ export default function Calendar() {
               </div>
               <div className="space-y-3">
                 {getUndatedEvents().length === 0 ? (
-                  <p className="text-[#FEEBD8]/50 text-sm italic">
+                  <p className="text-white/50 text-sm italic">
                     {draggedEvent
                       ? "Drop events here to remove their dates"
                       : "No undated events"}
@@ -1526,7 +1562,7 @@ export default function Calendar() {
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex items-center gap-2 flex-1">
-                          <FaGripVertical className="text-[#FEEBD8]/30 group-hover:text-[#FEEBD8]/60 transition-colors" />
+                          <FaGripVertical className="text-white/30 group-hover:text-white/60 transition-colors" />
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-1">
                               {event.type ===
@@ -1539,16 +1575,16 @@ export default function Calendar() {
                               {event.type === EventType.REMINDER && (
                                 <FaPen className="text-yellow-400 text-sm" />
                               )}
-                              <h4 className="font-medium text-[#FEEBD8] text-sm">
+                              <h4 className="font-medium text-white text-sm">
                                 {event.title}
                               </h4>
                             </div>
                             {event.college && (
-                              <p className="text-[#FEEBD8]/60 text-xs">
+                              <p className="text-white/60 text-xs">
                                 {getFormattedCollegeName(event)}
                               </p>
                             )}
-                            <p className="text-[#FEEBD8]/50 text-xs mt-1">
+                            <p className="text-white/50 text-xs mt-1">
                               {event.description}
                             </p>
                           </div>
@@ -1559,7 +1595,7 @@ export default function Calendar() {
                             setSelectedEvent(event);
                             setIsEditEventModalOpen(true);
                           }}
-                          className="text-[#FEEBD8]/50 hover:text-[#FEEBD8] transition-colors"
+                          className="text-white/50 hover:text-white transition-colors"
                         >
                           <FaEdit size={12} />
                         </button>
@@ -1571,15 +1607,15 @@ export default function Calendar() {
             </div>
 
             {/* Legend */}
-            <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-[#FEEBD8] mb-4">
+            <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6">
+              <h3 className="text-lg font-semibold text-white mb-4">
                 Event Types
               </h3>
               <div className="space-y-2">
                 {Object.entries(eventTypeColors).map(([type, color]) => (
                   <div key={type} className="flex items-center gap-2">
                     <div className={`w-3 h-3 rounded ${color}`}></div>
-                    <span className="text-[#FEEBD8]/70 text-sm capitalize">
+                    <span className="text-white/70 text-sm capitalize">
                       {type.toLowerCase().replace("_", " ")}
                     </span>
                   </div>
@@ -1599,12 +1635,12 @@ export default function Calendar() {
           onClick={handleCloseDateEventsModal}
         >
           <div
-            className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6 max-w-md w-full max-h-[80vh] overflow-y-auto animate-in slide-in-from-bottom-4 duration-300"
+            className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6 max-w-md w-full max-h-[80vh] overflow-y-auto animate-in slide-in-from-bottom-4 duration-300"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h3 className="text-xl font-semibold text-[#FEEBD8]">
+                <h3 className="text-xl font-semibold text-white">
                   Events for{" "}
                   {new Date(expandedDateEvents).toLocaleDateString("en-US", {
                     weekday: "long",
@@ -1613,14 +1649,14 @@ export default function Calendar() {
                     day: "numeric",
                   })}
                 </h3>
-                <p className="text-sm text-[#FEEBD8]/60 mt-1">
+                <p className="text-sm text-white/60 mt-1">
                   {getEventsForDate(expandedDateEvents).length} event
                   {getEventsForDate(expandedDateEvents).length !== 1 ? "s" : ""}
                 </p>
               </div>
               <button
                 onClick={handleCloseDateEventsModal}
-                className="text-[#FEEBD8]/70 hover:text-[#FEEBD8] transition-colors text-xl"
+                className="text-white/70 hover:text-white transition-colors text-xl"
               >
                 ×
               </button>
@@ -1677,7 +1713,7 @@ export default function Calendar() {
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex items-center gap-2 flex-1">
-                          <FaGripVertical className="text-[#FEEBD8]/30 group-hover:text-[#FEEBD8]/60 transition-colors" />
+                          <FaGripVertical className="text-white/30 group-hover:text-white/60 transition-colors" />
                           <div
                             className={`w-3 h-3 rounded ${
                               eventTypeColors[event.type]
@@ -1698,18 +1734,18 @@ export default function Calendar() {
                               {event.type === EventType.CAMPUS_VISIT && (
                                 <FaUniversity className="text-green-400 text-sm" />
                               )}
-                              <h4 className="font-medium text-[#FEEBD8] text-sm truncate">
+                              <h4 className="font-medium text-white text-sm truncate">
                                 {event.title}
                               </h4>
                             </div>
                             {event.college && (
-                              <p className="text-[#FEEBD8]/60 text-xs truncate">
+                              <p className="text-white/60 text-xs truncate">
                                 {getFormattedCollegeName(event)}
                               </p>
                             )}
                             <div className="flex items-center gap-2 mt-1">
                               {getTimeFromDate(event.date) && (
-                                <span className="text-[#FEEBD8]/70 text-xs">
+                                <span className="text-white/70 text-xs">
                                   {getTimeFromDate(event.date)}
                                   {isPast && isToday && (
                                     <span className="text-red-400 ml-1">
@@ -1736,7 +1772,7 @@ export default function Calendar() {
                               </span>
                             </div>
                             {event.description && (
-                              <p className="text-[#FEEBD8]/50 text-xs mt-1 line-clamp-2">
+                              <p className="text-white/50 text-xs mt-1 line-clamp-2">
                                 {event.description}
                               </p>
                             )}
@@ -1749,7 +1785,7 @@ export default function Calendar() {
                             setIsEditEventModalOpen(true);
                             handleCloseDateEventsModal();
                           }}
-                          className="text-[#FEEBD8]/50 hover:text-[#FEEBD8] transition-colors ml-2"
+                          className="text-white/50 hover:text-white transition-colors ml-2"
                         >
                           <FaEdit size={12} />
                         </button>
@@ -1765,7 +1801,7 @@ export default function Calendar() {
                   setIsAddEventModalOpen(true);
                   handleCloseDateEventsModal();
                 }}
-                className="w-full bg-[#FEEBD8] text-[#141414] px-4 py-2 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors flex items-center justify-center gap-2"
+                className="w-full bg-blue-500 text-[#141414] px-4 py-2 rounded-lg font-medium hover:bg-blue-600 transition-colors flex items-center justify-center gap-2"
               >
                 <FaPlus size={12} />
                 Add Event for This Date

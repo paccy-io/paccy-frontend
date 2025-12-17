@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
-import Navbar from "../../../../components/Navbar";
 import Footer from "../../../../components/Footer";
 import { api, ApiError } from "../../../../lib/api/college-applications";
 import { API_BASE_URL, API_ENDPOINTS } from "../../../../config/api";
@@ -164,6 +163,70 @@ const priorityColors: Record<string, string> = {
   safety: "bg-green-500",
 };
 
+// Custom Select Component for Safari compatibility
+interface CustomSelectProps {
+  value: string;
+  onChange: (value: string) => void;
+  options: { value: string; label: string }[];
+  placeholder?: string;
+}
+
+const CustomSelect: React.FC<CustomSelectProps> = ({
+  value,
+  onChange,
+  options,
+  placeholder = "Select...",
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const selectedOption = options.find((opt) => opt.value === value);
+
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-3 text-white text-left flex items-center justify-between hover:border-neutral-600/50 transition-colors"
+      >
+        <span className={!selectedOption ? "text-white/50" : ""}>
+          {selectedOption ? selectedOption.label : placeholder}
+        </span>
+        <FaChevronDown
+          className={`text-white/60 transition-transform ${
+            isOpen ? "rotate-180" : ""
+          }`}
+        />
+      </button>
+      {isOpen && (
+        <>
+          <div
+            className="fixed inset-0 z-10"
+            onClick={() => setIsOpen(false)}
+          />
+          <div className="absolute z-20 w-full mt-1 bg-[#1a1a1a] border border-neutral-700/50 rounded-xl overflow-hidden shadow-2xl max-h-60 overflow-y-auto">
+            {options.map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => {
+                  onChange(option.value);
+                  setIsOpen(false);
+                }}
+                className={`w-full text-left px-4 py-3 transition-colors ${
+                  option.value === value
+                    ? "bg-blue-500/20 text-blue-400"
+                    : "text-white hover:bg-white/5"
+                }`}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
+
 // Helper functions for date format conversion
 const formatDateForInput = (isoDate: string | undefined | null) => {
   if (!isoDate) return "";
@@ -211,6 +274,7 @@ export default function CollegeDetail() {
     BackendChecklist[]
   >([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [bannerImageUrl, setBannerImageUrl] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [expandedChecklists, setExpandedChecklists] = useState<Set<string>>(
     new Set()
@@ -219,6 +283,25 @@ export default function CollegeDetail() {
 
   // Modal states
   const [showEditCollegeModal, setShowEditCollegeModal] = useState(false);
+
+  // Function to set banner image using Lorem Picsum with seed for consistency
+  const fetchBannerImage = async (universityName: string) => {
+    try {
+      console.log("Setting banner for:", universityName);
+
+      // Use Lorem Picsum with the university name as seed for consistent, high-quality images
+      // This will give the same image for the same university each time
+      const imageUrl = `https://picsum.photos/seed/${encodeURIComponent(
+        universityName
+      )}/1600/400`;
+
+      console.log("Banner image URL:", imageUrl);
+      setBannerImageUrl(imageUrl);
+    } catch (error) {
+      console.error("Failed to set banner image:", error);
+      // Keep gradient as fallback
+    }
+  };
   const [showAddChecklistModal, setShowAddChecklistModal] = useState(false);
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
   const [showEditChecklistModal, setShowEditChecklistModal] = useState(false);
@@ -237,6 +320,7 @@ export default function CollegeDetail() {
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [newTag, setNewTag] = useState("");
   const [tagsInput, setTagsInput] = useState("");
+  const [showStatusEditor, setShowStatusEditor] = useState(false);
 
   // Tab state for edit modal
   const [activeEditTab, setActiveEditTab] = useState("basic");
@@ -332,6 +416,9 @@ export default function CollegeDetail() {
       setCollege(transformedCollege);
       setBackendChecklists(application.checklists || []);
       document.title = `${application.name} | Paccy`;
+
+      // Fetch banner image from Wikipedia
+      fetchBannerImage(application.name);
     } catch (error) {
       console.error("Failed to load college data:", error);
       showError(
@@ -766,9 +853,8 @@ export default function CollegeDetail() {
   if (isLoading || !college) {
     return (
       <div className="min-h-screen bg-[#0a0a0a]">
-        <Navbar />
         <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
-          <div className="text-[#FEEBD8] text-lg">
+          <div className="text-white text-lg">
             {isLoading ? "Loading college application..." : "College not found"}
           </div>
         </div>
@@ -797,58 +883,158 @@ export default function CollegeDetail() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a]">
-      <Navbar />
+      {/* Banner with Gradient */}
+      <div className="relative h-64 overflow-hidden bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900">
+        {/* Banner Image */}
+        {bannerImageUrl && (
+          <img
+            src={bannerImageUrl}
+            alt={`${college.universityName} campus`}
+            className="absolute inset-0 w-full h-full object-cover"
+            onError={(e) => {
+              e.currentTarget.style.display = "none";
+            }}
+          />
+        )}
+        {/* Decorative circles (shown when no image) */}
+        {!bannerImageUrl && (
+          <>
+            <div className="absolute top-10 left-10 w-32 h-32 bg-blue-400/20 rounded-full blur-3xl"></div>
+            <div className="absolute top-20 right-20 w-40 h-40 bg-purple-400/20 rounded-full blur-3xl"></div>
+            <div className="absolute bottom-10 left-1/3 w-36 h-36 bg-indigo-400/20 rounded-full blur-3xl"></div>
+          </>
+        )}
+        {/* Dark Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/60 to-transparent" />
 
-      <div className="max-w-screen-xl mx-auto px-4 md:px-10 py-8 pt-28">
-        {/* Header */}
-        <div className="flex flex-col lg:flex-row lg:items-start space-y-4 lg:space-y-0 lg:space-x-4 mb-8">
-          <Link
-            href="/dashboard/colleges"
-            className="text-[#FEEBD8]/70 hover:text-[#FEEBD8] transition-colors self-start"
-          >
-            <FaArrowLeft size={20} />
-          </Link>
-          <div className="flex-1">
-            <div className="mb-4">
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#FEEBD8] mb-3">
-                {college.universityName}
-              </h1>
-              <div className="flex flex-wrap items-center gap-2">
+        {/* Banner Content */}
+        <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10">
+          <div className="max-w-screen-xl mx-auto">
+            <Link
+              href="/dashboard/colleges"
+              className="inline-flex items-center gap-2 text-white/90 hover:text-white transition-colors mb-4 bg-black/30 backdrop-blur-sm px-3 py-2 rounded-xl"
+            >
+              <FaArrowLeft size={16} />
+              <span className="text-sm">Back to Applications</span>
+            </Link>
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-3">
+              {college.universityName}
+            </h1>
+            <div className="flex flex-wrap items-center gap-2 mb-3">
+              <span className="px-3 py-1 rounded-full text-xs font-medium bg-blue-500/90 text-white backdrop-blur-sm">
+                {college.type
+                  .replace(/_/g, " ")
+                  .replace(/\b\w/g, (l) => l.toUpperCase())}
+              </span>
+              {college.priority && (
                 <span
-                  className={`px-3 py-1 rounded-full text-sm text-white ${
-                    statusColors[college.status]
-                  }`}
+                  className={`px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm ${
+                    college.priority.toLowerCase() === "reach"
+                      ? "bg-purple-500/90"
+                      : college.priority.toLowerCase() === "target"
+                      ? "bg-blue-500/90"
+                      : "bg-green-500/90"
+                  } text-white`}
                 >
-                  {college.status
-                    .replace(/_/g, " ")
-                    .replace(/\b\w/g, (l) => l.toUpperCase())}
+                  {college.priority}
                 </span>
-                <span
-                  className={`px-3 py-1 rounded-full text-sm text-white ${
-                    typeColors[college.type]
-                  }`}
+              )}
+              <div className="text-white/80 text-sm flex items-center gap-1">
+                <FaMapMarkerAlt className="text-xs" />
+                <span>
+                  {college.universityState && `${college.universityState}, `}
+                  {college.universityCountry}
+                </span>
+              </div>
+            </div>
+            {college.applicationDeadline && (
+              <div className="flex items-center gap-2 text-white/90 text-sm">
+                <FaCalendar className="text-xs" />
+                <span>
+                  Deadline:{" "}
+                  {new Date(college.applicationDeadline).toLocaleDateString(
+                    "en-US",
+                    {
+                      month: "long",
+                      day: "numeric",
+                      year: "numeric",
+                    }
+                  )}
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-screen-xl mx-auto px-4 md:px-10 py-8">
+        {/* Status and Application Type Badges */}
+        <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="flex items-center gap-2">
+              <span
+                className={`px-3 py-1 rounded-full text-sm text-white ${
+                  statusColors[college.status]
+                }`}
+              >
+                {college.status
+                  .replace(/_/g, " ")
+                  .replace(/\b\w/g, (l) => l.toUpperCase())}
+              </span>
+              <div className="relative">
+                <button
+                  onClick={() => setShowStatusEditor(!showStatusEditor)}
+                  className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-colors"
+                  title="Change status"
                 >
-                  {college.type
-                    .replace(/_/g, " ")
-                    .replace(/\b\w/g, (l) => l.toUpperCase())}
-                </span>
-                {college.priority && (
-                  <span
-                    className={`px-3 py-1 rounded-full text-sm text-white ${
-                      priorityColors[college.priority.toLowerCase()]
-                    }`}
-                  >
-                    {college.priority}
-                  </span>
+                  <FaEdit className="text-xs" />
+                </button>
+                {showStatusEditor && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-10"
+                      onClick={() => setShowStatusEditor(false)}
+                    />
+                    <div className="absolute z-20 left-0 mt-2 w-56">
+                      <CustomSelect
+                        value={college.status}
+                        onChange={async (value) => {
+                          try {
+                            await api.collegeApplications.update(collegeId, {
+                              status: value as Status,
+                            });
+                            setCollege((prev) =>
+                              prev ? { ...prev, status: value as Status } : null
+                            );
+                            showSuccess("Status updated successfully");
+                            setShowStatusEditor(false);
+                          } catch (error: any) {
+                            console.error("Status update error:", error);
+                            showError(
+                              error?.message || "Failed to update status"
+                            );
+                          }
+                        }}
+                        options={[
+                          { value: "not_started", label: "Not Started" },
+                          { value: "in_progress", label: "In Progress" },
+                          { value: "submitted", label: "Submitted" },
+                          { value: "under_review", label: "Under Review" },
+                          { value: "accepted", label: "Accepted" },
+                          { value: "rejected", label: "Rejected" },
+                          { value: "deferred", label: "Deferred" },
+                          { value: "waitlisted", label: "Waitlisted" },
+                          { value: "withdrawn", label: "Withdrawn" },
+                        ]}
+                        placeholder="Select status"
+                      />
+                    </div>
+                  </>
                 )}
               </div>
             </div>
-            <p className="text-[#FEEBD8]/70">
-              {college.universityState && `${college.universityState}, `}
-              {college.universityCountry}
-            </p>
             {college.major && (
-              <div className="flex items-center gap-2 mt-2">
+              <div className="flex items-center gap-2">
                 <FaGraduationCap className="text-blue-400" />
                 <span className="text-blue-400 font-medium">
                   {college.major}
@@ -856,37 +1042,37 @@ export default function CollegeDetail() {
               </div>
             )}
           </div>
-          <div className="w-full lg:w-auto">
-            <button
-              onClick={() => setShowEditCollegeModal(true)}
-              className="bg-[#FEEBD8] text-[#141414] px-4 sm:px-6 py-3 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors flex items-center justify-center space-x-2 w-full lg:w-auto"
-            >
-              <FaEdit />
-              <span>Edit College</span>
-            </button>
-          </div>
+          <button
+            onClick={() => setShowEditCollegeModal(true)}
+            className="bg-blue-500 text-white px-4 sm:px-6 py-3 rounded-xl font-medium hover:bg-blue-600 transition-colors flex items-center justify-center space-x-2 w-full sm:w-auto"
+          >
+            <FaEdit />
+            <span>Edit College</span>
+          </button>
         </div>
 
         {/* College Info Cards */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           {/* Basic Info */}
-          <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
-            <h3 className="text-lg font-semibold text-[#FEEBD8] mb-4 flex items-center gap-2">
-              <FaUniversity />
+          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6">
+            <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+              <div className="p-2 bg-blue-500/10 rounded-xl">
+                <FaUniversity className="text-blue-400" />
+              </div>
               College Information
             </h3>
             <div className="space-y-3">
               <div>
-                <label className="text-[#FEEBD8]/70 text-sm">Full Name</label>
-                <div className="text-[#FEEBD8] font-medium">
+                <label className="text-white/70 text-sm">Full Name</label>
+                <div className="text-white font-medium">
                   {college.universityName}
                 </div>
               </div>
 
               {(college.universityState || college.universityCountry) && (
                 <div>
-                  <label className="text-[#FEEBD8]/70 text-sm">Location</label>
-                  <div className="text-[#FEEBD8]">
+                  <label className="text-white/70 text-sm">Location</label>
+                  <div className="text-white">
                     {college.universityState && college.universityCountry
                       ? `${college.universityState}, ${college.universityCountry}`
                       : college.universityState || college.universityCountry}
@@ -896,7 +1082,7 @@ export default function CollegeDetail() {
 
               {college.major && (
                 <div>
-                  <label className="text-[#FEEBD8]/70 text-sm">
+                  <label className="text-white/70 text-sm">
                     Intended Major
                   </label>
                   <div className="flex items-center gap-2">
@@ -909,12 +1095,12 @@ export default function CollegeDetail() {
               )}
 
               <div>
-                <label className="text-[#FEEBD8]/70 text-sm">
+                <label className="text-white/70 text-sm">
                   Application Deadline
                 </label>
                 <div className="flex items-center gap-2">
-                  <FaCalendar className="text-[#FEEBD8]/50" />
-                  <span className="text-[#FEEBD8]">
+                  <FaCalendar className="text-white/50" />
+                  <span className="text-white">
                     {formatDeadline(college.deadline)}
                     {college.deadline &&
                       (() => {
@@ -939,10 +1125,10 @@ export default function CollegeDetail() {
               {college.applicationFee !== undefined &&
                 college.applicationFee !== null && (
                   <div>
-                    <label className="text-[#FEEBD8]/70 text-sm">
+                    <label className="text-white/70 text-sm">
                       Application Fee
                     </label>
-                    <div className="text-[#FEEBD8]">
+                    <div className="text-white">
                       {college.applicationFee === 0
                         ? "Free"
                         : `$${college.applicationFee}`}
@@ -952,7 +1138,7 @@ export default function CollegeDetail() {
 
               {college.priority && (
                 <div>
-                  <label className="text-[#FEEBD8]/70 text-sm">
+                  <label className="text-white/70 text-sm">
                     Priority Level
                   </label>
                   <div className="flex items-center gap-2">
@@ -969,10 +1155,8 @@ export default function CollegeDetail() {
 
               {college.contactEmail && (
                 <div>
-                  <label className="text-[#FEEBD8]/70 text-sm">
-                    Contact Email
-                  </label>
-                  <div className="text-[#FEEBD8]">
+                  <label className="text-white/70 text-sm">Contact Email</label>
+                  <div className="text-white">
                     <a
                       href={`mailto:${college.contactEmail}`}
                       className="text-blue-400 hover:underline"
@@ -985,7 +1169,7 @@ export default function CollegeDetail() {
 
               {college.universityWebsite && (
                 <div>
-                  <label className="text-[#FEEBD8]/70 text-sm">
+                  <label className="text-white/70 text-sm">
                     Website{college.universityWebsite.includes(",") ? "s" : ""}
                   </label>
                   <div className="space-y-1">
@@ -1015,12 +1199,12 @@ export default function CollegeDetail() {
 
               {college.tags && college.tags.length > 0 && (
                 <div>
-                  <label className="text-[#FEEBD8]/70 text-sm">Tags</label>
+                  <label className="text-white/70 text-sm">Tags</label>
                   <div className="flex flex-wrap gap-2 mt-1">
                     {college.tags.map((tag, idx) => (
                       <span
                         key={idx}
-                        className="px-2 py-1 bg-neutral-800 text-[#FEEBD8]/70 text-xs rounded-full"
+                        className="px-2 py-1 bg-neutral-800 text-white/70 text-xs rounded-full"
                       >
                         {tag}
                       </span>
@@ -1032,20 +1216,22 @@ export default function CollegeDetail() {
           </div>
 
           {/* Progress Overview */}
-          <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
-            <h3 className="text-lg font-semibold text-[#FEEBD8] mb-4 flex items-center gap-2">
-              <FaChartLine />
+          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6">
+            <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+              <div className="p-2 bg-green-500/10 rounded-xl">
+                <FaChartLine className="text-green-400" />
+              </div>
               Progress Overview
             </h3>
             <div className="space-y-4">
               <div>
-                <div className="flex justify-between text-sm text-[#FEEBD8]/70 mb-2">
+                <div className="flex justify-between text-sm text-white/70 mb-2">
                   <span>Overall Progress</span>
                   <span>{overallProgress}%</span>
                 </div>
-                <div className="w-full bg-neutral-700 rounded-full h-3">
+                <div className="w-full bg-neutral-700/50 rounded-full h-3">
                   <div
-                    className="bg-gradient-to-r from-[#FEEBD8] to-[#E5D5B7] h-3 rounded-full transition-all duration-300"
+                    className="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full transition-all duration-300"
                     style={{ width: `${overallProgress}%` }}
                   ></div>
                 </div>
@@ -1060,7 +1246,7 @@ export default function CollegeDetail() {
                       0
                     )}
                   </div>
-                  <div className="text-[#FEEBD8]/70 text-sm">Completed</div>
+                  <div className="text-white/70 text-sm">Completed</div>
                 </div>
                 <div>
                   <div className="text-2xl font-bold text-yellow-400">
@@ -1072,16 +1258,18 @@ export default function CollegeDetail() {
                       0
                     )}
                   </div>
-                  <div className="text-[#FEEBD8]/70 text-sm">Remaining</div>
+                  <div className="text-white/70 text-sm">Remaining</div>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Quick Actions */}
-          <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
-            <h3 className="text-lg font-semibold text-[#FEEBD8] mb-4 flex items-center gap-2">
-              <FaTasks />
+          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6">
+            <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+              <div className="p-2 bg-purple-500/10 rounded-xl">
+                <FaTasks className="text-purple-400" />
+              </div>
               Quick Actions
             </h3>
             <div className="space-y-3">
@@ -1091,16 +1279,16 @@ export default function CollegeDetail() {
                 )}&major=${encodeURIComponent(
                   backendApplication?.major || ""
                 )}`}
-                className="w-full bg-[#FEEBD8]/10 border border-[#FEEBD8]/30 text-[#FEEBD8] px-4 py-2 rounded-lg hover:bg-[#FEEBD8]/20 transition-colors flex items-center gap-2"
+                className="w-full bg-white/5 border border-neutral-700/30 text-white px-4 py-2 rounded-xl hover:bg-white/10 hover:border-white/20 transition-colors flex items-center gap-2"
               >
                 <FaFileAlt />
                 <span>View Essays</span>
               </Link>
-              <button className="w-full bg-[#FEEBD8]/10 border border-[#FEEBD8]/30 text-[#FEEBD8] px-4 py-2 rounded-lg hover:bg-[#FEEBD8]/20 transition-colors flex items-center gap-2">
+              <button className="w-full bg-white/5 border border-neutral-700/30 text-white px-4 py-2 rounded-xl hover:bg-white/10 hover:border-white/20 transition-colors flex items-center gap-2">
                 <FaBell />
                 <span>Set Reminder</span>
               </button>
-              <button className="w-full bg-[#FEEBD8]/10 border border-[#FEEBD8]/30 text-[#FEEBD8] px-4 py-2 rounded-lg hover:bg-[#FEEBD8]/20 transition-colors flex items-center gap-2">
+              <button className="w-full bg-white/5 border border-neutral-700/30 text-white px-4 py-2 rounded-xl hover:bg-white/10 hover:border-white/20 transition-colors flex items-center gap-2">
                 <FaCalendar />
                 <span>Add to Calendar</span>
               </button>
@@ -1110,22 +1298,22 @@ export default function CollegeDetail() {
 
         {/* Notes Section */}
         {college.notes && (
-          <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6 mb-8">
-            <h3 className="text-lg font-semibold text-[#FEEBD8] mb-4">Notes</h3>
-            <p className="text-[#FEEBD8]/70">{college.notes}</p>
+          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6 mb-8">
+            <h3 className="text-lg font-semibold text-white mb-4">Notes</h3>
+            <p className="text-white/70">{college.notes}</p>
           </div>
         )}
 
         {/* Checklists */}
         <div className="space-y-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-[#FEEBD8] flex items-center gap-3">
+            <h2 className="text-2xl font-bold text-white flex items-center gap-3">
               <FaClipboardList />
               Application Checklists
             </h2>
             <button
               onClick={() => setShowAddChecklistModal(true)}
-              className="bg-[#FEEBD8] text-[#141414] px-4 py-2 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors flex items-center gap-2"
+              className="bg-blue-500 text-white px-4 py-2 rounded-xl font-medium hover:bg-blue-600 transition-colors flex items-center gap-2"
             >
               <FaPlus />
               <span>Add Checklist</span>
@@ -1135,7 +1323,7 @@ export default function CollegeDetail() {
           {backendChecklists.map((checklist) => (
             <div
               key={checklist.id}
-              className="bg-[#141414] border border-neutral-700/50 rounded-lg overflow-hidden"
+              className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl overflow-hidden"
             >
               <button
                 onClick={() => toggleChecklist(checklist.id)}
@@ -1144,16 +1332,16 @@ export default function CollegeDetail() {
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div className="flex items-center gap-4 flex-1">
                     {expandedChecklists.has(checklist.id) ? (
-                      <FaChevronDown className="text-[#FEEBD8]/50 flex-shrink-0" />
+                      <FaChevronDown className="text-white/50 flex-shrink-0" />
                     ) : (
-                      <FaChevronRight className="text-[#FEEBD8]/50 flex-shrink-0" />
+                      <FaChevronRight className="text-white/50 flex-shrink-0" />
                     )}
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-lg font-semibold text-[#FEEBD8]">
+                      <h3 className="text-lg font-semibold text-white">
                         {checklist.name}
                       </h3>
                       <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mt-2">
-                        <div className="text-sm text-[#FEEBD8]/70">
+                        <div className="text-sm text-white/70">
                           {
                             checklist.tasks.filter((task) => task.completed)
                               .length
@@ -1161,9 +1349,9 @@ export default function CollegeDetail() {
                           of {checklist.tasks.length} completed
                         </div>
                         <div className="flex items-center gap-2">
-                          <div className="w-24 sm:w-32 bg-neutral-700 rounded-full h-2">
+                          <div className="w-24 sm:w-32 bg-neutral-700/50 rounded-full h-2">
                             <div
-                              className="bg-gradient-to-r from-[#FEEBD8] to-[#E5D5B7] h-2 rounded-full transition-all duration-300"
+                              className="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full transition-all duration-300"
                               style={{
                                 width: `${
                                   checklist.tasks.length > 0
@@ -1179,7 +1367,7 @@ export default function CollegeDetail() {
                               }}
                             ></div>
                           </div>
-                          <span className="text-sm text-[#FEEBD8]/70">
+                          <span className="text-sm text-white/70">
                             {checklist.tasks.length > 0
                               ? Math.round(
                                   (checklist.tasks.filter(
@@ -1230,7 +1418,7 @@ export default function CollegeDetail() {
                     {checklist.tasks.map((task) => (
                       <div
                         key={task.id}
-                        className="p-4 bg-neutral-800/30 rounded-lg border border-neutral-700/30 cursor-pointer hover:bg-neutral-800/40 transition-colors"
+                        className="p-4 bg-neutral-800/30 rounded-xl border border-neutral-700/30 cursor-pointer hover:bg-neutral-800/40 transition-colors"
                         onClick={() => {
                           if (
                             task.priority ||
@@ -1274,14 +1462,14 @@ export default function CollegeDetail() {
                               <h4
                                 className={`text-lg font-medium ${
                                   task.completed
-                                    ? "text-[#FEEBD8]/70 line-through"
-                                    : "text-[#FEEBD8]"
+                                    ? "text-white/70 line-through"
+                                    : "text-white"
                                 }`}
                               >
                                 {task.name}
                               </h4>
                               {task.deadline && (
-                                <div className="text-sm text-[#FEEBD8]/50 mt-1 flex items-center gap-1">
+                                <div className="text-sm text-white/50 mt-1 flex items-center gap-1">
                                   <FaCalendar />
                                   Due: {formatDeadline(task.deadline)}
                                   {(() => {
@@ -1319,7 +1507,7 @@ export default function CollegeDetail() {
                                   e.stopPropagation();
                                   toggleTask(task.id);
                                 }}
-                                className="text-[#FEEBD8]/50 hover:text-[#FEEBD8] transition-colors flex-shrink-0"
+                                className="text-white/50 hover:text-white transition-colors flex-shrink-0"
                                 title={
                                   expandedTasks.has(task.id)
                                     ? "Show less"
@@ -1341,7 +1529,7 @@ export default function CollegeDetail() {
                                 setEditingTaskId(task.id);
                                 setShowEditTaskModal(true);
                               }}
-                              className="text-[#FEEBD8]/50 hover:text-yellow-400 transition-colors flex-shrink-0"
+                              className="text-white/50 hover:text-yellow-400 transition-colors flex-shrink-0"
                               title="Edit Task"
                             >
                               <FaEdit />
@@ -1351,7 +1539,7 @@ export default function CollegeDetail() {
                                 e.stopPropagation();
                                 handleDeleteTask(checklist.id, task.id);
                               }}
-                              className="text-[#FEEBD8]/50 hover:text-red-400 transition-colors flex-shrink-0"
+                              className="text-white/50 hover:text-red-400 transition-colors flex-shrink-0"
                               title="Delete Task"
                             >
                               <FaTrash />
@@ -1369,7 +1557,7 @@ export default function CollegeDetail() {
                               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-3">
                                 {task.priority && (
                                   <div className="flex items-center gap-2">
-                                    <span className="text-[#FEEBD8]/50 text-xs">
+                                    <span className="text-white/50 text-xs">
                                       Priority:
                                     </span>
                                     <span
@@ -1383,7 +1571,7 @@ export default function CollegeDetail() {
                                 )}
                                 {task.status && (
                                   <div className="flex items-center gap-2">
-                                    <span className="text-[#FEEBD8]/50 text-xs">
+                                    <span className="text-white/50 text-xs">
                                       Status:
                                     </span>
                                     <span className="px-2 py-1 bg-blue-500/20 text-blue-300 rounded-full text-xs font-medium">
@@ -1393,7 +1581,7 @@ export default function CollegeDetail() {
                                 )}
                                 {task.responsible && (
                                   <div className="flex items-center gap-2">
-                                    <span className="text-[#FEEBD8]/50 text-xs">
+                                    <span className="text-white/50 text-xs">
                                       Assigned:
                                     </span>
                                     <span className="px-2 py-1 bg-purple-500/20 text-purple-300 rounded-full text-xs font-medium">
@@ -1403,7 +1591,7 @@ export default function CollegeDetail() {
                                 )}
                                 {task.type && (
                                   <div className="flex items-center gap-2">
-                                    <span className="text-[#FEEBD8]/50 text-xs">
+                                    <span className="text-white/50 text-xs">
                                       Type:
                                     </span>
                                     <span className="px-2 py-1 bg-orange-500/20 text-orange-300 rounded-full text-xs font-medium">
@@ -1418,7 +1606,7 @@ export default function CollegeDetail() {
                               <div className="mt-3 pt-3 border-t border-neutral-700/30">
                                 {task.component && (
                                   <div className="mb-2">
-                                    <span className="text-[#FEEBD8]/50 text-xs">
+                                    <span className="text-white/50 text-xs">
                                       Component:{" "}
                                     </span>
                                     <span className="px-2 py-1 bg-teal-500/20 text-teal-300 rounded-full text-xs font-medium">
@@ -1428,10 +1616,10 @@ export default function CollegeDetail() {
                                 )}
                                 {task.notes && (
                                   <div>
-                                    <span className="text-[#FEEBD8]/50 text-xs">
+                                    <span className="text-white/50 text-xs">
                                       Notes:{" "}
                                     </span>
-                                    <span className="text-[#FEEBD8]/70 text-sm">
+                                    <span className="text-white/70 text-sm">
                                       {task.notes}
                                     </span>
                                   </div>
@@ -1447,7 +1635,7 @@ export default function CollegeDetail() {
                         setSelectedChecklistForTask(checklist.id);
                         setShowAddTaskModal(true);
                       }}
-                      className="w-full p-3 border border-neutral-600 border-dashed rounded-lg text-[#FEEBD8]/50 hover:text-[#FEEBD8] hover:border-[#FEEBD8]/30 transition-colors flex items-center justify-center gap-2"
+                      className="w-full p-3 border border-neutral-600 border-dashed rounded-xl text-white/50 hover:text-white hover:border-blue-500/30 transition-colors flex items-center justify-center gap-2"
                     >
                       <FaPlus />
                       <span>Add Task</span>
@@ -1466,9 +1654,9 @@ export default function CollegeDetail() {
       {/* Edit College Modal */}
       {showEditCollegeModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-[#1a1a1a] border border-neutral-700/50 rounded-lg p-4 sm:p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-[#1a1a1a] border border-neutral-700/50 rounded-xl p-4 sm:p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg sm:text-xl font-semibold text-[#FEEBD8]">
+              <h2 className="text-lg sm:text-xl font-semibold text-white">
                 Edit College Information
               </h2>
               <button
@@ -1478,20 +1666,20 @@ export default function CollegeDetail() {
                   setTagsInput("");
                   setActiveEditTab("basic");
                 }}
-                className="text-[#FEEBD8]/50 hover:text-[#FEEBD8] transition-colors"
+                className="text-white/50 hover:text-white transition-colors"
               >
                 <FaTimes size={20} />
               </button>
             </div>
 
             {/* Tab Navigation */}
-            <div className="flex space-x-1 mb-6 bg-neutral-800/50 p-1 rounded-lg">
+            <div className="flex space-x-1 mb-6 bg-neutral-800/50 p-1 rounded-xl">
               <button
                 onClick={() => setActiveEditTab("basic")}
                 className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
                   activeEditTab === "basic"
-                    ? "bg-[#FEEBD8] text-[#141414]"
-                    : "text-[#FEEBD8]/70 hover:text-[#FEEBD8] hover:bg-neutral-700/50"
+                    ? "bg-blue-500/20 text-blue-400 border border-blue-500/30"
+                    : "text-white/70 hover:text-white hover:bg-neutral-700/50"
                 }`}
               >
                 Basic Info
@@ -1500,8 +1688,8 @@ export default function CollegeDetail() {
                 onClick={() => setActiveEditTab("application")}
                 className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
                   activeEditTab === "application"
-                    ? "bg-[#FEEBD8] text-[#141414]"
-                    : "text-[#FEEBD8]/70 hover:text-[#FEEBD8] hover:bg-neutral-700/50"
+                    ? "bg-blue-500/20 text-blue-400 border border-blue-500/30"
+                    : "text-white/70 hover:text-white hover:bg-neutral-700/50"
                 }`}
               >
                 Application
@@ -1510,8 +1698,8 @@ export default function CollegeDetail() {
                 onClick={() => setActiveEditTab("additional")}
                 className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
                   activeEditTab === "additional"
-                    ? "bg-[#FEEBD8] text-[#141414]"
-                    : "text-[#FEEBD8]/70 hover:text-[#FEEBD8] hover:bg-neutral-700/50"
+                    ? "bg-blue-500/20 text-blue-400 border border-blue-500/30"
+                    : "text-white/70 hover:text-white hover:bg-neutral-700/50"
                 }`}
               >
                 Additional
@@ -1524,7 +1712,7 @@ export default function CollegeDetail() {
               {activeEditTab === "basic" && (
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-[#FEEBD8]/70 text-sm mb-2">
+                    <label className="block text-white/70 text-sm mb-2">
                       University Name
                     </label>
                     <input
@@ -1538,13 +1726,13 @@ export default function CollegeDetail() {
                           universityName: e.target.value,
                         }))
                       }
-                      className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
+                      className="w-full bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-3 text-white"
                     />
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-[#FEEBD8]/70 text-sm mb-2">
+                      <label className="block text-white/70 text-sm mb-2">
                         State
                       </label>
                       <input
@@ -1560,13 +1748,13 @@ export default function CollegeDetail() {
                             universityState: e.target.value,
                           }))
                         }
-                        className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
+                        className="w-full bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-3 text-white"
                         placeholder="e.g., California"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-[#FEEBD8]/70 text-sm mb-2">
+                      <label className="block text-white/70 text-sm mb-2">
                         Country
                       </label>
                       <input
@@ -1582,7 +1770,7 @@ export default function CollegeDetail() {
                             universityCountry: e.target.value,
                           }))
                         }
-                        className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
+                        className="w-full bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-3 text-white"
                         placeholder="e.g., United States"
                       />
                     </div>
@@ -1590,7 +1778,7 @@ export default function CollegeDetail() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-[#FEEBD8]/70 text-sm mb-2">
+                      <label className="block text-white/70 text-sm mb-2">
                         Major
                       </label>
                       <input
@@ -1602,41 +1790,39 @@ export default function CollegeDetail() {
                             major: e.target.value,
                           }))
                         }
-                        className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
+                        className="w-full bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-3 text-white"
                         placeholder="e.g., Computer Science"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-[#FEEBD8]/70 text-sm mb-2">
+                      <label className="block text-white/70 text-sm mb-2">
                         Priority Level
                       </label>
-                      <select
+                      <CustomSelect
                         value={editForm.priority || college?.priority || ""}
-                        onChange={(e) =>
+                        onChange={(value) =>
                           setEditForm((prev) => ({
                             ...prev,
-                            priority: e.target.value
-                              ? (e.target.value as
-                                  | "Safety"
-                                  | "Target"
-                                  | "Reach")
+                            priority: value
+                              ? (value as "Safety" | "Target" | "Reach")
                               : undefined,
                           }))
                         }
-                        className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
-                      >
-                        <option value="">Select Priority Level</option>
-                        <option value="Safety">Safety</option>
-                        <option value="Target">Target</option>
-                        <option value="Reach">Reach</option>
-                      </select>
+                        options={[
+                          { value: "", label: "Select Priority Level" },
+                          { value: "Safety", label: "Safety" },
+                          { value: "Target", label: "Target" },
+                          { value: "Reach", label: "Reach" },
+                        ]}
+                        placeholder="Select Priority Level"
+                      />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-[#FEEBD8]/70 text-sm mb-2">
+                      <label className="block text-white/70 text-sm mb-2">
                         Website(s)
                       </label>
                       <input
@@ -1652,13 +1838,13 @@ export default function CollegeDetail() {
                             universityWebsite: e.target.value,
                           }))
                         }
-                        className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
+                        className="w-full bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-3 text-white"
                         placeholder="e.g., https://www.university.edu"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-[#FEEBD8]/70 text-sm mb-2">
+                      <label className="block text-white/70 text-sm mb-2">
                         Contact Email
                       </label>
                       <input
@@ -1672,7 +1858,7 @@ export default function CollegeDetail() {
                             contactEmail: e.target.value,
                           }))
                         }
-                        className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
+                        className="w-full bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-3 text-white"
                         placeholder="admissions@university.edu"
                       />
                     </div>
@@ -1685,56 +1871,61 @@ export default function CollegeDetail() {
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-[#FEEBD8]/70 text-sm mb-2">
+                      <label className="block text-white/70 text-sm mb-2">
                         Status
                       </label>
-                      <select
+                      <CustomSelect
                         value={editForm.status || college?.status || ""}
-                        onChange={(e) =>
+                        onChange={(value) =>
                           setEditForm((prev) => ({
                             ...prev,
-                            status: e.target.value,
+                            status: value,
                           }))
                         }
-                        className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
-                      >
-                        <option value="not_started">Not Started</option>
-                        <option value="in_progress">In Progress</option>
-                        <option value="submitted">Submitted</option>
-                        <option value="under_review">Under Review</option>
-                        <option value="accepted">Accepted</option>
-                        <option value="rejected">Rejected</option>
-                        <option value="deferred">Deferred</option>
-                        <option value="waitlisted">Waitlisted</option>
-                        <option value="withdrawn">Withdrawn</option>
-                      </select>
+                        options={[
+                          { value: "not_started", label: "Not Started" },
+                          { value: "in_progress", label: "In Progress" },
+                          { value: "submitted", label: "Submitted" },
+                          { value: "under_review", label: "Under Review" },
+                          { value: "accepted", label: "Accepted" },
+                          { value: "rejected", label: "Rejected" },
+                          { value: "deferred", label: "Deferred" },
+                          { value: "waitlisted", label: "Waitlisted" },
+                          { value: "withdrawn", label: "Withdrawn" },
+                        ]}
+                        placeholder="Select status"
+                      />
                     </div>
 
                     <div>
-                      <label className="block text-[#FEEBD8]/70 text-sm mb-2">
+                      <label className="block text-white/70 text-sm mb-2">
                         Application Type
                       </label>
-                      <select
+                      <CustomSelect
                         value={editForm.type || college?.type || ""}
-                        onChange={(e) =>
+                        onChange={(value) =>
                           setEditForm((prev) => ({
                             ...prev,
-                            type: e.target.value,
+                            type: value,
                           }))
                         }
-                        className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
-                      >
-                        <option value="early_decision">
-                          Early Decision (ED)
-                        </option>
-                        <option value="early_action">Early Action (EA)</option>
-                        <option value="regular_decision">
-                          Regular Decision (RD)
-                        </option>
-                        <option value="rolling_admission">
-                          Rolling Admission
-                        </option>
-                      </select>
+                        options={[
+                          {
+                            value: "early_decision",
+                            label: "Early Decision (ED)",
+                          },
+                          { value: "early_action", label: "Early Action (EA)" },
+                          {
+                            value: "regular_decision",
+                            label: "Regular Decision (RD)",
+                          },
+                          {
+                            value: "rolling_admission",
+                            label: "Rolling Admission",
+                          },
+                        ]}
+                        placeholder="Select application type"
+                      />
                     </div>
                   </div>
 
@@ -1754,7 +1945,7 @@ export default function CollegeDetail() {
                     />
 
                     <div>
-                      <label className="block text-[#FEEBD8]/70 text-sm mb-2">
+                      <label className="block text-white/70 text-sm mb-2">
                         Application Fee ($)
                       </label>
                       <input
@@ -1770,7 +1961,7 @@ export default function CollegeDetail() {
                             applicationFee: Number(e.target.value),
                           }))
                         }
-                        className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
+                        className="w-full bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-3 text-white"
                         placeholder="0"
                       />
                     </div>
@@ -1782,7 +1973,7 @@ export default function CollegeDetail() {
               {activeEditTab === "additional" && (
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-[#FEEBD8]/70 text-sm mb-2">
+                    <label className="block text-white/70 text-sm mb-2">
                       Tags (comma separated)
                     </label>
                     <input
@@ -1800,13 +1991,13 @@ export default function CollegeDetail() {
                           tags: processedTags,
                         }));
                       }}
-                      className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
+                      className="w-full bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-3 text-white"
                       placeholder="e.g., Ivy League, Engineering, Research"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[#FEEBD8]/70 text-sm mb-2">
+                    <label className="block text-white/70 text-sm mb-2">
                       Notes
                     </label>
                     <textarea
@@ -1817,7 +2008,7 @@ export default function CollegeDetail() {
                           notes: e.target.value,
                         }))
                       }
-                      className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8] h-32 resize-none"
+                      className="w-full bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-3 text-white h-32 resize-none"
                       placeholder="Add any notes about this college..."
                     />
                   </div>
@@ -1828,7 +2019,7 @@ export default function CollegeDetail() {
               <div className="flex flex-col sm:flex-row gap-3 pt-6 border-t border-neutral-700/50">
                 <button
                   onClick={handleSaveCollege}
-                  className="flex-1 bg-[#FEEBD8] text-[#141414] px-4 py-3 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors"
+                  className="flex-1 bg-blue-500 text-white px-4 py-3 rounded-xl font-medium hover:bg-blue-600 transition-colors"
                 >
                   Save Changes
                 </button>
@@ -1839,9 +2030,30 @@ export default function CollegeDetail() {
                     setTagsInput("");
                     setActiveEditTab("basic");
                   }}
-                  className="px-4 py-3 border border-neutral-700/50 rounded-lg text-[#FEEBD8]/70 hover:text-[#FEEBD8] hover:border-[#FEEBD8]/30 transition-colors"
+                  className="px-4 py-3 border border-neutral-700/50 rounded-xl text-white/70 hover:text-white hover:border-white/20 transition-colors"
                 >
                   Cancel
+                </button>
+                <button
+                  onClick={async () => {
+                    if (
+                      window.confirm(
+                        `Are you sure you want to delete this application for ${college?.universityName}? This action cannot be undone.`
+                      )
+                    ) {
+                      try {
+                        await api.collegeApplications.delete(collegeId);
+                        showSuccess("Application deleted successfully");
+                        router.push("/dashboard/colleges");
+                      } catch (error) {
+                        showError("Failed to delete application");
+                      }
+                    }
+                  }}
+                  className="bg-red-500/10 text-red-400 px-4 py-3 rounded-xl font-medium hover:bg-red-500/20 border border-red-500/30 transition-colors flex items-center gap-2 justify-center"
+                >
+                  <FaTrash className="text-sm" />
+                  Delete
                 </button>
               </div>
             </div>
@@ -1852,9 +2064,9 @@ export default function CollegeDetail() {
       {/* Edit Checklist Modal */}
       {showEditChecklistModal && editingChecklist && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-[#1a1a1a] border border-neutral-700/50 rounded-lg p-4 sm:p-6 w-full max-w-md">
+          <div className="bg-[#1a1a1a] border border-neutral-700/50 rounded-xl p-4 sm:p-6 w-full max-w-md">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg sm:text-xl font-semibold text-[#FEEBD8]">
+              <h2 className="text-lg sm:text-xl font-semibold text-white">
                 Edit Checklist
               </h2>
               <button
@@ -1863,7 +2075,7 @@ export default function CollegeDetail() {
                   setEditingChecklist(null);
                   setEditingChecklistId(null);
                 }}
-                className="text-[#FEEBD8]/50 hover:text-[#FEEBD8] transition-colors"
+                className="text-white/50 hover:text-white transition-colors"
               >
                 <FaTimes size={20} />
               </button>
@@ -1871,7 +2083,7 @@ export default function CollegeDetail() {
 
             <div className="space-y-4">
               <div>
-                <label className="block text-[#FEEBD8]/70 text-sm mb-2">
+                <label className="block text-white/70 text-sm mb-2">
                   Checklist Name
                 </label>
                 <input
@@ -1882,12 +2094,12 @@ export default function CollegeDetail() {
                       prev ? { ...prev, name: e.target.value } : null
                     )
                   }
-                  className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
+                  className="w-full bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-3 text-white"
                 />
               </div>
 
               <div>
-                <label className="block text-[#FEEBD8]/70 text-sm mb-2">
+                <label className="block text-white/70 text-sm mb-2">
                   Category
                 </label>
                 <select
@@ -1899,20 +2111,43 @@ export default function CollegeDetail() {
                         : null
                     )
                   }
-                  className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
+                  className="w-full bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-3 text-white"
                 >
-                  <option value="application">Application</option>
-                  <option value="financial_aid">Financial Aid</option>
-                  <option value="scholarship">Scholarship</option>
-                  <option value="housing">Housing</option>
-                  <option value="academic">Academic</option>
-                  <option value="personal">Personal</option>
-                  <option value="other">Other</option>
+                  <option
+                    className="bg-[#1a1a1a] text-white"
+                    value="application"
+                  >
+                    Application
+                  </option>
+                  <option
+                    className="bg-[#1a1a1a] text-white"
+                    value="financial_aid"
+                  >
+                    Financial Aid
+                  </option>
+                  <option
+                    className="bg-[#1a1a1a] text-white"
+                    value="scholarship"
+                  >
+                    Scholarship
+                  </option>
+                  <option className="bg-[#1a1a1a] text-white" value="housing">
+                    Housing
+                  </option>
+                  <option className="bg-[#1a1a1a] text-white" value="academic">
+                    Academic
+                  </option>
+                  <option className="bg-[#1a1a1a] text-white" value="personal">
+                    Personal
+                  </option>
+                  <option className="bg-[#1a1a1a] text-white" value="other">
+                    Other
+                  </option>
                 </select>
               </div>
 
               <div>
-                <label className="block text-[#FEEBD8]/70 text-sm mb-2">
+                <label className="block text-white/70 text-sm mb-2">
                   Description
                 </label>
                 <textarea
@@ -1922,7 +2157,7 @@ export default function CollegeDetail() {
                       prev ? { ...prev, description: e.target.value } : null
                     )
                   }
-                  className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8] h-20 resize-none"
+                  className="w-full bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-3 text-white h-20 resize-none"
                   placeholder="Optional description..."
                 />
               </div>
@@ -1953,7 +2188,7 @@ export default function CollegeDetail() {
                     }
                   }}
                   disabled={!editingChecklist?.name.trim()}
-                  className="flex-1 bg-[#FEEBD8] text-[#141414] px-4 py-2 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 bg-blue-500 text-white px-4 py-2 rounded-xl font-medium hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Save Changes
                 </button>
@@ -1963,7 +2198,7 @@ export default function CollegeDetail() {
                     setEditingChecklist(null);
                     setEditingChecklistId(null);
                   }}
-                  className="px-4 py-2 border border-neutral-700/50 rounded-lg text-[#FEEBD8]/70 hover:text-[#FEEBD8] hover:border-[#FEEBD8]/30 transition-colors"
+                  className="px-4 py-2 border border-neutral-700/50 rounded-xl text-white/70 hover:text-white hover:border-[#FEEBD8]/30 transition-colors"
                 >
                   Cancel
                 </button>
@@ -1976,14 +2211,14 @@ export default function CollegeDetail() {
       {/* Add Checklist Modal */}
       {showAddChecklistModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-[#1a1a1a] border border-neutral-700/50 rounded-lg p-4 sm:p-6 w-full max-w-md">
+          <div className="bg-[#1a1a1a] border border-neutral-700/50 rounded-xl p-4 sm:p-6 w-full max-w-md">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg sm:text-xl font-semibold text-[#FEEBD8]">
+              <h2 className="text-lg sm:text-xl font-semibold text-white">
                 Add New Checklist
               </h2>
               <button
                 onClick={() => setShowAddChecklistModal(false)}
-                className="text-[#FEEBD8]/50 hover:text-[#FEEBD8] transition-colors"
+                className="text-white/50 hover:text-white transition-colors"
               >
                 <FaTimes size={20} />
               </button>
@@ -2001,13 +2236,13 @@ export default function CollegeDetail() {
               className="space-y-4"
             >
               <div>
-                <label className="block text-[#FEEBD8]/70 text-sm mb-2">
+                <label className="block text-white/70 text-sm mb-2">
                   Checklist Name
                 </label>
                 <input
                   name="name"
                   type="text"
-                  className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
+                  className="w-full bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-3 text-white"
                   placeholder="e.g., Essay Requirements"
                   required
                 />
@@ -2015,14 +2250,14 @@ export default function CollegeDetail() {
               <div className="flex flex-col sm:flex-row gap-3 pt-4">
                 <button
                   type="submit"
-                  className="flex-1 bg-[#FEEBD8] text-[#141414] px-4 py-2 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors"
+                  className="flex-1 bg-blue-500 text-white px-4 py-2 rounded-xl font-medium hover:bg-blue-600 transition-colors"
                 >
                   Add Checklist
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowAddChecklistModal(false)}
-                  className="px-4 py-2 border border-neutral-700/50 rounded-lg text-[#FEEBD8]/70 hover:text-[#FEEBD8] hover:border-[#FEEBD8]/30 transition-colors"
+                  className="px-4 py-2 border border-neutral-700/50 rounded-xl text-white/70 hover:text-white hover:border-[#FEEBD8]/30 transition-colors"
                 >
                   Cancel
                 </button>
@@ -2035,17 +2270,15 @@ export default function CollegeDetail() {
       {/* Add Task Modal */}
       {showAddTaskModal && selectedChecklistForTask && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-[#1a1a1a] border border-neutral-700/50 rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-[#FEEBD8]">
-                Add New Task
-              </h2>
+              <h2 className="text-xl font-semibold text-white">Add New Task</h2>
               <button
                 onClick={() => {
                   setShowAddTaskModal(false);
                   setSelectedChecklistForTask(null);
                 }}
-                className="text-[#FEEBD8]/50 hover:text-[#FEEBD8] transition-colors"
+                className="text-white/50 hover:text-white transition-colors"
               >
                 <FaTimes size={20} />
               </button>
@@ -2097,7 +2330,7 @@ export default function CollegeDetail() {
               className="space-y-4"
             >
               <div>
-                <label className="block text-[#FEEBD8]/70 text-sm mb-2">
+                <label className="block text-white/70 text-sm mb-2">
                   Task Name
                 </label>
                 <input
@@ -2109,7 +2342,7 @@ export default function CollegeDetail() {
                       name: e.target.value,
                     }))
                   }
-                  className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
+                  className="w-full bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-3 text-white"
                   placeholder="e.g., Write personal statement"
                   required
                 />
@@ -2126,7 +2359,7 @@ export default function CollegeDetail() {
                 />
 
                 <div>
-                  <label className="block text-[#FEEBD8]/70 text-sm mb-2">
+                  <label className="block text-white/70 text-sm mb-2">
                     Priority
                   </label>
                   <select
@@ -2137,18 +2370,24 @@ export default function CollegeDetail() {
                         priority: e.target.value as TaskPriority,
                       }))
                     }
-                    className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
+                    className="w-full bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-3 text-white"
                   >
-                    <option value="low">Low</option>
-                    <option value="medium">Medium</option>
-                    <option value="high">High</option>
+                    <option className="bg-[#1a1a1a] text-white" value="low">
+                      Low
+                    </option>
+                    <option className="bg-[#1a1a1a] text-white" value="medium">
+                      Medium
+                    </option>
+                    <option className="bg-[#1a1a1a] text-white" value="high">
+                      High
+                    </option>
                   </select>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[#FEEBD8]/70 text-sm mb-2">
+                  <label className="block text-white/70 text-sm mb-2">
                     Task Type
                   </label>
                   <select
@@ -2159,23 +2398,52 @@ export default function CollegeDetail() {
                         type: e.target.value as TaskType,
                       }))
                     }
-                    className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
+                    className="w-full bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-3 text-white"
                   >
-                    <option value="document_preparation">
+                    <option
+                      className="bg-[#1a1a1a] text-white"
+                      value="document_preparation"
+                    >
                       Document Preparation
                     </option>
-                    <option value="submission">Submission</option>
-                    <option value="review">Review</option>
-                    <option value="follow_up">Follow Up</option>
-                    <option value="research">Research</option>
-                    <option value="writing">Writing</option>
-                    <option value="scheduling">Scheduling</option>
-                    <option value="other">Other</option>
+                    <option
+                      className="bg-[#1a1a1a] text-white"
+                      value="submission"
+                    >
+                      Submission
+                    </option>
+                    <option className="bg-[#1a1a1a] text-white" value="review">
+                      Review
+                    </option>
+                    <option
+                      className="bg-[#1a1a1a] text-white"
+                      value="follow_up"
+                    >
+                      Follow Up
+                    </option>
+                    <option
+                      className="bg-[#1a1a1a] text-white"
+                      value="research"
+                    >
+                      Research
+                    </option>
+                    <option className="bg-[#1a1a1a] text-white" value="writing">
+                      Writing
+                    </option>
+                    <option
+                      className="bg-[#1a1a1a] text-white"
+                      value="scheduling"
+                    >
+                      Scheduling
+                    </option>
+                    <option className="bg-[#1a1a1a] text-white" value="other">
+                      Other
+                    </option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-[#FEEBD8]/70 text-sm mb-2">
+                  <label className="block text-white/70 text-sm mb-2">
                     Component
                   </label>
                   <select
@@ -2186,30 +2454,54 @@ export default function CollegeDetail() {
                         component: e.target.value as TaskComponent,
                       }))
                     }
-                    className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
+                    className="w-full bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-3 text-white"
                   >
-                    <option value="common_app">Common App</option>
-                    <option value="supplemental_essay">
+                    <option
+                      className="bg-[#1a1a1a] text-white"
+                      value="common_app"
+                    >
+                      Common App
+                    </option>
+                    <option
+                      className="bg-[#1a1a1a] text-white"
+                      value="supplemental_essay"
+                    >
                       Supplemental Essay
                     </option>
-                    <option value="academic_records">Academic Records</option>
-                    <option value="standardized_tests">
+                    <option
+                      className="bg-[#1a1a1a] text-white"
+                      value="academic_records"
+                    >
+                      Academic Records
+                    </option>
+                    <option
+                      className="bg-[#1a1a1a] text-white"
+                      value="standardized_tests"
+                    >
                       Standardized Tests
                     </option>
-                    <option value="supporting_documents">
+                    <option
+                      className="bg-[#1a1a1a] text-white"
+                      value="supporting_documents"
+                    >
                       Supporting Documents
                     </option>
-                    <option value="financial_documents">
+                    <option
+                      className="bg-[#1a1a1a] text-white"
+                      value="financial_documents"
+                    >
                       Financial Documents
                     </option>
-                    <option value="other">Other</option>
+                    <option className="bg-[#1a1a1a] text-white" value="other">
+                      Other
+                    </option>
                   </select>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[#FEEBD8]/70 text-sm mb-2">
+                  <label className="block text-white/70 text-sm mb-2">
                     Status
                   </label>
                   <select
@@ -2220,18 +2512,40 @@ export default function CollegeDetail() {
                         status: e.target.value as TaskStatus,
                       }))
                     }
-                    className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
+                    className="w-full bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-3 text-white"
                   >
-                    <option value="not_started">Not Started</option>
-                    <option value="in_progress">In Progress</option>
-                    <option value="under_review">Under Review</option>
-                    <option value="completed">Completed</option>
-                    <option value="waiting">Waiting</option>
+                    <option
+                      className="bg-[#1a1a1a] text-white"
+                      value="not_started"
+                    >
+                      Not Started
+                    </option>
+                    <option
+                      className="bg-[#1a1a1a] text-white"
+                      value="in_progress"
+                    >
+                      In Progress
+                    </option>
+                    <option
+                      className="bg-[#1a1a1a] text-white"
+                      value="under_review"
+                    >
+                      Under Review
+                    </option>
+                    <option
+                      className="bg-[#1a1a1a] text-white"
+                      value="completed"
+                    >
+                      Completed
+                    </option>
+                    <option className="bg-[#1a1a1a] text-white" value="waiting">
+                      Waiting
+                    </option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-[#FEEBD8]/70 text-sm mb-2">
+                  <label className="block text-white/70 text-sm mb-2">
                     Responsible Person
                   </label>
                   <select
@@ -2242,20 +2556,38 @@ export default function CollegeDetail() {
                         responsible: e.target.value as TaskResponsible,
                       }))
                     }
-                    className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
+                    className="w-full bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-3 text-white"
                   >
-                    <option value="student">Student</option>
-                    <option value="parent">Parent</option>
-                    <option value="counselor">Counselor</option>
-                    <option value="teacher">Teacher</option>
-                    <option value="school_office">School Office</option>
-                    <option value="other">Other</option>
+                    <option className="bg-[#1a1a1a] text-white" value="student">
+                      Student
+                    </option>
+                    <option className="bg-[#1a1a1a] text-white" value="parent">
+                      Parent
+                    </option>
+                    <option
+                      className="bg-[#1a1a1a] text-white"
+                      value="counselor"
+                    >
+                      Counselor
+                    </option>
+                    <option className="bg-[#1a1a1a] text-white" value="teacher">
+                      Teacher
+                    </option>
+                    <option
+                      className="bg-[#1a1a1a] text-white"
+                      value="school_office"
+                    >
+                      School Office
+                    </option>
+                    <option className="bg-[#1a1a1a] text-white" value="other">
+                      Other
+                    </option>
                   </select>
                 </div>
               </div>
 
               <div>
-                <label className="block text-[#FEEBD8]/70 text-sm mb-2">
+                <label className="block text-white/70 text-sm mb-2">
                   Notes
                 </label>
                 <textarea
@@ -2266,7 +2598,7 @@ export default function CollegeDetail() {
                       notes: e.target.value,
                     }))
                   }
-                  className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8] h-24 resize-none"
+                  className="w-full bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-3 text-white h-24 resize-none"
                   placeholder="Additional notes or details"
                 />
               </div>
@@ -2274,7 +2606,7 @@ export default function CollegeDetail() {
               <div className="flex flex-col sm:flex-row gap-3 pt-4">
                 <button
                   type="submit"
-                  className="flex-1 bg-[#FEEBD8] text-[#141414] px-4 py-2 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors"
+                  className="flex-1 bg-blue-500 text-white px-4 py-2 rounded-xl font-medium hover:bg-blue-600 transition-colors"
                 >
                   Add Task
                 </button>
@@ -2284,7 +2616,7 @@ export default function CollegeDetail() {
                     setShowAddTaskModal(false);
                     setSelectedChecklistForTask(null);
                   }}
-                  className="px-4 py-2 border border-neutral-700/50 rounded-lg text-[#FEEBD8]/70 hover:text-[#FEEBD8] hover:border-[#FEEBD8]/30 transition-colors"
+                  className="px-4 py-2 border border-neutral-700/50 rounded-xl text-white/70 hover:text-white hover:border-[#FEEBD8]/30 transition-colors"
                 >
                   Cancel
                 </button>
@@ -2297,11 +2629,9 @@ export default function CollegeDetail() {
       {/* Edit Task Modal */}
       {showEditTaskModal && editingTask && editingChecklistId && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-[#1a1a1a] border border-neutral-700/50 rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-[#FEEBD8]">
-                Edit Task
-              </h2>
+              <h2 className="text-xl font-semibold text-white">Edit Task</h2>
               <button
                 onClick={() => {
                   setShowEditTaskModal(false);
@@ -2309,7 +2639,7 @@ export default function CollegeDetail() {
                   setEditingChecklistId(null);
                   setEditingTaskId(null);
                 }}
-                className="text-[#FEEBD8]/50 hover:text-[#FEEBD8] transition-colors"
+                className="text-white/50 hover:text-white transition-colors"
               >
                 <FaTimes size={20} />
               </button>
@@ -2317,7 +2647,7 @@ export default function CollegeDetail() {
 
             <div className="space-y-4">
               <div>
-                <label className="block text-[#FEEBD8]/70 text-sm mb-2">
+                <label className="block text-white/70 text-sm mb-2">
                   Task Name
                 </label>
                 <input
@@ -2328,7 +2658,7 @@ export default function CollegeDetail() {
                       prev ? { ...prev, name: e.target.value } : null
                     )
                   }
-                  className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
+                  className="w-full bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-3 text-white"
                   placeholder="e.g., Write personal statement"
                 />
               </div>
@@ -2351,7 +2681,7 @@ export default function CollegeDetail() {
                 />
 
                 <div>
-                  <label className="block text-[#FEEBD8]/70 text-sm mb-2">
+                  <label className="block text-white/70 text-sm mb-2">
                     Priority
                   </label>
                   <select
@@ -2366,18 +2696,24 @@ export default function CollegeDetail() {
                           : null
                       )
                     }
-                    className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
+                    className="w-full bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-3 text-white"
                   >
-                    <option value="low">Low</option>
-                    <option value="medium">Medium</option>
-                    <option value="high">High</option>
+                    <option className="bg-[#1a1a1a] text-white" value="low">
+                      Low
+                    </option>
+                    <option className="bg-[#1a1a1a] text-white" value="medium">
+                      Medium
+                    </option>
+                    <option className="bg-[#1a1a1a] text-white" value="high">
+                      High
+                    </option>
                   </select>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[#FEEBD8]/70 text-sm mb-2">
+                  <label className="block text-white/70 text-sm mb-2">
                     Task Type
                   </label>
                   <select
@@ -2389,23 +2725,52 @@ export default function CollegeDetail() {
                           : null
                       )
                     }
-                    className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
+                    className="w-full bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-3 text-white"
                   >
-                    <option value="document_preparation">
+                    <option
+                      className="bg-[#1a1a1a] text-white"
+                      value="document_preparation"
+                    >
                       Document Preparation
                     </option>
-                    <option value="submission">Submission</option>
-                    <option value="review">Review</option>
-                    <option value="follow_up">Follow Up</option>
-                    <option value="research">Research</option>
-                    <option value="writing">Writing</option>
-                    <option value="scheduling">Scheduling</option>
-                    <option value="other">Other</option>
+                    <option
+                      className="bg-[#1a1a1a] text-white"
+                      value="submission"
+                    >
+                      Submission
+                    </option>
+                    <option className="bg-[#1a1a1a] text-white" value="review">
+                      Review
+                    </option>
+                    <option
+                      className="bg-[#1a1a1a] text-white"
+                      value="follow_up"
+                    >
+                      Follow Up
+                    </option>
+                    <option
+                      className="bg-[#1a1a1a] text-white"
+                      value="research"
+                    >
+                      Research
+                    </option>
+                    <option className="bg-[#1a1a1a] text-white" value="writing">
+                      Writing
+                    </option>
+                    <option
+                      className="bg-[#1a1a1a] text-white"
+                      value="scheduling"
+                    >
+                      Scheduling
+                    </option>
+                    <option className="bg-[#1a1a1a] text-white" value="other">
+                      Other
+                    </option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-[#FEEBD8]/70 text-sm mb-2">
+                  <label className="block text-white/70 text-sm mb-2">
                     Component
                   </label>
                   <select
@@ -2420,30 +2785,54 @@ export default function CollegeDetail() {
                           : null
                       )
                     }
-                    className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
+                    className="w-full bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-3 text-white"
                   >
-                    <option value="common_app">Common App</option>
-                    <option value="supplemental_essay">
+                    <option
+                      className="bg-[#1a1a1a] text-white"
+                      value="common_app"
+                    >
+                      Common App
+                    </option>
+                    <option
+                      className="bg-[#1a1a1a] text-white"
+                      value="supplemental_essay"
+                    >
                       Supplemental Essay
                     </option>
-                    <option value="academic_records">Academic Records</option>
-                    <option value="standardized_tests">
+                    <option
+                      className="bg-[#1a1a1a] text-white"
+                      value="academic_records"
+                    >
+                      Academic Records
+                    </option>
+                    <option
+                      className="bg-[#1a1a1a] text-white"
+                      value="standardized_tests"
+                    >
                       Standardized Tests
                     </option>
-                    <option value="supporting_documents">
+                    <option
+                      className="bg-[#1a1a1a] text-white"
+                      value="supporting_documents"
+                    >
                       Supporting Documents
                     </option>
-                    <option value="financial_documents">
+                    <option
+                      className="bg-[#1a1a1a] text-white"
+                      value="financial_documents"
+                    >
                       Financial Documents
                     </option>
-                    <option value="other">Other</option>
+                    <option className="bg-[#1a1a1a] text-white" value="other">
+                      Other
+                    </option>
                   </select>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[#FEEBD8]/70 text-sm mb-2">
+                  <label className="block text-white/70 text-sm mb-2">
                     Status
                   </label>
                   <select
@@ -2455,18 +2844,40 @@ export default function CollegeDetail() {
                           : null
                       )
                     }
-                    className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
+                    className="w-full bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-3 text-white"
                   >
-                    <option value="not_started">Not Started</option>
-                    <option value="in_progress">In Progress</option>
-                    <option value="under_review">Under Review</option>
-                    <option value="completed">Completed</option>
-                    <option value="waiting">Waiting</option>
+                    <option
+                      className="bg-[#1a1a1a] text-white"
+                      value="not_started"
+                    >
+                      Not Started
+                    </option>
+                    <option
+                      className="bg-[#1a1a1a] text-white"
+                      value="in_progress"
+                    >
+                      In Progress
+                    </option>
+                    <option
+                      className="bg-[#1a1a1a] text-white"
+                      value="under_review"
+                    >
+                      Under Review
+                    </option>
+                    <option
+                      className="bg-[#1a1a1a] text-white"
+                      value="completed"
+                    >
+                      Completed
+                    </option>
+                    <option className="bg-[#1a1a1a] text-white" value="waiting">
+                      Waiting
+                    </option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-[#FEEBD8]/70 text-sm mb-2">
+                  <label className="block text-white/70 text-sm mb-2">
                     Responsible Person
                   </label>
                   <select
@@ -2481,20 +2892,38 @@ export default function CollegeDetail() {
                           : null
                       )
                     }
-                    className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8]"
+                    className="w-full bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-3 text-white"
                   >
-                    <option value="student">Student</option>
-                    <option value="parent">Parent</option>
-                    <option value="counselor">Counselor</option>
-                    <option value="teacher">Teacher</option>
-                    <option value="school_office">School Office</option>
-                    <option value="other">Other</option>
+                    <option className="bg-[#1a1a1a] text-white" value="student">
+                      Student
+                    </option>
+                    <option className="bg-[#1a1a1a] text-white" value="parent">
+                      Parent
+                    </option>
+                    <option
+                      className="bg-[#1a1a1a] text-white"
+                      value="counselor"
+                    >
+                      Counselor
+                    </option>
+                    <option className="bg-[#1a1a1a] text-white" value="teacher">
+                      Teacher
+                    </option>
+                    <option
+                      className="bg-[#1a1a1a] text-white"
+                      value="school_office"
+                    >
+                      School Office
+                    </option>
+                    <option className="bg-[#1a1a1a] text-white" value="other">
+                      Other
+                    </option>
                   </select>
                 </div>
               </div>
 
               <div>
-                <label className="block text-[#FEEBD8]/70 text-sm mb-2">
+                <label className="block text-white/70 text-sm mb-2">
                   Notes
                 </label>
                 <textarea
@@ -2504,7 +2933,7 @@ export default function CollegeDetail() {
                       prev ? { ...prev, notes: e.target.value } : null
                     )
                   }
-                  className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg p-3 text-[#FEEBD8] h-24 resize-none"
+                  className="w-full bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-3 text-white h-24 resize-none"
                   placeholder="Additional notes or details"
                 />
               </div>
@@ -2519,11 +2948,11 @@ export default function CollegeDetail() {
                       prev ? { ...prev, completed: e.target.checked } : null
                     )
                   }
-                  className="w-4 h-4 text-[#FEEBD8] bg-[#141414] border-neutral-700/50 rounded focus:ring-[#FEEBD8] focus:ring-2"
+                  className="w-4 h-4 text-white bg-gradient-to-br from-[#141414] to-[#1a1a1a] border-neutral-700/50 rounded focus:ring-[#FEEBD8] focus:ring-2"
                 />
                 <label
                   htmlFor="completed-edit"
-                  className="text-[#FEEBD8]/70 text-sm"
+                  className="text-white/70 text-sm"
                 >
                   Mark as completed
                 </label>
@@ -2561,7 +2990,7 @@ export default function CollegeDetail() {
                     }
                   }}
                   disabled={!editingTask?.name.trim()}
-                  className="flex-1 bg-[#FEEBD8] text-[#141414] px-4 py-2 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 bg-blue-500 text-white px-4 py-2 rounded-xl font-medium hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Save Changes
                 </button>
@@ -2572,7 +3001,7 @@ export default function CollegeDetail() {
                     setEditingChecklistId(null);
                     setEditingTaskId(null);
                   }}
-                  className="px-4 py-2 border border-neutral-700/50 rounded-lg text-[#FEEBD8]/70 hover:text-[#FEEBD8] hover:border-[#FEEBD8]/30 transition-colors"
+                  className="px-4 py-2 border border-neutral-700/50 rounded-xl text-white/70 hover:text-white hover:border-[#FEEBD8]/30 transition-colors"
                 >
                   Cancel
                 </button>

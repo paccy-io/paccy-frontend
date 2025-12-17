@@ -13,8 +13,14 @@ export default {
         foreground: "var(--foreground)",
       },
       fontFamily: {
-        sans: ["var(--font-inter)", "var(--font-geist-sans)", "sans-serif"],
+        sans: [
+          "var(--font-lexend)",
+          "var(--font-inter)",
+          "var(--font-geist-sans)",
+          "sans-serif",
+        ],
         mono: ["var(--font-geist-mono)", "monospace"],
+        lexend: ["var(--font-lexend)", "sans-serif"],
         "climate-crisis": ["var(--font-climate-crisis)", "sans-serif"],
       },
     },

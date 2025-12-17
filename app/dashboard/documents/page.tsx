@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
 import AddDocumentModal from "../../../components/Modals/AddDocumentModal";
 import EditDocumentModal from "../../../components/Modals/EditDocumentModal";
@@ -211,65 +210,63 @@ export default function DocumentOrganizer() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a]">
-      <Navbar />
-
-      <div className="max-w-screen-2xl mx-auto px-4 md:px-10 py-8 pt-28">
+      <div className="max-w-screen-2xl mx-auto px-4 md:px-10 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center gap-4">
             <Link
               href="/dashboard"
-              className="text-[#FEEBD8]/70 hover:text-[#FEEBD8] transition-colors"
+              className="text-white/70 hover:text-white transition-colors"
             >
               <FaArrowLeft size={20} />
             </Link>
-            <div>
-              <h1 className="text-4xl font-bold text-[#FEEBD8]">
-                Document Organizer
+            <div className="flex-1 min-w-0">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white">
+                Documents
               </h1>
-              <p className="text-[#FEEBD8]/70 mt-2">
+              <p className="text-white/70 mt-2 text-sm sm:text-base">
                 Keep all your application files organized
               </p>
             </div>
           </div>
           <button
             onClick={() => setIsAddDocumentModalOpen(true)}
-            className="bg-[#FEEBD8] text-[#141414] px-6 py-3 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors flex items-center space-x-2"
+            className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-blue-600 hover:to-blue-700 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/20 flex items-center gap-2"
           >
             <FaPlus />
-            <span>Upload Document</span>
+            <span className="hidden sm:inline">Upload Document</span>
           </button>
         </div>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
-            <div className="text-2xl font-bold text-[#FEEBD8] mb-1">
+          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6">
+            <div className="text-3xl font-bold text-white mb-1">
               {documents.length}
             </div>
-            <div className="text-[#FEEBD8]/70 text-sm">Total Documents</div>
+            <div className="text-white/60 text-sm">Total Documents</div>
           </div>
 
-          <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
-            <div className="text-2xl font-bold text-green-400 mb-1">
+          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6">
+            <div className="text-3xl font-bold text-green-400 mb-1">
               {
                 documents.filter(
                   (d) => d.status === "Verified" || d.status === "Official"
                 ).length
               }
             </div>
-            <div className="text-[#FEEBD8]/70 text-sm">Verified</div>
+            <div className="text-white/60 text-sm">Verified</div>
           </div>
 
-          <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
-            <div className="text-2xl font-bold text-blue-400 mb-1">
+          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6">
+            <div className="text-3xl font-bold text-blue-400 mb-1">
               {documents.filter((d) => d.type === "pdf").length}
             </div>
-            <div className="text-[#FEEBD8]/70 text-sm">PDF Files</div>
+            <div className="text-white/60 text-sm">PDF Files</div>
           </div>
 
-          <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
-            <div className="text-2xl font-bold text-purple-400 mb-1">
+          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6">
+            <div className="text-3xl font-bold text-purple-400 mb-1">
               {Math.round(
                 documents.reduce(
                   (acc, doc) => acc + parseFloat(doc.size.split(" ")[0]),
@@ -277,22 +274,22 @@ export default function DocumentOrganizer() {
                 ) * 10
               ) / 10}
             </div>
-            <div className="text-[#FEEBD8]/70 text-sm">MB Total</div>
+            <div className="text-white/60 text-sm">MB Total</div>
           </div>
         </div>
 
         {/* Filters and Search */}
-        <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6 mb-8">
+        <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6 mb-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             {/* Search */}
             <div className="lg:col-span-2 relative">
-              <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#FEEBD8]/50" />
+              <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/50" />
               <input
                 type="text"
                 placeholder="Search documents..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg pl-10 pr-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                className="w-full bg-neutral-800/50 border border-neutral-700 rounded-lg pl-10 pr-4 py-2 text-white placeholder:text-white/40 focus:outline-none focus:border-blue-500/50"
               />
             </div>
 
@@ -300,7 +297,7 @@ export default function DocumentOrganizer() {
             <select
               value={filterType}
               onChange={(e) => setFilterType(e.target.value)}
-              className="bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+              className="bg-neutral-800/50 border border-neutral-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500/50"
             >
               <option value="All">All Types</option>
               {allTypes.map((type) => (
@@ -314,7 +311,7 @@ export default function DocumentOrganizer() {
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+              className="bg-neutral-800/50 border border-neutral-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500/50"
             >
               <option value="All">All Statuses</option>
               {allStatuses.map((status) => (
@@ -328,7 +325,7 @@ export default function DocumentOrganizer() {
             <select
               value={filterTag}
               onChange={(e) => setFilterTag(e.target.value)}
-              className="bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+              className="bg-neutral-800/50 border border-neutral-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500/50"
             >
               <option value="All">All Tags</option>
               {allTags.map((tag) => (
@@ -345,7 +342,7 @@ export default function DocumentOrganizer() {
           {filteredDocuments.map((doc, index) => (
             <div
               key={doc.id}
-              className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6 hover:border-[#FEEBD8]/30 transition-colors"
+              className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6 hover:border-blue-500/30 transition-all duration-300"
             >
               <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                 <div className="flex items-start gap-4 flex-1">
@@ -354,7 +351,7 @@ export default function DocumentOrganizer() {
 
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
-                      <h3 className="text-lg font-semibold text-[#FEEBD8]">
+                      <h3 className="text-lg font-semibold text-white">
                         {doc.name}
                       </h3>
                       <span
@@ -366,7 +363,7 @@ export default function DocumentOrganizer() {
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-4 mb-3 text-sm text-[#FEEBD8]/70">
+                    <div className="flex items-center gap-4 mb-3 text-sm text-white/60">
                       <span>{doc.type.toUpperCase()}</span>
                       <span>{formatFileSize(doc.size)}</span>
                       <span>Uploaded {formatDate(doc.uploadDate)}</span>
@@ -388,7 +385,7 @@ export default function DocumentOrganizer() {
                     </div>
 
                     {/* Assigned Colleges */}
-                    <div className="text-sm text-[#FEEBD8]/60">
+                    <div className="text-sm text-white/60">
                       <strong>Assigned to:</strong>{" "}
                       {doc.colleges.includes("All")
                         ? "All Colleges"
@@ -404,23 +401,23 @@ export default function DocumentOrganizer() {
                 <div className="flex lg:flex-col gap-2">
                   <button
                     onClick={() => handlePreviewClick(document)}
-                    className="bg-[#FEEBD8] text-[#141414] px-4 py-2 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors flex items-center gap-2"
+                    className="bg-blue-500/10 text-blue-400 border border-blue-500/30 px-4 py-2 rounded-lg font-medium hover:bg-blue-500/20 transition-colors flex items-center gap-2"
                   >
                     <FaEye />
                     <span>Preview</span>
                   </button>
-                  <button className="bg-blue-500/20 text-blue-400 px-4 py-2 rounded-lg font-medium hover:bg-blue-500/30 transition-colors flex items-center gap-2">
+                  <button className="bg-green-500/10 text-green-400 border border-green-500/30 px-4 py-2 rounded-lg font-medium hover:bg-green-500/20 transition-colors flex items-center gap-2">
                     <FaDownload />
                     <span>Download</span>
                   </button>
                   <button
                     onClick={() => handleEditClick(document)}
-                    className="bg-neutral-500/20 text-neutral-400 px-4 py-2 rounded-lg font-medium hover:bg-neutral-500/30 transition-colors flex items-center gap-2"
+                    className="bg-yellow-500/10 text-yellow-400 border border-yellow-500/30 px-4 py-2 rounded-lg font-medium hover:bg-yellow-500/20 transition-colors flex items-center gap-2"
                   >
                     <FaEdit />
                     <span>Edit Info</span>
                   </button>
-                  <button className="bg-red-500/20 text-red-400 px-4 py-2 rounded-lg font-medium hover:bg-red-500/30 transition-colors flex items-center gap-2">
+                  <button className="bg-red-500/10 text-red-400 border border-red-500/30 px-4 py-2 rounded-lg font-medium hover:bg-red-500/20 transition-colors flex items-center gap-2">
                     <FaTrash />
                     <span>Delete</span>
                   </button>
@@ -432,7 +429,7 @@ export default function DocumentOrganizer() {
 
         {filteredDocuments.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-[#FEEBD8]/50 text-lg">
+            <p className="text-white/50 text-lg">
               No documents found matching your criteria.
             </p>
           </div>

@@ -322,7 +322,7 @@ export default function DatePicker({
         <div className="flex items-center justify-between">
           <button
             onClick={() => navigateMonth("prev")}
-            className="p-1.5 rounded-md bg-neutral-800 hover:bg-neutral-700 text-[#FEEBD8]/60 hover:text-[#FEEBD8] transition-colors"
+            className="p-1.5 rounded-md bg-neutral-800 hover:bg-neutral-700 text-[white]/60 hover:text-[white] transition-colors"
           >
             <FaChevronLeft size={10} />
           </button>
@@ -335,7 +335,7 @@ export default function DatePicker({
                   setShowMonthSelector(!showMonthSelector);
                   setShowYearSelector(false);
                 }}
-                className="text-[#FEEBD8] font-medium text-sm hover:bg-neutral-800 px-2 py-1 rounded-md transition-colors"
+                className="text-[white] font-medium text-sm hover:bg-neutral-800 px-2 py-1 rounded-md transition-colors"
               >
                 {months[currentMonth]}
               </button>
@@ -354,8 +354,8 @@ export default function DatePicker({
                       onClick={() => handleMonthSelect(index)}
                       className={`w-full text-left px-3 py-1.5 text-xs hover:bg-neutral-700 transition-colors ${
                         index === currentMonth
-                          ? "bg-[#FEEBD8] text-[#141414] font-medium"
-                          : "text-[#FEEBD8]"
+                          ? "bg-[white] text-[#141414] font-medium"
+                          : "text-[white]"
                       }`}
                     >
                       {month}
@@ -372,7 +372,7 @@ export default function DatePicker({
                   setShowYearSelector(!showYearSelector);
                   setShowMonthSelector(false);
                 }}
-                className="text-[#FEEBD8] font-medium text-sm hover:bg-neutral-800 px-2 py-1 rounded-md transition-colors"
+                className="text-[white] font-medium text-sm hover:bg-neutral-800 px-2 py-1 rounded-md transition-colors"
               >
                 {currentYear}
               </button>
@@ -391,8 +391,8 @@ export default function DatePicker({
                       onClick={() => handleYearSelect(year)}
                       className={`w-full text-left px-3 py-1.5 text-xs hover:bg-neutral-700 transition-colors ${
                         year === currentYear
-                          ? "bg-[#FEEBD8] text-[#141414] font-medium"
-                          : "text-[#FEEBD8]"
+                          ? "bg-[white] text-[#141414] font-medium"
+                          : "text-[white]"
                       }`}
                     >
                       {year}
@@ -405,7 +405,7 @@ export default function DatePicker({
 
           <button
             onClick={() => navigateMonth("next")}
-            className="p-1.5 rounded-md bg-neutral-800 hover:bg-neutral-700 text-[#FEEBD8]/60 hover:text-[#FEEBD8] transition-colors"
+            className="p-1.5 rounded-md bg-neutral-800 hover:bg-neutral-700 text-[white]/60 hover:text-[white] transition-colors"
           >
             <FaChevronRight size={10} />
           </button>
@@ -419,7 +419,7 @@ export default function DatePicker({
           {weekDays.map((day) => (
             <div
               key={day}
-              className="h-6 flex items-center justify-center text-xs font-medium text-[#FEEBD8]/50"
+              className="h-6 flex items-center justify-center text-xs font-medium text-[white]/50"
             >
               {day}
             </div>
@@ -442,19 +442,19 @@ export default function DatePicker({
                   h-6 w-6 rounded-md text-xs font-medium transition-all duration-200 flex items-center justify-center
                   ${
                     !isCurrentMonth
-                      ? "text-[#FEEBD8]/20"
+                      ? "text-[white]/20"
                       : isInRange
-                      ? "text-[#FEEBD8] hover:bg-neutral-700"
-                      : "text-[#FEEBD8]/30 cursor-not-allowed"
+                      ? "text-[white] hover:bg-neutral-700"
+                      : "text-[white]/30 cursor-not-allowed"
                   }
                   ${
                     selected
-                      ? "bg-[#FEEBD8] text-[#141414] font-bold shadow-lg"
+                      ? "bg-[white] text-[#141414] font-bold shadow-lg"
                       : ""
                   }
                   ${
                     today && !selected
-                      ? "ring-1 ring-[#FEEBD8]/50 bg-neutral-800"
+                      ? "ring-1 ring-[white]/50 bg-neutral-800"
                       : ""
                   }
                   ${
@@ -476,13 +476,13 @@ export default function DatePicker({
         <div className="flex gap-2">
           <button
             onClick={() => handleDateSelect(new Date())}
-            className="flex-1 bg-neutral-800 hover:bg-neutral-700 text-[#FEEBD8] px-2 py-1.5 rounded-md text-xs font-medium transition-colors"
+            className="flex-1 bg-neutral-800 hover:bg-neutral-700 text-[white] px-2 py-1.5 rounded-md text-xs font-medium transition-colors"
           >
             Today
           </button>
           <button
             onClick={() => setIsOpen(false)}
-            className="flex-1 bg-[#FEEBD8] hover:bg-[#E5D5B7] text-[#141414] px-2 py-1.5 rounded-md text-xs font-medium transition-colors"
+            className="flex-1 bg-[white] hover:bg-[#E5D5B7] text-[#141414] px-2 py-1.5 rounded-md text-xs font-medium transition-colors"
           >
             Close
           </button>
@@ -494,7 +494,7 @@ export default function DatePicker({
   return (
     <div ref={containerRef} className={`relative ${className}`}>
       {label && (
-        <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+        <label className="block text-sm font-medium text-[white]/70 mb-2">
           {label}
         </label>
       )}
@@ -508,10 +508,10 @@ export default function DatePicker({
           onClick={handleInputClick}
           readOnly
           disabled={disabled}
-          className={`w-full bg-neutral-800 border rounded-lg px-3 py-2 pr-10 text-[#FEEBD8] cursor-pointer focus:outline-none transition-colors ${
+          className={`w-full bg-neutral-800 border rounded-lg px-3 py-2 pr-10 text-[white] cursor-pointer focus:outline-none transition-colors ${
             error
               ? "border-red-500 focus:border-red-500"
-              : "border-neutral-700 focus:border-[#FEEBD8] hover:border-[#FEEBD8]/50"
+              : "border-neutral-700 focus:border-[white] hover:border-[white]/50"
           } ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
         />
 
@@ -522,14 +522,14 @@ export default function DatePicker({
                 e.stopPropagation();
                 handleClear();
               }}
-              className="text-[#FEEBD8]/40 hover:text-[#FEEBD8]/70 transition-colors"
+              className="text-[white]/40 hover:text-[white]/70 transition-colors"
             >
               <FaTimes size={12} />
             </button>
           )}
           <FaCalendarAlt
-            className={`text-[#FEEBD8]/60 ${
-              !disabled && "group-hover:text-[#FEEBD8]/80"
+            className={`text-[white]/60 ${
+              !disabled && "group-hover:text-[white]/80"
             }`}
             size={14}
           />

@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
 import AddTermModal from "../../../components/Modals/AddTermModal";
 import AddExamScoreModal from "../../../components/Modals/AddExamScoreModal";
@@ -232,45 +231,40 @@ export default function AcademyPage() {
   const ibExamDate = getIBExamDate();
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-[#FEEBD8]">
-      <Navbar />
-
-      <div className="max-w-7xl mx-auto px-4 pt-24 pb-8">
+    <div className="min-h-screen bg-[#0A0A0A] text-white">
+      <div className="max-w-7xl mx-auto px-4 pt-8 pb-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-4">
-            <Link
-              href="/dashboard"
-              className="p-2 rounded-lg bg-neutral-800 hover:bg-neutral-700 transition-colors"
-            >
-              <FaArrowLeft size={18} />
-            </Link>
-            <div>
-              <h1 className="text-3xl font-bold text-[#FEEBD8] flex items-center gap-3">
-                <FaGraduationCap className="text-[#FEEBD8]" />
-                Academy Dashboard
-              </h1>
-              <p className="text-[#FEEBD8]/60 mt-1">
-                Track your academic progress and achievements
-              </p>
-            </div>
+        <div className="flex items-center gap-4 mb-8">
+          <Link
+            href="/dashboard"
+            className="text-white/70 hover:text-white transition-colors"
+          >
+            <FaArrowLeft size={20} />
+          </Link>
+          <div className="flex-1 min-w-0">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white">
+              Academic Dashboard
+            </h1>
+            <p className="text-white/70 mt-2 text-sm sm:text-base">
+              Track your academic progress and achievements
+            </p>
           </div>
         </div>
 
         <div className="space-y-8">
           {/* High School GPA Tracker */}
-          <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6 hover:border-[#FEEBD8]/30 transition-colors">
+          <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6 hover:border-blue-500/30 transition-colors">
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-gradient-to-br from-[#FEEBD8] to-[#E5D5B7] shadow-md">
-                  <FaChartLine className="text-[#141414]" size={20} />
+                <div className="p-2 rounded-lg bg-blue-500/10">
+                  <FaChartLine className="text-blue-400" size={20} />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-[#FEEBD8] mb-1">
+                  <h2 className="text-xl font-bold text-white mb-1">
                     High School GPA
                   </h2>
-                  <p className="text-[#FEEBD8]/70 text-sm">
+                  <p className="text-white/70 text-sm">
                     Track your academic journey through high school
                   </p>
                 </div>
@@ -288,8 +282,8 @@ export default function AcademyPage() {
                 disabled={saving || loading}
                 className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
                   isEditingGPA
-                    ? "bg-[#FEEBD8] text-[#141414] hover:bg-[#E5D5B7]"
-                    : "bg-neutral-700/50 text-[#FEEBD8] hover:bg-neutral-700"
+                    ? "bg-blue-500 text-white hover:bg-blue-600"
+                    : "bg-neutral-700/50 text-white hover:bg-neutral-700"
                 } ${saving || loading ? "opacity-50 cursor-not-allowed" : ""}`}
               >
                 {saving ? (
@@ -304,7 +298,7 @@ export default function AcademyPage() {
             {/* GPA Scale Selector - Only show when editing */}
             {isEditingGPA && (
               <div className="mb-6">
-                <label className="block text-[#FEEBD8]/70 text-sm mb-3">
+                <label className="block text-white/70 text-sm mb-3">
                   GPA Scale
                 </label>
                 <div className="inline-flex bg-neutral-800/50 rounded-xl p-1 border border-neutral-700/50">
@@ -314,15 +308,15 @@ export default function AcademyPage() {
                       onClick={() => setGpaScale(scale)}
                       className={`relative px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 ease-out min-w-[60px] ${
                         gpaScale === scale
-                          ? "bg-[#FEEBD8] text-[#141414] shadow-lg shadow-[#FEEBD8]/20 transform scale-105"
-                          : "text-[#FEEBD8]/60 hover:text-[#FEEBD8] hover:bg-neutral-700/40 hover:scale-102"
+                          ? "bg-blue-500 text-white shadow-lg shadow-blue-500/20 transform scale-105"
+                          : "text-white/60 hover:text-white hover:bg-neutral-700/40 hover:scale-102"
                       } ${index === 0 ? "ml-0" : "ml-1"}`}
                     >
                       <span className="relative z-10">
                         {scale === "100" ? "100%" : scale}
                       </span>
                       {gpaScale === scale && (
-                        <div className="absolute inset-0 bg-gradient-to-r from-[#FEEBD8] to-[#E5D5B7] rounded-lg opacity-10" />
+                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg opacity-10" />
                       )}
                     </button>
                   ))}
@@ -341,13 +335,13 @@ export default function AcademyPage() {
                     </span>
                   </div>
 
-                  <div className="text-3xl font-bold text-[#FEEBD8] mb-2">
+                  <div className="text-3xl font-bold text-white mb-2">
                     {cumulativeGPA > 0
                       ? convertGPA(cumulativeGPA, "4.0", gpaScale)
                       : "--"}
                   </div>
 
-                  <div className="text-[#FEEBD8]/70 text-sm mb-3">
+                  <div className="text-white/70 text-sm mb-3">
                     Cumulative GPA (
                     {gpaScale === "100" ? "Percentage" : `${gpaScale} Scale`})
                   </div>
@@ -356,22 +350,22 @@ export default function AcademyPage() {
                   {cumulativeGPA > 0 && (
                     <div className="grid grid-cols-3 gap-3 text-xs">
                       <div className="text-center p-3 rounded-lg bg-neutral-700/30">
-                        <div className="font-semibold text-[#FEEBD8] text-sm">
+                        <div className="font-semibold text-white text-sm">
                           {convertGPA(cumulativeGPA, "4.0", "4.0")}
                         </div>
-                        <div className="text-[#FEEBD8]/60 mt-1">4.0</div>
+                        <div className="text-white/60 mt-1">4.0</div>
                       </div>
                       <div className="text-center p-3 rounded-lg bg-neutral-700/30">
-                        <div className="font-semibold text-[#FEEBD8] text-sm">
+                        <div className="font-semibold text-white text-sm">
                           {convertGPA(cumulativeGPA, "4.0", "5.0")}
                         </div>
-                        <div className="text-[#FEEBD8]/60 mt-1">5.0</div>
+                        <div className="text-white/60 mt-1">5.0</div>
                       </div>
                       <div className="text-center p-3 rounded-lg bg-neutral-700/30">
-                        <div className="font-semibold text-[#FEEBD8] text-sm">
+                        <div className="font-semibold text-white text-sm">
                           {convertGPA(cumulativeGPA, "4.0", "100")}%
                         </div>
-                        <div className="text-[#FEEBD8]/60 mt-1">%</div>
+                        <div className="text-white/60 mt-1">%</div>
                       </div>
                     </div>
                   )}
@@ -383,19 +377,19 @@ export default function AcademyPage() {
             <div className="grid grid-cols-2 gap-4">
               {gradeYears.map((year, index) => (
                 <div key={year.grade} className="group">
-                  <div className="bg-neutral-800/30 rounded-lg p-4 border border-neutral-700/30 hover:border-[#FEEBD8]/30 transition-all duration-200">
+                  <div className="bg-neutral-800/30 rounded-lg p-4 border border-neutral-700/30 hover:border-blue-500/30 transition-all duration-200">
                     <div className="flex items-center justify-between mb-3">
                       <div>
-                        <h3 className="text-sm font-semibold text-[#FEEBD8]">
+                        <h3 className="text-sm font-semibold text-white">
                           Grade {year.grade}
                         </h3>
-                        <p className="text-xs text-[#FEEBD8]/60 mt-1">
+                        <p className="text-xs text-white/60 mt-1">
                           {year.name}
                         </p>
                       </div>
 
                       <div className="text-right">
-                        <div className="text-lg font-bold text-[#FEEBD8]">
+                        <div className="text-lg font-bold text-white">
                           {year.gpa !== null
                             ? convertGPA(year.gpa, gpaScale, gpaScale)
                             : "--"}
@@ -425,12 +419,12 @@ export default function AcademyPage() {
                             const value = parseFloat(e.target.value);
                             updateYearGPA(index, isNaN(value) ? null : value);
                           }}
-                          className="w-full bg-neutral-700/50 border border-neutral-700 rounded-lg px-3 py-2 text-[#FEEBD8] text-center text-sm font-medium placeholder-[#FEEBD8]/40 focus:outline-none focus:border-[#FEEBD8] focus:bg-neutral-700 transition-all duration-200"
+                          className="w-full bg-neutral-700/50 border border-neutral-700 rounded-lg px-3 py-2 text-white text-center text-sm font-medium placeholder-[#FEEBD8]/40 focus:outline-none focus:border-blue-500 focus:bg-neutral-700 transition-all duration-200"
                         />
 
                         {year.gpa !== null && (
                           <div className="text-xs text-center">
-                            <div className="flex justify-between text-[#FEEBD8]/60 space-x-2">
+                            <div className="flex justify-between text-white/60 space-x-2">
                               <span>
                                 4.0: {convertGPA(year.gpa, gpaScale, "4.0")}
                               </span>
@@ -447,7 +441,7 @@ export default function AcademyPage() {
                     ) : (
                       <div className="text-center py-2">
                         {year.gpa !== null ? (
-                          <div className="text-xs text-[#FEEBD8]/60">
+                          <div className="text-xs text-white/60">
                             <div className="flex justify-between space-x-2">
                               <span>
                                 4.0: {convertGPA(year.gpa, gpaScale, "4.0")}
@@ -505,18 +499,18 @@ export default function AcademyPage() {
           {/* Exam Scores and Events */}
           <div className="space-y-6">
             {/* Exam Scores Overview */}
-            <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6 hover:border-[#FEEBD8]/30 transition-colors">
+            <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6 hover:border-blue-500/30 transition-colors">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-gradient-to-br from-[#FEEBD8] to-[#E5D5B7]">
-                    <FaTrophy className="text-[#141414]" size={18} />
+                  <div className="p-2 rounded-lg bg-yellow-500/10">
+                    <FaTrophy className="text-yellow-400" size={18} />
                   </div>
                   <div>
                     <div className="flex items-center gap-3">
-                      <h3 className="text-xl font-semibold text-[#FEEBD8]">
+                      <h3 className="text-xl font-semibold text-white">
                         Exam Scores
                       </h3>
-                      <span className="px-2 py-1 bg-[#FEEBD8]/10 border border-[#FEEBD8]/20 rounded-full text-xs font-medium text-[#FEEBD8]/80">
+                      <span className="px-2 py-1 bg-blue-500/10 border border-blue-500/20 rounded-full text-xs font-medium text-white/80">
                         {loading
                           ? "..."
                           : `${exams.length} ${
@@ -524,14 +518,14 @@ export default function AcademyPage() {
                             }`}
                       </span>
                     </div>
-                    <p className="text-[#FEEBD8]/70 text-sm mt-1">
+                    <p className="text-white/70 text-sm mt-1">
                       Track your standardized test performance
                     </p>
                   </div>
                 </div>
                 <button
                   onClick={handleAddExamScore}
-                  className="bg-[#FEEBD8] text-[#141414] px-3 py-2 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors flex items-center gap-2"
+                  className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition-all duration-200 flex items-center gap-2 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 hover:scale-105"
                 >
                   <FaPlus size={12} />
                   <span>Add</span>
@@ -541,14 +535,14 @@ export default function AcademyPage() {
               <div className="space-y-4">
                 {loading ? (
                   <div className="text-center py-8">
-                    <FaSpinner className="animate-spin text-[#FEEBD8] text-xl mx-auto mb-2" />
-                    <p className="text-[#FEEBD8]/60">Loading exam scores...</p>
+                    <FaSpinner className="animate-spin text-white text-xl mx-auto mb-2" />
+                    <p className="text-white/60">Loading exam scores...</p>
                   </div>
                 ) : exams.length === 0 ? (
                   <div className="text-center py-8">
-                    <FaTrophy className="text-[#FEEBD8]/40 text-3xl mx-auto mb-3" />
-                    <p className="text-[#FEEBD8]/60">No exam scores yet</p>
-                    <p className="text-[#FEEBD8]/40 text-sm">
+                    <FaTrophy className="text-white/40 text-3xl mx-auto mb-3" />
+                    <p className="text-white/60">No exam scores yet</p>
+                    <p className="text-white/40 text-sm">
                       Add your first exam score to get started
                     </p>
                   </div>
@@ -556,12 +550,12 @@ export default function AcademyPage() {
                   exams.map((exam) => (
                     <div
                       key={exam.id}
-                      className="bg-neutral-800/50 rounded-lg p-4 border border-neutral-700/30 hover:border-[#FEEBD8]/30 transition-colors group"
+                      className="bg-neutral-800/50 rounded-lg p-4 border border-neutral-700/30 hover:border-blue-500/30 transition-colors group"
                     >
                       <div className="flex justify-between items-start mb-3">
                         <div className="flex-1">
                           <div className="flex items-center justify-between">
-                            <h4 className="font-medium text-[#FEEBD8] text-sm">
+                            <h4 className="font-medium text-white text-sm">
                               {exam.name}
                             </h4>
                             <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
@@ -581,7 +575,7 @@ export default function AcademyPage() {
                               </button>
                             </div>
                           </div>
-                          <p className="text-[#FEEBD8]/60 text-xs mt-1">
+                          <p className="text-white/60 text-xs mt-1">
                             {exam.exam_date
                               ? new Date(
                                   exam.exam_date + "-01"
@@ -593,32 +587,30 @@ export default function AcademyPage() {
                           </p>
                         </div>
                         <div className="text-right ml-3">
-                          <div className="text-lg font-semibold text-[#FEEBD8]">
+                          <div className="text-lg font-semibold text-white">
                             {exam.score}/{exam.max_score}
                           </div>
-                          <div className="text-xs text-[#FEEBD8]/60">
+                          <div className="text-xs text-white/60">
                             {getExamProgress(exam).toFixed(0)}%
                           </div>
                         </div>
                       </div>
 
                       <div className="mb-2">
-                        <div className="flex justify-between text-xs text-[#FEEBD8]/60 mb-1">
+                        <div className="flex justify-between text-xs text-white/60 mb-1">
                           <span>Progress</span>
                           <span>{getExamProgress(exam).toFixed(0)}%</span>
                         </div>
                         <div className="w-full bg-neutral-700 rounded-full h-2">
                           <div
-                            className="bg-[#FEEBD8] h-2 rounded-full transition-all duration-300"
+                            className="bg-blue-500 h-2 rounded-full transition-all duration-300"
                             style={{ width: `${getExamProgress(exam)}%` }}
                           />
                         </div>
                       </div>
 
                       <div className="flex justify-between items-center text-xs">
-                        <span className="text-[#FEEBD8]/60">
-                          Type: {exam.type}
-                        </span>
+                        <span className="text-white/60">Type: {exam.type}</span>
                         {exam.notes && (
                           <span className="text-gray-400 truncate ml-2">
                             {exam.notes}
@@ -635,13 +627,13 @@ export default function AcademyPage() {
             <div className="bg-[#141414] border border-neutral-700 rounded-xl p-6">
               <div className="flex items-center gap-3 mb-6">
                 <div className="p-2 rounded-lg bg-neutral-800">
-                  <FaGraduationCap className="text-[#FEEBD8]" size={18} />
+                  <FaGraduationCap className="text-white" size={18} />
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-[#FEEBD8]">
+                  <h3 className="text-xl font-semibold text-white">
                     Upcoming Events
                   </h3>
-                  <p className="text-[#FEEBD8]/60 text-sm mt-1">
+                  <p className="text-white/60 text-sm mt-1">
                     Academic deadlines and important dates
                   </p>
                 </div>
@@ -654,7 +646,7 @@ export default function AcademyPage() {
                     <div className="flex justify-between items-center">
                       <div>
                         <h4 className="font-medium text-blue-300">SAT Exam</h4>
-                        <p className="text-[#FEEBD8]/60 text-sm">
+                        <p className="text-white/60 text-sm">
                           {new Date(satExamDate).toLocaleDateString("en-US", {
                             weekday: "long",
                             year: "numeric",
@@ -691,7 +683,7 @@ export default function AcademyPage() {
                           <h4 className="font-medium text-green-300">
                             AP {ap.subject}
                           </h4>
-                          <p className="text-[#FEEBD8]/60 text-sm">
+                          <p className="text-white/60 text-sm">
                             {new Date(ap.date).toLocaleDateString("en-US", {
                               weekday: "long",
                               year: "numeric",
@@ -731,7 +723,7 @@ export default function AcademyPage() {
                           <h4 className="font-medium text-purple-300">
                             {event.title}
                           </h4>
-                          <p className="text-[#FEEBD8]/60 text-sm">
+                          <p className="text-white/60 text-sm">
                             {event.date &&
                               new Date(event.date).toLocaleDateString("en-US", {
                                 weekday: "long",

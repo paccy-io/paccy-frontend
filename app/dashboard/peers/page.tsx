@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
 import {
   FaArrowLeft,
@@ -197,93 +196,89 @@ export default function PeerNetwork() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a]">
-      <Navbar />
-
-      <div className="max-w-screen-2xl mx-auto px-4 md:px-10 py-8 pt-28">
+      <div className="max-w-screen-2xl mx-auto px-4 md:px-10 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center gap-4">
             <Link
               href="/dashboard"
-              className="text-[#FEEBD8]/70 hover:text-[#FEEBD8] transition-colors"
+              className="text-white/70 hover:text-white transition-colors"
             >
               <FaArrowLeft size={20} />
             </Link>
-            <div>
-              <h1 className="text-4xl font-bold text-[#FEEBD8]">
+            <div className="flex-1 min-w-0">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white">
                 Peer Network
               </h1>
-              <p className="text-[#FEEBD8]/70 mt-2">
+              <p className="text-white/70 mt-2 text-sm sm:text-base">
                 Connect and collaborate with fellow students worldwide
               </p>
             </div>
           </div>
           <div className="flex items-center gap-4">
             <div className="text-right">
-              <div className="text-2xl font-bold text-[#FEEBD8]">
+              <div className="text-2xl font-bold text-white">
                 {getConnectedPeers().length}
               </div>
-              <div className="text-[#FEEBD8]/70 text-sm">Your Connections</div>
+              <div className="text-white/60 text-sm">Your Connections</div>
             </div>
           </div>
         </div>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
-            <div className="text-2xl font-bold text-blue-400 mb-1">
+          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6">
+            <div className="text-3xl font-bold text-blue-400 mb-1">
               {peers.length}
             </div>
-            <div className="text-[#FEEBD8]/70 text-sm">Total Peers</div>
+            <div className="text-white/60 text-sm">Total Peers</div>
           </div>
 
-          <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
-            <div className="text-2xl font-bold text-green-400 mb-1">
+          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6">
+            <div className="text-3xl font-bold text-green-400 mb-1">
               {getConnectedPeers().length}
             </div>
-            <div className="text-[#FEEBD8]/70 text-sm">Your Connections</div>
+            <div className="text-white/60 text-sm">Your Connections</div>
           </div>
 
-          <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
-            <div className="text-2xl font-bold text-purple-400 mb-1">
+          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6">
+            <div className="text-3xl font-bold text-purple-400 mb-1">
               {countries.length}
             </div>
-            <div className="text-[#FEEBD8]/70 text-sm">Countries</div>
+            <div className="text-white/60 text-sm">Countries</div>
           </div>
 
-          <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
-            <div className="text-2xl font-bold text-yellow-400 mb-1">
+          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6">
+            <div className="text-3xl font-bold text-yellow-400 mb-1">
               {majors.length}
             </div>
-            <div className="text-[#FEEBD8]/70 text-sm">Majors</div>
+            <div className="text-white/60 text-sm">Majors</div>
           </div>
         </div>
 
         {/* Search and Filters */}
-        <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6 mb-8">
+        <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6 mb-8">
           <div className="flex items-center gap-3 mb-4">
             <FaUsers className="text-blue-400" />
-            <h3 className="text-xl font-semibold text-[#FEEBD8]">
-              Discover Peers
-            </h3>
+            <h3 className="text-xl font-semibold text-white">Discover Peers</h3>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="relative">
-              <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#FEEBD8]/50" />
+              <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/50" />
               <input
                 type="text"
                 placeholder="Search by name, major, or university..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg pl-10 pr-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                className="w-full bg-neutral-800/50 border border-neutral-700 rounded-lg pl-10 pr-4 py-2 text-white placeholder:text-white/40 focus:outline-none focus:border-blue-500/50"
               />
             </div>
 
             <select
               value={filterCountry}
               onChange={(e) => setFilterCountry(e.target.value)}
-              className="bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+              className="bg-neutral-800/50 border border-neutral-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500/50"
             >
               <option value="All">All Countries</option>
               {countries.map((country) => (
@@ -296,7 +291,7 @@ export default function PeerNetwork() {
             <select
               value={filterMajor}
               onChange={(e) => setFilterMajor(e.target.value)}
-              className="bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+              className="bg-neutral-800/50 border border-neutral-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500/50"
             >
               <option value="All">All Majors</option>
               {majors.map((major) => (
@@ -309,7 +304,7 @@ export default function PeerNetwork() {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+              className="bg-neutral-800/50 border border-neutral-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500/50"
             >
               <option value="activity">Sort by Activity</option>
               <option value="joined">Sort by Join Date</option>
@@ -326,31 +321,31 @@ export default function PeerNetwork() {
               setFilterMajor("All");
               setSearchTerm("");
             }}
-            className="bg-[#FEEBD8] text-[#141414] px-4 py-2 rounded-full text-sm font-medium hover:bg-[#E5D5B7] transition-colors"
+            className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:from-blue-600 hover:to-blue-700 transition-all duration-300"
           >
             All Peers
           </button>
           <button
             onClick={() => setFilterMajor("Computer Science")}
-            className="bg-neutral-800 text-[#FEEBD8] px-4 py-2 rounded-full text-sm font-medium hover:bg-neutral-700 transition-colors"
+            className="bg-blue-500/10 text-blue-400 border border-blue-500/30 px-4 py-2 rounded-full text-sm font-medium hover:bg-blue-500/20 transition-colors"
           >
             Computer Science
           </button>
           <button
             onClick={() => setFilterMajor("Engineering")}
-            className="bg-neutral-800 text-[#FEEBD8] px-4 py-2 rounded-full text-sm font-medium hover:bg-neutral-700 transition-colors"
+            className="bg-blue-500/10 text-blue-400 border border-blue-500/30 px-4 py-2 rounded-full text-sm font-medium hover:bg-blue-500/20 transition-colors"
           >
             Engineering
           </button>
           <button
             onClick={() => setFilterCountry("United States")}
-            className="bg-neutral-800 text-[#FEEBD8] px-4 py-2 rounded-full text-sm font-medium hover:bg-neutral-700 transition-colors"
+            className="bg-blue-500/10 text-blue-400 border border-blue-500/30 px-4 py-2 rounded-full text-sm font-medium hover:bg-blue-500/20 transition-colors"
           >
             United States
           </button>
           <button
             onClick={() => setFilterCountry("Canada")}
-            className="bg-neutral-800 text-[#FEEBD8] px-4 py-2 rounded-full text-sm font-medium hover:bg-neutral-700 transition-colors"
+            className="bg-blue-500/10 text-blue-400 border border-blue-500/30 px-4 py-2 rounded-full text-sm font-medium hover:bg-blue-500/20 transition-colors"
           >
             Canada
           </button>
@@ -361,19 +356,19 @@ export default function PeerNetwork() {
           {filteredPeers.map((peer) => (
             <div
               key={peer.id}
-              className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6 hover:border-[#FEEBD8]/30 transition-all duration-300 hover:transform hover:scale-105"
+              className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6 hover:border-blue-500/30 transition-all duration-300 hover:transform hover:scale-105"
             >
               <div className="text-center mb-4">
-                <div className="w-16 h-16 bg-[#FEEBD8] rounded-full mx-auto mb-3 flex items-center justify-center">
-                  <span className="text-[#141414] text-xl font-bold">
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full mx-auto mb-3 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                  <span className="text-white text-xl font-bold">
                     {peer.name
                       .split(" ")
                       .map((n) => n[0])
                       .join("")}
                   </span>
                 </div>
-                <h4 className="text-[#FEEBD8] font-semibold">{peer.name}</h4>
-                <div className="flex items-center justify-center gap-2 text-sm text-[#FEEBD8]/70 mt-1">
+                <h4 className="text-white font-semibold">{peer.name}</h4>
+                <div className="flex items-center justify-center gap-2 text-sm text-white/60 mt-1">
                   <FaGlobe size={12} />
                   <span>{peer.country}</span>
                 </div>
@@ -381,27 +376,25 @@ export default function PeerNetwork() {
 
               <div className="space-y-3 mb-4">
                 <div>
-                  <span className="text-[#FEEBD8]/70 text-sm">
-                    Intended Major:
-                  </span>
-                  <p className="text-[#FEEBD8] font-medium">{peer.major}</p>
+                  <span className="text-white/60 text-sm">Intended Major:</span>
+                  <p className="text-white font-medium">{peer.major}</p>
                 </div>
 
                 <div>
-                  <span className="text-[#FEEBD8]/70 text-sm">
+                  <span className="text-white/60 text-sm">
                     Target Universities:
                   </span>
                   <div className="flex flex-wrap gap-1 mt-1">
                     {peer.targetUniversities.slice(0, 2).map((uni, idx) => (
                       <span
                         key={idx}
-                        className="bg-neutral-800 text-[#FEEBD8]/80 text-xs px-2 py-1 rounded-full"
+                        className="bg-neutral-800/50 text-white/80 text-xs px-2 py-1 rounded-full"
                       >
                         {uni}
                       </span>
                     ))}
                     {peer.targetUniversities.length > 2 && (
-                      <span className="text-[#FEEBD8]/60 text-xs">
+                      <span className="text-white/60 text-xs">
                         +{peer.targetUniversities.length - 2} more
                       </span>
                     )}
@@ -409,12 +402,12 @@ export default function PeerNetwork() {
                 </div>
 
                 <div>
-                  <span className="text-[#FEEBD8]/70 text-sm">Interests:</span>
+                  <span className="text-white/60 text-sm">Interests:</span>
                   <div className="flex flex-wrap gap-1 mt-1">
                     {peer.interests.slice(0, 2).map((interest, idx) => (
                       <span
                         key={idx}
-                        className="bg-blue-500/20 text-blue-400 text-xs px-2 py-1 rounded-full"
+                        className="bg-blue-500/10 text-blue-400 border border-blue-500/30 text-xs px-2 py-1 rounded-full"
                       >
                         {interest}
                       </span>
@@ -423,17 +416,17 @@ export default function PeerNetwork() {
                 </div>
 
                 <div className="flex justify-between items-center text-sm">
-                  <span className="text-[#FEEBD8]/70">
+                  <span className="text-white/60">
                     GPA: <span className="text-green-400">{peer.gpa}</span>
                   </span>
-                  <span className="text-[#FEEBD8]/60 flex items-center gap-1">
+                  <span className="text-white/60 flex items-center gap-1">
                     <FaComments size={12} />
                     {peer.activePosts} posts
                   </span>
                 </div>
 
                 {peer.mutualConnections > 0 && (
-                  <div className="text-xs text-[#FEEBD8]/60 flex items-center gap-1">
+                  <div className="text-xs text-white/60 flex items-center gap-1">
                     <FaUsers size={10} />
                     {peer.mutualConnections} mutual connections
                   </div>
@@ -443,10 +436,10 @@ export default function PeerNetwork() {
               <div className="space-y-2">
                 <button
                   onClick={() => handleConnect(peer.id)}
-                  className={`w-full px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 ${
+                  className={`w-full px-4 py-2 rounded-lg font-medium transition-all duration-300 flex items-center justify-center gap-2 ${
                     peer.isConnected
-                      ? "bg-green-500/20 text-green-400 hover:bg-green-500/30"
-                      : "bg-[#FEEBD8] text-[#141414] hover:bg-[#E5D5B7]"
+                      ? "bg-green-500/10 text-green-400 border border-green-500/30 hover:bg-green-500/20"
+                      : "bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 shadow-lg shadow-blue-500/20"
                   }`}
                 >
                   {peer.isConnected ? <FaHeart /> : <FaUserPlus />}
@@ -455,7 +448,7 @@ export default function PeerNetwork() {
 
                 <button
                   onClick={() => handleStartProject(peer)}
-                  className="w-full bg-purple-500/20 text-purple-400 px-4 py-2 rounded-lg font-medium hover:bg-purple-500/30 transition-colors flex items-center justify-center gap-2"
+                  className="w-full bg-purple-500/10 text-purple-400 border border-purple-500/30 px-4 py-2 rounded-lg font-medium hover:bg-purple-500/20 transition-colors flex items-center justify-center gap-2"
                 >
                   <FaRocket />
                   <span>Start Project Together</span>
@@ -467,11 +460,11 @@ export default function PeerNetwork() {
 
         {filteredPeers.length === 0 && (
           <div className="text-center py-12">
-            <FaUsers className="mx-auto text-[#FEEBD8]/30 text-6xl mb-4" />
-            <h3 className="text-xl font-semibold text-[#FEEBD8]/70 mb-2">
+            <FaUsers className="mx-auto text-white/30 text-6xl mb-4" />
+            <h3 className="text-xl font-semibold text-white/70 mb-2">
               No peers found
             </h3>
-            <p className="text-[#FEEBD8]/50">
+            <p className="text-white/50">
               Try adjusting your search criteria or filters.
             </p>
           </div>
@@ -479,17 +472,20 @@ export default function PeerNetwork() {
 
         {/* Connected Peers Section */}
         {getConnectedPeers().length > 0 && (
-          <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
-            <h3 className="text-xl font-semibold text-[#FEEBD8] mb-4 flex items-center gap-2">
+          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6">
+            <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
               <FaHeart className="text-green-400" />
               Your Connections ({getConnectedPeers().length})
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {getConnectedPeers().map((peer) => (
-                <div key={peer.id} className="bg-neutral-800 rounded-lg p-4">
+                <div
+                  key={peer.id}
+                  className="bg-neutral-800/50 rounded-lg p-4 border border-neutral-700/30"
+                >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-[#FEEBD8] rounded-full flex items-center justify-center">
-                      <span className="text-[#141414] font-bold">
+                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-lg shadow-blue-500/20">
+                      <span className="text-white font-bold">
                         {peer.name
                           .split(" ")
                           .map((n) => n[0])
@@ -497,10 +493,8 @@ export default function PeerNetwork() {
                       </span>
                     </div>
                     <div>
-                      <h4 className="text-[#FEEBD8] font-medium">
-                        {peer.name}
-                      </h4>
-                      <p className="text-[#FEEBD8]/60 text-sm">{peer.major}</p>
+                      <h4 className="text-white font-medium">{peer.name}</h4>
+                      <p className="text-white/60 text-sm">{peer.major}</p>
                     </div>
                   </div>
                 </div>
@@ -512,25 +506,25 @@ export default function PeerNetwork() {
 
       {/* Project Modal */}
       {showProjectModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-[#141414] border border-neutral-700 rounded-lg p-8 max-w-md w-full">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-8 max-w-md w-full shadow-2xl">
             <div className="text-center">
-              <div className="w-16 h-16 bg-purple-500/20 rounded-full mx-auto mb-4 flex items-center justify-center">
+              <div className="w-16 h-16 bg-purple-500/10 rounded-full mx-auto mb-4 flex items-center justify-center border border-purple-500/30">
                 <FaRocket className="text-purple-400 text-2xl" />
               </div>
-              <h3 className="text-2xl font-bold text-[#FEEBD8] mb-4">
+              <h3 className="text-2xl font-bold text-white mb-4">
                 Coming Soon!
               </h3>
-              <p className="text-[#FEEBD8]/70 mb-6">
+              <p className="text-white/70 mb-6">
                 You'll soon be able to launch collaborative projects with{" "}
-                <span className="text-[#FEEBD8] font-medium">
+                <span className="text-white font-medium">
                   {selectedPeer?.name}
                 </span>
                 . Stay tuned for this exciting feature!
               </p>
               <button
                 onClick={() => setShowProjectModal(false)}
-                className="bg-[#FEEBD8] text-[#141414] px-6 py-3 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors"
+                className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40"
               >
                 Got it!
               </button>

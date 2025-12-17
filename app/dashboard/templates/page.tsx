@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
 import ImportTemplateModal from "../../../components/Modals/ImportTemplateModal";
 import TemplatePreviewModal from "../../../components/Modals/TemplatePreviewModal";
@@ -870,22 +869,20 @@ export default function TemplatesPage() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a]">
-      <Navbar />
-
-      <div className="max-w-screen-2xl mx-auto px-4 md:px-10 py-8 pt-28">
+      <div className="max-w-screen-2xl mx-auto px-4 md:px-10 py-8">
         {/* Header */}
-        <div className="flex items-center space-x-4 mb-8">
+        <div className="flex items-center gap-4 mb-8">
           <Link
             href="/dashboard"
-            className="text-[#FEEBD8]/70 hover:text-[#FEEBD8] transition-colors"
+            className="text-white/70 hover:text-white transition-colors"
           >
             <FaArrowLeft size={20} />
           </Link>
-          <div>
-            <h1 className="text-4xl font-bold text-[#FEEBD8]">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white">
               University Templates
             </h1>
-            <p className="text-[#FEEBD8]/70 mt-2">
+            <p className="text-white/70 mt-2 text-sm sm:text-base">
               Import pre-built application checklists and tasks for universities
               worldwide
             </p>
@@ -894,47 +891,47 @@ export default function TemplatesPage() {
 
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
-            <div className="text-2xl font-bold text-[#FEEBD8] mb-1">
+          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6">
+            <div className="text-3xl font-bold text-white mb-1">
               {universityTemplates.length}
             </div>
-            <div className="text-[#FEEBD8]/70 text-sm">Total Templates</div>
+            <div className="text-white/60 text-sm">Total Templates</div>
           </div>
-          <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
-            <div className="text-2xl font-bold text-[#FEEBD8] mb-1">
+          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6">
+            <div className="text-3xl font-bold text-blue-400 mb-1">
               {countries.length}
             </div>
-            <div className="text-[#FEEBD8]/70 text-sm">Countries Covered</div>
+            <div className="text-white/60 text-sm">Countries Covered</div>
           </div>
-          <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
-            <div className="text-2xl font-bold text-[#FEEBD8] mb-1">1.5K+</div>
-            <div className="text-[#FEEBD8]/70 text-sm">Students Helped</div>
+          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6">
+            <div className="text-3xl font-bold text-green-400 mb-1">1.5K+</div>
+            <div className="text-white/60 text-sm">Students Helped</div>
           </div>
-          <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
-            <div className="text-2xl font-bold text-[#FEEBD8] mb-1">95%</div>
-            <div className="text-[#FEEBD8]/70 text-sm">Success Rate</div>
+          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6">
+            <div className="text-3xl font-bold text-purple-400 mb-1">95%</div>
+            <div className="text-white/60 text-sm">Success Rate</div>
           </div>
         </div>
 
         {/* Search and Filters */}
-        <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6 mb-8">
+        <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6 mb-8">
           <div className="flex flex-col lg:flex-row gap-4">
             {/* Search */}
             <div className="flex-1 relative">
-              <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#FEEBD8]/40" />
+              <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/50" />
               <input
                 type="text"
                 placeholder="Search by country, university system, or requirements..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 bg-neutral-800 border border-neutral-600 rounded-lg text-[#FEEBD8] placeholder-[#FEEBD8]/40 focus:outline-none focus:border-[#FEEBD8]/50"
+                className="w-full pl-10 pr-4 py-3 bg-neutral-800/50 border border-neutral-700 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-blue-500/50"
               />
             </div>
 
             {/* Filter Toggle */}
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center gap-2 px-4 py-3 bg-neutral-800 border border-neutral-600 rounded-lg text-[#FEEBD8] hover:border-[#FEEBD8]/50 transition-colors"
+              className="flex items-center gap-2 px-4 py-3 bg-blue-500/10 text-blue-400 border border-blue-500/30 rounded-lg hover:bg-blue-500/20 transition-colors"
             >
               <FaFilter />
               Filters
@@ -946,13 +943,13 @@ export default function TemplatesPage() {
             <div className="mt-4 pt-4 border-t border-neutral-700/50">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[#FEEBD8]/70 text-sm mb-2">
+                  <label className="block text-white/60 text-sm mb-2">
                     Country
                   </label>
                   <select
                     value={selectedCountry}
                     onChange={(e) => setSelectedCountry(e.target.value)}
-                    className="w-full p-3 bg-neutral-800 border border-neutral-600 rounded-lg text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]/50"
+                    className="w-full p-3 bg-neutral-800/50 border border-neutral-700 rounded-lg text-white focus:outline-none focus:border-blue-500/50"
                   >
                     <option value="all">All Countries</option>
                     {countries.map((country) => (
@@ -964,13 +961,13 @@ export default function TemplatesPage() {
                 </div>
 
                 <div>
-                  <label className="block text-[#FEEBD8]/70 text-sm mb-2">
+                  <label className="block text-white/60 text-sm mb-2">
                     Difficulty
                   </label>
                   <select
                     value={selectedDifficulty}
                     onChange={(e) => setSelectedDifficulty(e.target.value)}
-                    className="w-full p-3 bg-neutral-800 border border-neutral-600 rounded-lg text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]/50"
+                    className="w-full p-3 bg-neutral-800/50 border border-neutral-700 rounded-lg text-white focus:outline-none focus:border-blue-500/50"
                   >
                     <option value="all">All Difficulties</option>
                     <option value="Easy">Easy</option>
@@ -988,7 +985,7 @@ export default function TemplatesPage() {
           {filteredTemplates.map((template) => (
             <div
               key={template.id}
-              className="bg-[#141414] border border-neutral-700/50 rounded-lg overflow-hidden hover:border-[#FEEBD8]/30 transition-colors"
+              className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl overflow-hidden hover:border-blue-500/30 transition-all duration-300"
             >
               {/* Header */}
               <div className="p-6 border-b border-neutral-700/50">
@@ -996,10 +993,10 @@ export default function TemplatesPage() {
                   <div className="flex items-center gap-3">
                     <span className="text-3xl">{template.flag}</span>
                     <div>
-                      <h3 className="text-xl font-semibold text-[#FEEBD8]">
+                      <h3 className="text-xl font-semibold text-white">
                         {template.name}
                       </h3>
-                      <p className="text-[#FEEBD8]/60 text-sm">
+                      <p className="text-white/60 text-sm">
                         {template.country}
                       </p>
                     </div>
@@ -1012,18 +1009,18 @@ export default function TemplatesPage() {
                     >
                       {template.difficulty}
                     </span>
-                    <div className="flex items-center gap-1 text-[#FEEBD8]/60">
+                    <div className="flex items-center gap-1 text-white/60">
                       <FaStar className="text-yellow-400" size={12} />
                       <span className="text-xs">{template.popularity}%</span>
                     </div>
                   </div>
                 </div>
 
-                <p className="text-[#FEEBD8]/70 text-sm mb-4">
+                <p className="text-white/70 text-sm mb-4">
                   {template.description}
                 </p>
 
-                <div className="flex items-center gap-4 text-xs text-[#FEEBD8]/60">
+                <div className="flex items-center gap-4 text-xs text-white/60">
                   <div className="flex items-center gap-1">
                     <FaUsers size={12} />
                     {template.estimatedUsers}
@@ -1039,7 +1036,7 @@ export default function TemplatesPage() {
               <div className="p-6">
                 {/* Requirements */}
                 <div className="mb-6">
-                  <h4 className="text-[#FEEBD8] font-medium mb-3 flex items-center gap-2">
+                  <h4 className="text-white font-medium mb-3 flex items-center gap-2">
                     <FaCheckCircle className="text-green-400" size={16} />
                     Key Requirements
                   </h4>
@@ -1047,14 +1044,14 @@ export default function TemplatesPage() {
                     {template.requirements.slice(0, 4).map((req, index) => (
                       <div
                         key={index}
-                        className="flex items-center gap-2 text-[#FEEBD8]/70 text-sm"
+                        className="flex items-center gap-2 text-white/70 text-sm"
                       >
-                        <div className="w-1.5 h-1.5 bg-[#FEEBD8]/40 rounded-full"></div>
+                        <div className="w-1.5 h-1.5 bg-blue-400 rounded-full"></div>
                         {req}
                       </div>
                     ))}
                     {template.requirements.length > 4 && (
-                      <div className="text-[#FEEBD8]/60 text-xs">
+                      <div className="text-white/60 text-xs">
                         +{template.requirements.length - 4} more requirements
                       </div>
                     )}
@@ -1063,7 +1060,7 @@ export default function TemplatesPage() {
 
                 {/* Common Tests */}
                 <div className="mb-6">
-                  <h4 className="text-[#FEEBD8] font-medium mb-3 flex items-center gap-2">
+                  <h4 className="text-white font-medium mb-3 flex items-center gap-2">
                     <FaCertificate className="text-blue-400" size={16} />
                     Common Tests
                   </h4>
@@ -1071,7 +1068,7 @@ export default function TemplatesPage() {
                     {template.commonTests.map((test, index) => (
                       <span
                         key={index}
-                        className="px-2 py-1 bg-neutral-800 rounded-full text-xs text-[#FEEBD8]/70"
+                        className="px-2 py-1 bg-blue-500/10 border border-blue-500/30 rounded-full text-xs text-blue-400"
                       >
                         {test}
                       </span>
@@ -1081,7 +1078,7 @@ export default function TemplatesPage() {
 
                 {/* Unique Features */}
                 <div className="mb-6">
-                  <h4 className="text-[#FEEBD8] font-medium mb-3 flex items-center gap-2">
+                  <h4 className="text-white font-medium mb-3 flex items-center gap-2">
                     <FaStar className="text-yellow-400" size={16} />
                     Unique Features
                   </h4>
@@ -1091,7 +1088,7 @@ export default function TemplatesPage() {
                       .map((feature, index) => (
                         <div
                           key={index}
-                          className="flex items-center gap-2 text-[#FEEBD8]/70 text-sm"
+                          className="flex items-center gap-2 text-white/70 text-sm"
                         >
                           <div className="w-1.5 h-1.5 bg-yellow-400 rounded-full"></div>
                           {feature}
@@ -1101,24 +1098,22 @@ export default function TemplatesPage() {
                 </div>
 
                 {/* Template Stats */}
-                <div className="mb-6 p-3 bg-neutral-800/50 rounded-lg">
+                <div className="mb-6 p-3 bg-neutral-800/30 border border-neutral-700/30 rounded-lg">
                   <div className="grid grid-cols-2 gap-4 text-center">
                     <div>
-                      <div className="text-lg font-semibold text-[#FEEBD8]">
+                      <div className="text-lg font-semibold text-white">
                         {template.checklists.length}
                       </div>
-                      <div className="text-xs text-[#FEEBD8]/60">
-                        Checklists
-                      </div>
+                      <div className="text-xs text-white/60">Checklists</div>
                     </div>
                     <div>
-                      <div className="text-lg font-semibold text-[#FEEBD8]">
+                      <div className="text-lg font-semibold text-white">
                         {template.checklists.reduce(
                           (total, checklist) => total + checklist.tasks.length,
                           0
                         )}
                       </div>
-                      <div className="text-xs text-[#FEEBD8]/60">Tasks</div>
+                      <div className="text-xs text-white/60">Tasks</div>
                     </div>
                   </div>
                 </div>
@@ -1127,14 +1122,14 @@ export default function TemplatesPage() {
                 <div className="space-y-3">
                   <button
                     onClick={() => handlePreviewTemplate(template)}
-                    className="w-full bg-neutral-700 text-[#FEEBD8] py-3 px-6 rounded-lg font-medium hover:bg-neutral-600 transition-colors flex items-center justify-center gap-2"
+                    className="w-full bg-blue-500/10 text-blue-400 border border-blue-500/30 py-3 px-6 rounded-lg font-medium hover:bg-blue-500/20 transition-colors flex items-center justify-center gap-2"
                   >
                     <FaEye />
                     Preview Template
                   </button>
                   <button
                     onClick={() => handleImportTemplate(template)}
-                    className="w-full bg-[#FEEBD8] text-[#141414] py-3 px-6 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors flex items-center justify-center gap-2"
+                    className="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-3 px-6 rounded-xl font-semibold hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 flex items-center justify-center gap-2"
                   >
                     <FaDownload />
                     Import Template
@@ -1148,8 +1143,8 @@ export default function TemplatesPage() {
         {/* No Results */}
         {filteredTemplates.length === 0 && (
           <div className="text-center py-12">
-            <FaExclamationTriangle className="text-[#FEEBD8]/40 text-4xl mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-[#FEEBD8] mb-2">
+            <FaExclamationTriangle className="text-white/40 text-4xl mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-white mb-2">
               No Templates Found
             </h3>
             <p className="text-[#FEEBD8]/70 mb-4">
@@ -1169,43 +1164,43 @@ export default function TemplatesPage() {
         )}
 
         {/* Help Section */}
-        <div className="mt-12 bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
-          <h3 className="text-xl font-semibold text-[#FEEBD8] mb-4">
+        <div className="mt-12 bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-8">
+          <h3 className="text-2xl font-bold text-white mb-6 text-center">
             How Templates Work
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center text-blue-400 mx-auto mb-3">
-                <FaSearch size={20} />
+              <div className="w-16 h-16 bg-blue-500/10 border border-blue-500/30 rounded-xl flex items-center justify-center text-blue-400 mx-auto mb-4 shadow-lg shadow-blue-500/20">
+                <FaSearch size={24} />
               </div>
-              <h4 className="font-medium text-[#FEEBD8] mb-2">
+              <h4 className="font-semibold text-white mb-2 text-lg">
                 1. Choose Template
               </h4>
-              <p className="text-[#FEEBD8]/70 text-sm">
+              <p className="text-white/70 text-sm">
                 Browse templates by country and select the one that matches your
                 target universities.
               </p>
             </div>
             <div className="text-center">
-              <div className="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center text-green-400 mx-auto mb-3">
-                <FaDownload size={20} />
+              <div className="w-16 h-16 bg-green-500/10 border border-green-500/30 rounded-xl flex items-center justify-center text-green-400 mx-auto mb-4 shadow-lg shadow-green-500/20">
+                <FaDownload size={24} />
               </div>
-              <h4 className="font-medium text-[#FEEBD8] mb-2">
+              <h4 className="font-semibold text-white mb-2 text-lg">
                 2. Import Template
               </h4>
-              <p className="text-[#FEEBD8]/70 text-sm">
+              <p className="text-white/70 text-sm">
                 Click import to automatically create checklists and tasks for
                 your college applications.
               </p>
             </div>
             <div className="text-center">
-              <div className="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center text-purple-400 mx-auto mb-3">
-                <FaCheckCircle size={20} />
+              <div className="w-16 h-16 bg-purple-500/10 border border-purple-500/30 rounded-xl flex items-center justify-center text-purple-400 mx-auto mb-4 shadow-lg shadow-purple-500/20">
+                <FaCheckCircle size={24} />
               </div>
-              <h4 className="font-medium text-[#FEEBD8] mb-2">
+              <h4 className="font-semibold text-white mb-2 text-lg">
                 3. Track Progress
               </h4>
-              <p className="text-[#FEEBD8]/70 text-sm">
+              <p className="text-white/70 text-sm">
                 Use the imported tasks and deadlines to stay organized
                 throughout your application process.
               </p>

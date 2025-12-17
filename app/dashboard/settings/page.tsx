@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
 import { useAuth } from "../../../components/AuthProvider";
 import { API_BASE_URL } from "../../../config/api";
@@ -389,6 +388,9 @@ export default function Settings() {
         setNewProfilePictureUrl("");
         setUpdateSuccess("Profile picture updated successfully!");
 
+        // Auto-refresh data after successful update
+        await handleRefreshData();
+
         // Clear success message after 3 seconds
         setTimeout(() => setUpdateSuccess(null), 3000);
       } catch (error: any) {
@@ -420,10 +422,10 @@ export default function Settings() {
     return (
       <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
         <div className="text-center">
-          <div className="text-[#FEEBD8] text-lg mb-4">
+          <div className="text-white text-lg mb-4">
             Loading your settings...
           </div>
-          <div className="text-[#FEEBD8]/60 text-sm">
+          <div className="text-white/60 text-sm">
             This should only take a moment
           </div>
         </div>
@@ -526,6 +528,9 @@ export default function Settings() {
         setUpdateSuccess("No changes detected");
       }
 
+      // Auto-refresh data after successful update
+      await handleRefreshData();
+
       // Clear success message after 3 seconds
       setTimeout(() => setUpdateSuccess(null), 3000);
     } catch (error: any) {
@@ -585,6 +590,9 @@ export default function Settings() {
       const status = value ? "enabled" : "disabled";
       setUpdateSuccess(`${friendlyName} ${status} successfully!`);
 
+      // Auto-refresh data after successful update
+      await handleRefreshData();
+
       // Clear success message after 3 seconds
       setTimeout(() => setUpdateSuccess(null), 3000);
     } catch (error: any) {
@@ -631,6 +639,9 @@ export default function Settings() {
           friendlyKey.charAt(0).toUpperCase() + friendlyKey.slice(1)
         } updated successfully!`
       );
+
+      // Auto-refresh data after successful update
+      await handleRefreshData();
 
       // Clear success message after 3 seconds
       setTimeout(() => setUpdateSuccess(null), 3000);
@@ -686,6 +697,9 @@ export default function Settings() {
       const friendlyName = friendlyNames[key] || key;
       setUpdateSuccess(`${friendlyName} updated successfully!`);
 
+      // Auto-refresh data after successful update
+      await handleRefreshData();
+
       // Clear success message after 3 seconds
       setTimeout(() => setUpdateSuccess(null), 3000);
     } catch (error: any) {
@@ -697,13 +711,11 @@ export default function Settings() {
   const renderProfileTab = () => (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-[#FEEBD8]">
-          Profile Information
-        </h2>
+        <h2 className="text-2xl font-bold text-white">Profile Information</h2>
         {!isEditing ? (
           <button
             onClick={() => setIsEditing(true)}
-            className="bg-[#FEEBD8] text-[#141414] px-4 py-2 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors flex items-center gap-2"
+            className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-lg shadow-blue-500/20 flex items-center gap-2"
           >
             <FaEdit />
             <span>Edit</span>
@@ -736,7 +748,7 @@ export default function Settings() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Profile Picture */}
-        <div className="bg-gradient-to-br from-[#1a1a1a] to-[#141414] border border-neutral-700/50 rounded-xl p-8 shadow-lg">
+        <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-8 shadow-lg">
           <div className="flex flex-col items-center">
             {/* Profile Picture with enhanced styling */}
             <div
@@ -752,7 +764,7 @@ export default function Settings() {
                       user?.avatar
                     }
                     alt={`${userData?.firstName || "User"}'s profile`}
-                    className="w-32 h-32 rounded-full object-cover border-4 border-[#FEEBD8]/20 shadow-xl group-hover:border-[#FEEBD8]/40 transition-all duration-200"
+                    className="w-32 h-32 rounded-full object-cover border-4 border-blue-500/20 shadow-xl group-hover:border-blue-500/40 transition-all duration-200"
                     onError={(e) => {
                       // Fallback to initials if image fails to load
                       e.currentTarget.style.display = "none";
@@ -763,18 +775,18 @@ export default function Settings() {
                   />
                   {/* Fallback initials (hidden by default) */}
                   <div
-                    className="w-32 h-32 bg-gradient-to-br from-[#FEEBD8] to-[#E5D5B7] rounded-full flex items-center justify-center absolute top-0 left-0 shadow-xl group-hover:from-[#FEEBD8]/90 group-hover:to-[#E5D5B7]/90 transition-all duration-200"
+                    className="w-32 h-32 bg-gradient-to-br from-blue-400 to-blue-500 rounded-full flex items-center justify-center absolute top-0 left-0 shadow-xl group-hover:from-blue-400/90 group-hover:to-blue-500/90 transition-all duration-200"
                     style={{ display: "none" }}
                   >
-                    <span className="text-[#141414] text-3xl font-bold">
+                    <span className="text-white text-3xl font-bold">
                       {userData?.firstName?.[0] || "U"}
                       {userData?.lastName?.[0] || ""}
                     </span>
                   </div>
                 </div>
               ) : (
-                <div className="w-32 h-32 bg-gradient-to-br from-[#FEEBD8] to-[#E5D5B7] rounded-full flex items-center justify-center shadow-xl group-hover:from-[#FEEBD8]/90 group-hover:to-[#E5D5B7]/90 transition-all duration-200">
-                  <span className="text-[#141414] text-3xl font-bold">
+                <div className="w-32 h-32 bg-gradient-to-br from-blue-400 to-blue-500 rounded-full flex items-center justify-center shadow-xl group-hover:from-blue-400/90 group-hover:to-blue-500/90 transition-all duration-200">
+                  <span className="text-white text-3xl font-bold">
                     {userData?.firstName?.[0] || "U"}
                     {userData?.lastName?.[0] || ""}
                   </span>
@@ -794,12 +806,12 @@ export default function Settings() {
 
             {/* User Info */}
             <div className="text-center mb-6">
-              <h2 className="text-2xl font-bold text-[#FEEBD8] mb-2">
+              <h2 className="text-2xl font-bold text-white mb-2">
                 {userData?.firstName} {userData?.lastName}
               </h2>
               {userData?.username && (
-                <div className="inline-flex items-center gap-1 bg-[#FEEBD8]/10 backdrop-blur-sm border border-[#FEEBD8]/20 rounded-full px-4 py-2">
-                  <span className="text-[#FEEBD8]/90 text-sm font-medium">
+                <div className="inline-flex items-center gap-1 bg-blue-500/10 backdrop-blur-sm border border-blue-500/30 rounded-full px-4 py-2">
+                  <span className="text-blue-400 text-sm font-medium">
                     @{userData.username}
                   </span>
                 </div>
@@ -827,13 +839,13 @@ export default function Settings() {
         </div>
 
         {/* Personal Info */}
-        <div className="lg:col-span-2 bg-[#1a1a1a] border border-neutral-700 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-[#FEEBD8] mb-4">
+        <div className="lg:col-span-2 bg-neutral-800/30 border border-neutral-700/50 rounded-xl p-6">
+          <h3 className="text-lg font-semibold text-white mb-4">
             Personal Information
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+              <label className="block text-sm font-medium text-white/70 mb-2">
                 First Name
               </label>
               <input
@@ -846,11 +858,11 @@ export default function Settings() {
                   }))
                 }
                 disabled={!isEditing}
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8] disabled:opacity-50"
+                className="w-full bg-neutral-800/50 border border-neutral-700 rounded-lg px-4 py-2 text-white placeholder:text-white/40 focus:outline-none focus:border-blue-500/50 disabled:opacity-50"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+              <label className="block text-sm font-medium text-white/70 mb-2">
                 Last Name
               </label>
               <input
@@ -863,11 +875,11 @@ export default function Settings() {
                   }))
                 }
                 disabled={!isEditing}
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8] disabled:opacity-50"
+                className="w-full bg-neutral-800/50 border border-neutral-700 rounded-lg px-4 py-2 text-white placeholder:text-white/40 focus:outline-none focus:border-blue-500/50 disabled:opacity-50"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+              <label className="block text-sm font-medium text-white/70 mb-2">
                 Email
               </label>
               <input
@@ -880,14 +892,14 @@ export default function Settings() {
                   }))
                 }
                 disabled={true} // Disabled: Email changes not available yet
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8] disabled:opacity-50"
+                className="w-full bg-neutral-800/50 border border-neutral-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500/50 disabled:opacity-50"
               />
-              <p className="text-[#FEEBD8]/40 text-xs mt-1">
+              <p className="text-white/40 text-xs mt-1">
                 Email changes coming soon
               </p>
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+              <label className="block text-sm font-medium text-white/70 mb-2">
                 Phone
               </label>
               <input
@@ -900,14 +912,14 @@ export default function Settings() {
                   }))
                 }
                 disabled={true} // Disabled: Phone field not available in current API endpoints
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8] disabled:opacity-50"
+                className="w-full bg-neutral-800/50 border border-neutral-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500/50 disabled:opacity-50"
               />
-              <p className="text-[#FEEBD8]/40 text-xs mt-1">
+              <p className="text-white/40 text-xs mt-1">
                 Phone field coming soon
               </p>
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+              <label className="block text-sm font-medium text-white/70 mb-2">
                 High School
               </label>
               <input
@@ -920,11 +932,11 @@ export default function Settings() {
                   }))
                 }
                 disabled={!isEditing}
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8] disabled:opacity-50"
+                className="w-full bg-neutral-800/50 border border-neutral-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500/50 disabled:opacity-50"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+              <label className="block text-sm font-medium text-white/70 mb-2">
                 Graduation Year
               </label>
               <input
@@ -941,11 +953,11 @@ export default function Settings() {
                   }))
                 }
                 disabled={!isEditing}
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8] disabled:opacity-50"
+                className="w-full bg-neutral-800/50 border border-neutral-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500/50 disabled:opacity-50"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+              <label className="block text-sm font-medium text-white/70 mb-2">
                 Location
               </label>
               <input
@@ -959,11 +971,11 @@ export default function Settings() {
                 }
                 disabled={!isEditing}
                 placeholder="City, Country"
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8] disabled:opacity-50"
+                className="w-full bg-neutral-800/50 border border-neutral-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500/50 disabled:opacity-50"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+              <label className="block text-sm font-medium text-white/70 mb-2">
                 Birthdate
               </label>
               <input
@@ -977,11 +989,11 @@ export default function Settings() {
                 }
                 disabled={!isEditing}
                 placeholder="MM-DD-YYYY"
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8] disabled:opacity-50"
+                className="w-full bg-neutral-800/50 border border-neutral-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500/50 disabled:opacity-50"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+              <label className="block text-sm font-medium text-white/70 mb-2">
                 Website
               </label>
               <input
@@ -995,18 +1007,18 @@ export default function Settings() {
                 }
                 disabled={!isEditing}
                 placeholder="https://yourwebsite.com"
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8] disabled:opacity-50"
+                className="w-full bg-neutral-800/50 border border-neutral-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500/50 disabled:opacity-50"
               />
             </div>
 
             {/* Social Links Section */}
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+              <label className="block text-sm font-medium text-white/70 mb-2">
                 Social Links
               </label>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs text-[#FEEBD8]/50 mb-1">
+                  <label className="block text-xs text-white/50 mb-1">
                     LinkedIn
                   </label>
                   <input
@@ -1027,11 +1039,11 @@ export default function Settings() {
                     }
                     disabled={!isEditing}
                     placeholder="https://linkedin.com/in/username"
-                    className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-[#FEEBD8] text-sm focus:outline-none focus:border-[#FEEBD8] disabled:opacity-50"
+                    className="w-full bg-neutral-800/50 border border-neutral-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500/50 disabled:opacity-50"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-[#FEEBD8]/50 mb-1">
+                  <label className="block text-xs text-white/50 mb-1">
                     Twitter
                   </label>
                   <input
@@ -1052,11 +1064,11 @@ export default function Settings() {
                     }
                     disabled={!isEditing}
                     placeholder="https://twitter.com/username"
-                    className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-[#FEEBD8] text-sm focus:outline-none focus:border-[#FEEBD8] disabled:opacity-50"
+                    className="w-full bg-neutral-800/50 border border-neutral-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500/50 disabled:opacity-50"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-[#FEEBD8]/50 mb-1">
+                  <label className="block text-xs text-white/50 mb-1">
                     Instagram
                   </label>
                   <input
@@ -1077,11 +1089,11 @@ export default function Settings() {
                     }
                     disabled={!isEditing}
                     placeholder="https://instagram.com/username"
-                    className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-[#FEEBD8] text-sm focus:outline-none focus:border-[#FEEBD8] disabled:opacity-50"
+                    className="w-full bg-neutral-800/50 border border-neutral-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500/50 disabled:opacity-50"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-[#FEEBD8]/50 mb-1">
+                  <label className="block text-xs text-white/50 mb-1">
                     GitHub
                   </label>
                   <input
@@ -1102,14 +1114,14 @@ export default function Settings() {
                     }
                     disabled={!isEditing}
                     placeholder="https://github.com/username"
-                    className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-[#FEEBD8] text-sm focus:outline-none focus:border-[#FEEBD8] disabled:opacity-50"
+                    className="w-full bg-neutral-800/50 border border-neutral-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500/50 disabled:opacity-50"
                   />
                 </div>
               </div>
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+              <label className="block text-sm font-medium text-white/70 mb-2">
                 Bio
               </label>
               <textarea
@@ -1123,7 +1135,7 @@ export default function Settings() {
                 disabled={!isEditing}
                 rows={3}
                 placeholder="Tell us about yourself..."
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8] disabled:opacity-50 resize-none"
+                className="w-full bg-neutral-800/50 border border-neutral-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500/50 disabled:opacity-50 resize-none"
               />
             </div>
           </div>
@@ -1134,11 +1146,9 @@ export default function Settings() {
 
   const renderNotificationsTab = () => (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-[#FEEBD8]">
-        Notification Settings
-      </h2>
+      <h2 className="text-2xl font-bold text-white">Notification Settings</h2>
 
-      <div className="bg-[#1a1a1a] border border-neutral-700 rounded-lg p-6">
+      <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6">
         <div className="space-y-4">
           {Object.entries(userData.notifications).map(([key, value]) => (
             <div
@@ -1146,13 +1156,13 @@ export default function Settings() {
               className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-3 sm:p-0"
             >
               <div className="flex-1 min-w-0">
-                <h3 className="text-[#FEEBD8] font-medium text-sm sm:text-base">
+                <h3 className="text-white font-medium text-sm sm:text-base">
                   {key
                     .replace(/([A-Z])/g, " $1")
                     .replace(/^./, (str) => str.toUpperCase())}
                   {key === "weeklyReports" && " *"}
                 </h3>
-                <p className="text-[#FEEBD8]/60 text-xs sm:text-sm mt-1 pr-2">
+                <p className="text-white/60 text-xs sm:text-sm mt-1 pr-2">
                   {key === "emailNotifications" &&
                     "Get notified via email about deadlines, updates, and new features"}
                   {key === "weeklyReports" &&
@@ -1165,7 +1175,7 @@ export default function Settings() {
                 <button
                   onClick={() => updateNotification(key, !value)}
                   className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors touch-manipulation ${
-                    value ? "bg-[#FEEBD8]" : "bg-neutral-600"
+                    value ? "bg-blue-500" : "bg-neutral-600"
                   }`}
                 >
                   <span
@@ -1184,18 +1194,18 @@ export default function Settings() {
 
   const renderPreferencesTab = () => (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-[#FEEBD8]">Preferences</h2>
+      <h2 className="text-2xl font-bold text-white">Preferences</h2>
 
-      <div className="bg-[#1a1a1a] border border-neutral-700 rounded-lg p-6">
+      <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6">
         <div className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+            <label className="block text-sm font-medium text-white/70 mb-2">
               Theme
             </label>
             <select
               value={userData.preferences.theme}
               onChange={(e) => updatePreference("theme", e.target.value)}
-              className="bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+              className="bg-neutral-800/50 border border-neutral-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500/50"
             >
               <option value="dark">Dark</option>
               <option value="light">Light</option>
@@ -1203,13 +1213,13 @@ export default function Settings() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+            <label className="block text-sm font-medium text-white/70 mb-2">
               Time Format *
             </label>
             <select
               value={userData.preferences.timeFormat}
               onChange={(e) => updatePreference("timeFormat", e.target.value)}
-              className="bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+              className="bg-neutral-800/50 border border-neutral-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500/50"
             >
               <option value="12h">12 Hour</option>
               <option value="24h">24 Hour</option>
@@ -1217,13 +1227,13 @@ export default function Settings() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+            <label className="block text-sm font-medium text-white/70 mb-2">
               Date Format *
             </label>
             <select
               value={userData.preferences.dateFormat}
               onChange={(e) => updatePreference("dateFormat", e.target.value)}
-              className="bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+              className="bg-neutral-800/50 border border-neutral-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500/50"
             >
               <option value="MM/DD/YYYY">MM/DD/YYYY</option>
               <option value="DD/MM/YYYY">DD/MM/YYYY</option>
@@ -1232,13 +1242,13 @@ export default function Settings() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+            <label className="block text-sm font-medium text-white/70 mb-2">
               Default View *
             </label>
             <select
               value={userData.preferences.defaultView}
               onChange={(e) => updatePreference("defaultView", e.target.value)}
-              className="bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+              className="bg-neutral-800/50 border border-neutral-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500/50"
             >
               <option value="dashboard">Dashboard</option>
               <option value="colleges">Colleges</option>
@@ -1247,13 +1257,13 @@ export default function Settings() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-[#FEEBD8]/70 mb-2">
+            <label className="block text-sm font-medium text-white/70 mb-2">
               Language
             </label>
             <select
               value={userData.preferences.language}
               onChange={(e) => updatePreference("language", e.target.value)}
-              className="bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+              className="bg-neutral-800/50 border border-neutral-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500/50"
             >
               <option value="en">English</option>
               <option value="en-US">English (United States)</option>
@@ -1293,28 +1303,28 @@ export default function Settings() {
 
   const renderSecurityTab = () => (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-[#FEEBD8]">Security Settings</h2>
+      <h2 className="text-2xl font-bold text-white">Security Settings</h2>
 
-      <div className="bg-[#1a1a1a] border border-neutral-700 rounded-lg p-6">
+      <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6">
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-[#FEEBD8] font-medium">Change Password</h3>
-              <p className="text-[#FEEBD8]/60 text-sm">
+              <h3 className="text-white font-medium">Change Password *</h3>
+              <p className="text-white/60 text-sm">
                 Update your account password
               </p>
             </div>
-            <button className="bg-[#FEEBD8] text-[#141414] px-4 py-2 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors">
+            <button className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:from-blue-600 hover:to-blue-700 transition-colors">
               Change
             </button>
           </div>
 
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-[#FEEBD8] font-medium">
-                Two-Factor Authentication
+              <h3 className="text-white font-medium">
+                Two-Factor Authentication *
               </h3>
-              <p className="text-[#FEEBD8]/60 text-sm">
+              <p className="text-white/60 text-sm">
                 Add an extra layer of security to your account
               </p>
             </div>
@@ -1325,8 +1335,8 @@ export default function Settings() {
 
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-[#FEEBD8] font-medium">Active Sessions</h3>
-              <p className="text-[#FEEBD8]/60 text-sm">
+              <h3 className="text-white font-medium">Active Sessions *</h3>
+              <p className="text-white/60 text-sm">
                 Manage your active login sessions
               </p>
             </div>
@@ -1341,20 +1351,20 @@ export default function Settings() {
 
   const renderPrivacyTab = () => (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-[#FEEBD8]">Privacy Settings</h2>
+      <h2 className="text-2xl font-bold text-white">Privacy Settings</h2>
 
       {/* Profile Privacy */}
-      <div className="bg-[#1a1a1a] border border-neutral-700 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-[#FEEBD8] mb-4">
+      <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6">
+        <h3 className="text-lg font-semibold text-white mb-4">
           Profile Privacy
         </h3>
         <div className="space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-3 sm:p-0">
             <div className="flex-1 min-w-0">
-              <h4 className="text-[#FEEBD8] font-medium text-sm sm:text-base">
+              <h4 className="text-white font-medium text-sm sm:text-base">
                 Profile Visibility
               </h4>
-              <p className="text-[#FEEBD8]/60 text-xs sm:text-sm mt-1 pr-2">
+              <p className="text-white/60 text-xs sm:text-sm mt-1 pr-2">
                 {userData.privacy.isProfilePublic
                   ? "Your profile is visible to other users and can be found in search results"
                   : "Your profile is private and only visible to you"}
@@ -1370,7 +1380,7 @@ export default function Settings() {
                 }
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors touch-manipulation ${
                   userData.privacy.isProfilePublic
-                    ? "bg-[#FEEBD8]"
+                    ? "bg-blue-500"
                     : "bg-neutral-600"
                 }`}
               >
@@ -1387,10 +1397,10 @@ export default function Settings() {
 
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-3 sm:p-0">
             <div className="flex-1 min-w-0">
-              <h4 className="text-[#FEEBD8] font-medium text-sm sm:text-base">
+              <h4 className="text-white font-medium text-sm sm:text-base">
                 Searchable Profile *
               </h4>
-              <p className="text-[#FEEBD8]/60 text-xs sm:text-sm mt-1 pr-2">
+              <p className="text-white/60 text-xs sm:text-sm mt-1 pr-2">
                 Allow your profile to appear in search results
               </p>
             </div>
@@ -1404,7 +1414,7 @@ export default function Settings() {
                 }
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors touch-manipulation ${
                   userData.privacy.searchableProfile
-                    ? "bg-[#FEEBD8]"
+                    ? "bg-blue-500"
                     : "bg-neutral-600"
                 }`}
               >
@@ -1421,10 +1431,10 @@ export default function Settings() {
 
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-3 sm:p-0">
             <div className="flex-1 min-w-0">
-              <h4 className="text-[#FEEBD8] font-medium text-sm sm:text-base">
+              <h4 className="text-white font-medium text-sm sm:text-base">
                 Show Online Status *
               </h4>
-              <p className="text-[#FEEBD8]/60 text-xs sm:text-sm mt-1 pr-2">
+              <p className="text-white/60 text-xs sm:text-sm mt-1 pr-2">
                 Let others see when you're online
               </p>
             </div>
@@ -1438,7 +1448,7 @@ export default function Settings() {
                 }
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors touch-manipulation ${
                   userData.privacy.showOnlineStatus
-                    ? "bg-[#FEEBD8]"
+                    ? "bg-blue-500"
                     : "bg-neutral-600"
                 }`}
               >
@@ -1473,17 +1483,17 @@ export default function Settings() {
       </div>
 
       {/* Contact Information Privacy */}
-      <div className="bg-[#1a1a1a] border border-neutral-700 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-[#FEEBD8] mb-4">
+      <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6">
+        <h3 className="text-lg font-semibold text-white mb-4">
           Contact Information
         </h3>
         <div className="space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-3 sm:p-0">
             <div className="flex-1 min-w-0">
-              <h4 className="text-[#FEEBD8] font-medium text-sm sm:text-base">
+              <h4 className="text-white font-medium text-sm sm:text-base">
                 Show Email Address *
               </h4>
-              <p className="text-[#FEEBD8]/60 text-xs sm:text-sm mt-1 pr-2">
+              <p className="text-white/60 text-xs sm:text-sm mt-1 pr-2">
                 Display your email address on your public profile
               </p>
             </div>
@@ -1493,7 +1503,7 @@ export default function Settings() {
                   updatePrivacy("showEmail", !userData.privacy.showEmail)
                 }
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors touch-manipulation ${
-                  userData.privacy.showEmail ? "bg-[#FEEBD8]" : "bg-neutral-600"
+                  userData.privacy.showEmail ? "bg-blue-500" : "bg-neutral-600"
                 }`}
               >
                 <span
@@ -1509,10 +1519,10 @@ export default function Settings() {
 
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-3 sm:p-0">
             <div className="flex-1 min-w-0">
-              <h4 className="text-[#FEEBD8] font-medium text-sm sm:text-base">
+              <h4 className="text-white font-medium text-sm sm:text-base">
                 Show Phone Number *
               </h4>
-              <p className="text-[#FEEBD8]/60 text-xs sm:text-sm mt-1 pr-2">
+              <p className="text-white/60 text-xs sm:text-sm mt-1 pr-2">
                 Display your phone number on your public profile
               </p>
             </div>
@@ -1522,7 +1532,7 @@ export default function Settings() {
                   updatePrivacy("showPhone", !userData.privacy.showPhone)
                 }
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors touch-manipulation ${
-                  userData.privacy.showPhone ? "bg-[#FEEBD8]" : "bg-neutral-600"
+                  userData.privacy.showPhone ? "bg-blue-500" : "bg-neutral-600"
                 }`}
               >
                 <span
@@ -1538,10 +1548,10 @@ export default function Settings() {
 
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-3 sm:p-0">
             <div className="flex-1 min-w-0">
-              <h4 className="text-[#FEEBD8] font-medium text-sm sm:text-base">
+              <h4 className="text-white font-medium text-sm sm:text-base">
                 Allow Messaging *
               </h4>
-              <p className="text-[#FEEBD8]/60 text-xs sm:text-sm mt-1 pr-2">
+              <p className="text-white/60 text-xs sm:text-sm mt-1 pr-2">
                 Let other users send you direct messages
               </p>
             </div>
@@ -1555,7 +1565,7 @@ export default function Settings() {
                 }
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors touch-manipulation ${
                   userData.privacy.allowMessaging
-                    ? "bg-[#FEEBD8]"
+                    ? "bg-blue-500"
                     : "bg-neutral-600"
                 }`}
               >
@@ -1573,17 +1583,17 @@ export default function Settings() {
       </div>
 
       {/* Data & Analytics */}
-      <div className="bg-[#1a1a1a] border border-neutral-700 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-[#FEEBD8] mb-4">
+      <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6">
+        <h3 className="text-lg font-semibold text-white mb-4">
           Data & Analytics
         </h3>
         <div className="space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-3 sm:p-0">
             <div className="flex-1 min-w-0">
-              <h4 className="text-[#FEEBD8] font-medium text-sm sm:text-base">
+              <h4 className="text-white font-medium text-sm sm:text-base">
                 Data Collection *
               </h4>
-              <p className="text-[#FEEBD8]/60 text-xs sm:text-sm mt-1 pr-2">
+              <p className="text-white/60 text-xs sm:text-sm mt-1 pr-2">
                 Allow us to collect usage data to improve your experience
               </p>
             </div>
@@ -1597,7 +1607,7 @@ export default function Settings() {
                 }
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors touch-manipulation ${
                   userData.privacy.dataCollection
-                    ? "bg-[#FEEBD8]"
+                    ? "bg-blue-500"
                     : "bg-neutral-600"
                 }`}
               >
@@ -1614,10 +1624,10 @@ export default function Settings() {
 
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-3 sm:p-0">
             <div className="flex-1 min-w-0">
-              <h4 className="text-[#FEEBD8] font-medium text-sm sm:text-base">
+              <h4 className="text-white font-medium text-sm sm:text-base">
                 Analytics Tracking *
               </h4>
-              <p className="text-[#FEEBD8]/60 text-xs sm:text-sm mt-1 pr-2">
+              <p className="text-white/60 text-xs sm:text-sm mt-1 pr-2">
                 Enable analytics to help us understand how you use Paccy
               </p>
             </div>
@@ -1627,7 +1637,7 @@ export default function Settings() {
                   updatePrivacy("analytics", !userData.privacy.analytics)
                 }
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors touch-manipulation ${
-                  userData.privacy.analytics ? "bg-[#FEEBD8]" : "bg-neutral-600"
+                  userData.privacy.analytics ? "bg-blue-500" : "bg-neutral-600"
                 }`}
               >
                 <span
@@ -1654,7 +1664,7 @@ export default function Settings() {
             <p className="text-blue-300/80 text-sm">
               We're committed to protecting your privacy. You can change these
               settings at any time. For more information, check out our{" "}
-              <button className="text-[#FEEBD8] underline hover:text-[#E5D5B7]">
+              <button className="text-white underline hover:text-blue-400">
                 Privacy Policy
               </button>
               .
@@ -1667,9 +1677,7 @@ export default function Settings() {
 
   const renderBillingTab = () => (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-[#FEEBD8]">
-        Billing & Subscription
-      </h2>
+      <h2 className="text-2xl font-bold text-white">Billing & Subscription</h2>
 
       {/* Payment System Notice */}
       <div className="bg-gradient-to-r from-orange-500/20 to-yellow-500/20 border border-orange-400/50 rounded-xl p-4 ">
@@ -1688,36 +1696,36 @@ export default function Settings() {
       </div>
 
       {/* Current Plan */}
-      <div className="bg-[#1a1a1a] border border-neutral-700 rounded-lg p-6">
+      <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <FaCrown className="text-yellow-400" size={24} />
             <div>
-              <h3 className="text-xl font-semibold text-[#FEEBD8]">
+              <h3 className="text-xl font-semibold text-white">
                 {userData.plan} Plan
               </h3>
-              <p className="text-[#FEEBD8]/60">
+              <p className="text-white/60">
                 Expires on {new Date(userData.planExpiry).toLocaleDateString()}
               </p>
             </div>
           </div>
           <button
             onClick={handleUpgradeClick}
-            className="bg-[#FEEBD8] text-[#141414] px-4 py-2 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors"
+            className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:from-blue-600 hover:to-blue-700 transition-colors"
           >
             Upgrade Plan
           </button>
         </div>
 
         <div className="space-y-2">
-          <h4 className="text-sm font-medium text-[#FEEBD8]/70">
+          <h4 className="text-sm font-medium text-white/70">
             Current Plan Features:
           </h4>
           {planFeatures[userData.plan as keyof typeof planFeatures].map(
             (feature, idx) => (
               <div key={idx} className="flex items-center gap-2">
                 <FaCheck className="text-green-400 text-sm" />
-                <span className="text-[#FEEBD8]/70 text-sm">{feature}</span>
+                <span className="text-white/70 text-sm">{feature}</span>
               </div>
             )
           )}
@@ -1725,12 +1733,10 @@ export default function Settings() {
       </div>
 
       {/* Billing History */}
-      <div className="bg-[#1a1a1a] border border-neutral-700 rounded-lg p-6">
+      <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-[#FEEBD8]">
-            Billing History
-          </h3>
-          <button className="text-[#FEEBD8] hover:text-[#E5D5B7] transition-colors flex items-center gap-2">
+          <h3 className="text-lg font-semibold text-white">Billing History</h3>
+          <button className="text-white hover:text-blue-400 transition-colors flex items-center gap-2">
             <FaDownload />
             <span>Download</span>
           </button>
@@ -1739,17 +1745,17 @@ export default function Settings() {
         <div className="space-y-3">
           <div className="flex items-center justify-between p-3 bg-neutral-800 rounded-lg">
             <div>
-              <p className="text-[#FEEBD8] font-medium">Pro Plan - Annual</p>
-              <p className="text-[#FEEBD8]/60 text-sm">December 15, 2024</p>
+              <p className="text-white font-medium">Pro Plan - Annual</p>
+              <p className="text-white/60 text-sm">December 15, 2024</p>
             </div>
-            <p className="text-[#FEEBD8] font-semibold">$99.00</p>
+            <p className="text-white font-semibold">$99.00</p>
           </div>
           <div className="flex items-center justify-between p-3 bg-neutral-800 rounded-lg">
             <div>
-              <p className="text-[#FEEBD8] font-medium">Pro Plan - Annual</p>
-              <p className="text-[#FEEBD8]/60 text-sm">December 15, 2023</p>
+              <p className="text-white font-medium">Pro Plan - Annual</p>
+              <p className="text-white/60 text-sm">December 15, 2023</p>
             </div>
-            <p className="text-[#FEEBD8] font-semibold">$89.00</p>
+            <p className="text-white font-semibold">$89.00</p>
           </div>
         </div>
       </div>
@@ -1758,33 +1764,31 @@ export default function Settings() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a]">
-      <Navbar />
-
-      <div className="max-w-screen-2xl mx-auto px-4 md:px-10 py-8 pt-28">
+      <div className="max-w-screen-2xl mx-auto px-4 md:px-10 py-8">
         {/* Header */}
-        <div className="flex items-center space-x-4 mb-8">
+        <div className="flex items-center gap-4 mb-8">
           <Link
             href="/dashboard"
-            className="text-[#FEEBD8]/70 hover:text-[#FEEBD8] transition-colors"
+            className="text-white/70 hover:text-white transition-colors"
           >
             <FaArrowLeft size={20} />
           </Link>
-          <div className="flex-1">
-            <h1 className="text-4xl font-bold text-[#FEEBD8]">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white">
               Settings & Account
             </h1>
-            <div className="flex items-center gap-4 mt-2">
-              <p className="text-[#FEEBD8]/70 hidden md:block">
+            <div className="flex flex-wrap items-center gap-3 mt-2">
+              <p className="text-white/70 text-sm sm:text-base hidden md:block">
                 Manage your account settings and preferences
               </p>
               {user && (
-                <div className="flex items-center gap-2 bg-green-900/20 border border-green-600/30 rounded-lg px-3 py-1">
+                <div className="flex items-center gap-2 bg-green-500/10 border border-green-500/30 rounded-lg px-3 py-1">
                   <div className="w-2 h-2 bg-green-400 rounded-full"></div>
                   <span className="text-green-400 text-sm">Live Data</span>
                 </div>
               )}
               {dataLoading && (
-                <div className="flex items-center gap-2 bg-blue-900/20 border border-blue-600/30 rounded-lg px-3 py-1">
+                <div className="flex items-center gap-2 bg-blue-500/10 border border-blue-500/30 rounded-lg px-3 py-1">
                   <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
                   <span className="text-blue-400 text-sm">Syncing...</span>
                 </div>
@@ -1792,10 +1796,10 @@ export default function Settings() {
               <button
                 onClick={handleRefreshData}
                 disabled={dataLoading}
-                className="flex items-center gap-2 bg-[#FEEBD8]/10 border border-[#FEEBD8]/30 rounded-lg px-3 py-1 hover:bg-[#FEEBD8]/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 bg-blue-500/10 border border-blue-500/30 rounded-lg px-3 py-1 hover:bg-blue-500/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <svg
-                  className={`w-4 h-4 text-[#FEEBD8] ${
+                  className={`w-4 h-4 text-blue-400 ${
                     dataLoading ? "animate-spin" : ""
                   }`}
                   fill="none"
@@ -1809,51 +1813,50 @@ export default function Settings() {
                     d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
                   />
                 </svg>
-                <span className="text-[#FEEBD8] text-sm">
+                <span className="text-blue-400 text-sm">
                   {dataLoading ? "Refreshing..." : "Refresh"}
                 </span>
               </button>
             </div>
-            <p className="text-[#FEEBD8]/50 text-xs mt-2">
-              * Settings marked with asterisk are not connected to backend yet
+            <p className="text-white/50 text-xs mt-2">
+              * Settings marked with asterisk are not supported yet.
             </p>
           </div>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Sidebar Navigation */}
-          <div className="lg:w-64">
-            <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
-              <nav className="space-y-2">
-                {tabs.map((tab) => (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
-                      activeTab === tab.id
-                        ? "bg-[#FEEBD8] text-[#141414]"
-                        : "text-[#FEEBD8]/70 hover:text-[#FEEBD8] hover:bg-neutral-800"
-                    }`}
-                  >
-                    {tab.icon}
-                    <span>{tab.label}</span>
-                  </button>
-                ))}
-              </nav>
-
+        {/* Horizontal Tab Navigation */}
+        <div className="mb-8">
+          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-2">
+            <div className="flex flex-wrap gap-2">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+                    activeTab === tab.id
+                      ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/20"
+                      : "text-white/70 hover:text-white hover:bg-neutral-800/50"
+                  }`}
+                >
+                  {tab.icon}
+                  <span className="hidden sm:inline">{tab.label}</span>
+                </button>
+              ))}
               <button
                 onClick={handleLogout}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-red-400 hover:bg-red-500/10 transition-colors mt-4"
+                className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium text-red-400 hover:bg-red-500/10 transition-colors ml-auto"
               >
                 <FaSignOutAlt />
-                <span>Sign Out</span>
+                <span className="hidden sm:inline">Sign Out</span>
               </button>
             </div>
           </div>
+        </div>
 
+        <div className="flex flex-col gap-8">
           {/* Main Content */}
           <div className="flex-1">
-            <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-8">
+            <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-8">
               {/* Feedback Messages */}
               {updateError && (
                 <div className="mb-6 p-4 bg-red-500/20 border border-red-500/30 rounded-lg text-red-400">
@@ -1913,12 +1916,12 @@ export default function Settings() {
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6 w-full max-w-md">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-[#FEEBD8]">
+              <h2 className="text-xl font-semibold text-white">
                 Change Profile Picture
               </h2>
               <button
                 onClick={handleProfilePictureModalClose}
-                className="text-[#FEEBD8]/50 hover:text-[#FEEBD8] transition-colors"
+                className="text-white/50 hover:text-white transition-colors"
               >
                 <svg
                   className="w-6 h-6"
@@ -1938,7 +1941,7 @@ export default function Settings() {
 
             <div className="space-y-4">
               <div>
-                <label className="block text-[#FEEBD8]/70 text-sm mb-2">
+                <label className="block text-white/70 text-sm mb-2">
                   Profile Picture URL
                 </label>
                 <input
@@ -1946,9 +1949,9 @@ export default function Settings() {
                   value={newProfilePictureUrl}
                   onChange={(e) => setNewProfilePictureUrl(e.target.value)}
                   placeholder="https://example.com/your-image.jpg"
-                  className="w-full bg-[#141414] border border-neutral-700/50 rounded-lg px-4 py-3 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8] placeholder-[#FEEBD8]/40"
+                  className="w-full bg-neutral-800/50 border border-neutral-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500/50 placeholder:text-white/40"
                 />
-                <p className="text-[#FEEBD8]/50 text-xs mt-2">
+                <p className="text-white/50 text-xs mt-2">
                   Enter a direct link to an image (JPG, PNG, GIF, WebP)
                 </p>
               </div>
@@ -1956,11 +1959,11 @@ export default function Settings() {
               {/* Preview */}
               {newProfilePictureUrl && (
                 <div className="text-center">
-                  <p className="text-[#FEEBD8]/70 text-sm mb-2">Preview:</p>
-                  <div className="w-20 h-20 mx-auto rounded-full overflow-hidden border-2 border-[#FEEBD8]/20 bg-neutral-800 flex items-center justify-center relative">
+                  <p className="text-white/70 text-sm mb-2">Preview:</p>
+                  <div className="w-20 h-20 mx-auto rounded-full overflow-hidden border-2 border-blue-500/20 bg-neutral-800 flex items-center justify-center relative">
                     {previewImageStatus === "loading" && (
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-6 h-6 border-2 border-[#FEEBD8]/30 border-t-[#FEEBD8] rounded-full animate-spin"></div>
+                        <div className="w-6 h-6 border-2 border-blue-500/30 border-t-blue-500 rounded-full animate-spin"></div>
                       </div>
                     )}
                     {previewImageStatus === "error" && (
@@ -1998,7 +2001,7 @@ export default function Settings() {
                     </p>
                   )}
                   {previewImageStatus === "loaded" && (
-                    <p className="text-[#FEEBD8]/50 text-xs mt-2">
+                    <p className="text-white/50 text-xs mt-2">
                       {newProfilePictureUrl.length > 50
                         ? `${newProfilePictureUrl.substring(0, 50)}...`
                         : newProfilePictureUrl}
@@ -2010,14 +2013,14 @@ export default function Settings() {
               <div className="flex gap-3 pt-4">
                 <button
                   onClick={handleProfilePictureModalClose}
-                  className="flex-1 px-4 py-2 border border-neutral-700/50 rounded-lg text-[#FEEBD8]/70 hover:text-[#FEEBD8] hover:border-[#FEEBD8]/30 transition-colors"
+                  className="flex-1 px-4 py-2 border border-neutral-700/50 rounded-lg text-white/70 hover:text-white hover:border-blue-500/30 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleProfilePictureUpdate}
                   disabled={!newProfilePictureUrl.trim() || isUpdating}
-                  className="flex-1 bg-[#FEEBD8] text-[#141414] px-4 py-2 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:from-blue-600 hover:to-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {isUpdating ? (
                     <>
@@ -2059,15 +2062,15 @@ export default function Settings() {
             <div className="p-6">
               <p className="text-white/80 mb-4 leading-relaxed">
                 We're currently integrating our payment system for the{" "}
-                <span className="font-semibold text-[#FEEBD8]">
+                <span className="font-semibold text-white">
                   {alertInfo.planName}
                 </span>{" "}
                 plan. Our team is working around the clock to make this
                 available soon!
               </p>
 
-              <div className="bg-[#141414] rounded-xl p-4 mb-6 border border-[#FEEBD8]/20">
-                <h4 className="text-[#FEEBD8] font-semibold mb-2">
+              <div className="bg-[#141414] rounded-xl p-4 mb-6 border border-blue-500/20">
+                <h4 className="text-white font-semibold mb-2">
                   Want Early Access?
                 </h4>
                 <p className="text-white/70 text-sm mb-2">
@@ -2095,7 +2098,7 @@ export default function Settings() {
                     );
                     closeAlert();
                   }}
-                  className="flex-1 px-4 py-3 border border-[#FEEBD8] text-[#FEEBD8] rounded-xl font-bold hover:bg-[#FEEBD8]/10 transition-all duration-300"
+                  className="flex-1 px-4 py-3 border border-blue-500 text-white rounded-xl font-bold hover:bg-blue-500/10 transition-all duration-300"
                 >
                   Contact Us
                 </button>

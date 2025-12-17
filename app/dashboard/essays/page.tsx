@@ -3,11 +3,7 @@
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
-import AddEssayModal from "../../../components/Modals/AddEssayModal";
-import EditEssayModal from "../../../components/Modals/EditEssayModal";
-import PreviewEssayModal from "../../../components/Modals/PreviewEssayModal";
 import { useToast } from "../../../lib/hooks/useToast";
 import { essaysApi } from "../../../lib/api/essays";
 import { collegeApplicationsApi } from "../../../lib/api/college-applications";
@@ -15,13 +11,15 @@ import { Essay, EssayStatus, CollegeApplication } from "../../../lib/types";
 import {
   FaPlus,
   FaSearch,
-  FaEdit,
   FaTrash,
-  FaEye,
   FaArrowLeft,
   FaClock,
   FaCheckCircle,
   FaExclamationTriangle,
+  FaPen,
+  FaFileAlt,
+  FaFilter,
+  FaSpinner,
 } from "react-icons/fa";
 
 const statusColors: Record<string, string> = {
@@ -85,10 +83,6 @@ function EssayManagerContent() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("All");
   const [filterCollege, setFilterCollege] = useState("All");
-  const [isAddEssayModalOpen, setIsAddEssayModalOpen] = useState(false);
-  const [isEditEssayModalOpen, setIsEditEssayModalOpen] = useState(false);
-  const [isPreviewEssayModalOpen, setIsPreviewEssayModalOpen] = useState(false);
-  const [selectedEssay, setSelectedEssay] = useState<Essay | null>(null);
 
   useEffect(() => {
     document.title = "Essay Manager | Paccy";
@@ -211,43 +205,26 @@ function EssayManagerContent() {
     )
   ).filter((name): name is string => name !== null);
 
-  const handleAddEssay = async (newEssayData: any) => {
+  const handleCreateEssay = async () => {
     try {
       const createdEssay = await essaysApi.create({
-        title: newEssayData.title,
-        college_application_id: newEssayData.college_application_id,
-        status: newEssayData.status || EssayStatus.NOT_STARTED,
-        prompt: newEssayData.prompt,
-        content: newEssayData.content,
+        title: "Untitled Essay",
+        status: EssayStatus.NOT_STARTED,
+        prompt: "",
+        content: "",
       });
-      setEssays((prev) => [...prev, createdEssay]);
       showSuccess("Essay created successfully!");
+      router.push(`/dashboard/essays/${createdEssay.id}`);
     } catch (error) {
       console.error("Failed to create essay:", error);
       showError("Failed to create essay");
     }
   };
 
-  const handleEditEssay = async (updatedEssay: Essay) => {
-    try {
-      const updated = await essaysApi.update(updatedEssay.id, {
-        title: updatedEssay.title,
-        status: updatedEssay.status,
-        prompt: updatedEssay.prompt,
-        content: updatedEssay.content,
-      });
-      setEssays((prev) =>
-        prev.map((essay) => (essay.id === updated.id ? updated : essay))
-      );
-      setSelectedEssay(null);
-      showSuccess("Essay updated successfully!");
-    } catch (error) {
-      console.error("Failed to update essay:", error);
-      showError("Failed to update essay");
-    }
-  };
+  const handleDeleteEssay = async (essayId: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
 
-  const handleDeleteEssay = async (essayId: string) => {
     if (!confirm("Are you sure you want to delete this essay?")) {
       return;
     }
@@ -262,47 +239,30 @@ function EssayManagerContent() {
     }
   };
 
-  const handleEditClick = (essay: any) => {
-    setSelectedEssay(essay);
-    setIsEditEssayModalOpen(true);
-  };
-
-  const handlePreviewClick = (essay: any) => {
-    setSelectedEssay(essay);
-    setIsPreviewEssayModalOpen(true);
-  };
-
-  const handlePreviewEdit = () => {
-    setIsPreviewEssayModalOpen(false);
-    setIsEditEssayModalOpen(true);
-  };
-
   return (
     <div className="min-h-screen bg-[#0a0a0a]">
-      <Navbar />
-
-      <div className="max-w-screen-2xl mx-auto px-4 md:px-10 py-8 pt-28">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center gap-4">
             <Link
               href="/dashboard"
-              className="text-[#FEEBD8]/70 hover:text-[#FEEBD8] transition-colors"
+              className="text-white/70 hover:text-white transition-colors"
             >
               <FaArrowLeft size={20} />
             </Link>
-            <div>
-              <h1 className="text-4xl font-bold text-[#FEEBD8]">
-                Essay Manager
+            <div className="flex-1 min-w-0">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white">
+                Essays
               </h1>
-              <p className="text-[#FEEBD8]/70 mt-2">
+              <p className="text-white/70 mt-2 text-sm sm:text-base">
                 Write and organize your application essays
               </p>
             </div>
           </div>
           <button
-            onClick={() => setIsAddEssayModalOpen(true)}
-            className="bg-[#FEEBD8] text-[#141414] px-6 py-3 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors flex items-center space-x-2"
+            onClick={handleCreateEssay}
+            className="bg-gradient-to-r from-purple-500 to-purple-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-purple-600 hover:to-purple-700 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20 flex items-center gap-2"
           >
             <FaPlus />
             <span>New Essay</span>
@@ -310,77 +270,111 @@ function EssayManagerContent() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
-            <div className="text-2xl font-bold text-[#FEEBD8] mb-1">
-              {essays.length}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-3xl font-bold text-white mb-1">
+                  {essays.length}
+                </div>
+                <div className="text-white/60 text-sm">Total Essays</div>
+              </div>
+              <div className="p-3 bg-purple-500/10 rounded-lg">
+                <FaFileAlt className="text-2xl text-purple-400" />
+              </div>
             </div>
-            <div className="text-[#FEEBD8]/70 text-sm">Total Essays</div>
           </div>
 
-          <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
-            <div className="text-2xl font-bold text-green-400 mb-1">
-              {essays.filter((e) => e.status === EssayStatus.COMPLETED).length}
+          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-3xl font-bold text-green-400 mb-1">
+                  {
+                    essays.filter((e) => e.status === EssayStatus.COMPLETED)
+                      .length
+                  }
+                </div>
+                <div className="text-white/60 text-sm">Completed</div>
+              </div>
+              <div className="p-3 bg-green-500/10 rounded-lg">
+                <FaCheckCircle className="text-2xl text-green-400" />
+              </div>
             </div>
-            <div className="text-[#FEEBD8]/70 text-sm">Complete</div>
           </div>
 
-          <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
-            <div className="text-2xl font-bold text-yellow-400 mb-1">
-              {
-                essays.filter((e) => e.status === EssayStatus.IN_PROGRESS)
-                  .length
-              }
+          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-3xl font-bold text-blue-400 mb-1">
+                  {
+                    essays.filter((e) => e.status === EssayStatus.IN_PROGRESS)
+                      .length
+                  }
+                </div>
+                <div className="text-white/60 text-sm">In Progress</div>
+              </div>
+              <div className="p-3 bg-blue-500/10 rounded-lg">
+                <FaClock className="text-2xl text-blue-400" />
+              </div>
             </div>
-            <div className="text-[#FEEBD8]/70 text-sm">In Progress</div>
           </div>
 
-          <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
-            <div className="text-2xl font-bold text-orange-400 mb-1">
-              {
-                essays.filter((e) => e.status === EssayStatus.REVIEW_NEEDED)
-                  .length
-              }
+          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-3xl font-bold text-orange-400 mb-1">
+                  {
+                    essays.filter((e) => e.status === EssayStatus.REVIEW_NEEDED)
+                      .length
+                  }
+                </div>
+                <div className="text-white/60 text-sm">Need Review</div>
+              </div>
+              <div className="p-3 bg-orange-500/10 rounded-lg">
+                <FaExclamationTriangle className="text-2xl text-orange-400" />
+              </div>
             </div>
-            <div className="text-[#FEEBD8]/70 text-sm">Need Review</div>
           </div>
         </div>
 
         {/* Filters and Search */}
-        <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6 mb-8">
-          <div className="flex flex-col md:flex-row gap-4">
+        <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6 mb-8">
+          <div className="flex flex-col lg:flex-row gap-4">
             {/* Search */}
             <div className="flex-1 relative">
-              <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#FEEBD8]/50" />
+              <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/40" />
               <input
                 type="text"
                 placeholder="Search essays by title or college..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg pl-10 pr-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                className="w-full bg-[#0a0a0a]/50 border border-neutral-700/50 rounded-xl pl-11 pr-4 py-3 text-white placeholder:text-white/40 focus:outline-none focus:border-purple-500/50 focus:bg-[#0a0a0a]/80 transition-all"
               />
             </div>
 
             {/* Status Filter */}
-            <select
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
-              className="bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
-            >
-              <option value="All">All Statuses</option>
-              <option value={EssayStatus.NOT_STARTED}>Not Started</option>
-              <option value={EssayStatus.IN_PROGRESS}>In Progress</option>
-              <option value={EssayStatus.NOT_SUBMITTED}>Not Submitted</option>
-              <option value={EssayStatus.REVIEW_NEEDED}>Review Needed</option>
-              <option value={EssayStatus.SUBMITTED}>Submitted</option>
-              <option value={EssayStatus.COMPLETED}>Completed</option>
-            </select>
+            <div className="relative">
+              <FaFilter className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/40 pointer-events-none" />
+              <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                className="bg-[#0a0a0a]/50 border border-neutral-700/50 rounded-xl pl-11 pr-10 py-3 text-white focus:outline-none focus:border-purple-500/50 focus:bg-[#0a0a0a]/80 transition-all appearance-none cursor-pointer min-w-[160px]"
+              >
+                <option value="All">All Statuses</option>
+                <option value={EssayStatus.NOT_STARTED}>Not Started</option>
+                <option value={EssayStatus.IN_PROGRESS}>In Progress</option>
+                <option value={EssayStatus.NOT_SUBMITTED}>Not Submitted</option>
+                <option value={EssayStatus.REVIEW_NEEDED}>Review Needed</option>
+                <option value={EssayStatus.SUBMITTED}>Submitted</option>
+                <option value={EssayStatus.COMPLETED}>Completed</option>
+              </select>
+            </div>
 
             {/* College Filter */}
             <select
               value={filterCollege}
               onChange={(e) => handleCollegeFilterChange(e.target.value)}
-              className="bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+              className="bg-[#0a0a0a]/50 border border-neutral-700/50 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500/50 focus:bg-[#0a0a0a]/80 transition-all cursor-pointer min-w-[180px]"
             >
               <option value="All">All Colleges</option>
               {collegeNames.map((collegeName) => (
@@ -392,137 +386,126 @@ function EssayManagerContent() {
           </div>
         </div>
 
-        {/* Essays Grid */}
-        <div className="grid gap-6">
-          {filteredEssays.map((essay) => (
-            <div
-              key={essay.id}
-              className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6 hover:border-[#FEEBD8]/30 transition-colors"
-            >
-              <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
-                <div className="flex-1">
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
-                    <h3 className="text-xl font-semibold text-[#FEEBD8]">
-                      {essay.title}
-                    </h3>
-                    <div className="flex items-center gap-2">
-                      <div className="text-lg sm:text-base">
-                        {getStatusIcon(essay.status)}
-                      </div>
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs text-white ${
-                          statusColors[essay.status]
-                        }`}
-                      >
-                        {getStatusDisplayName(essay.status)}
-                      </span>
-                    </div>
-                  </div>
-
-                  <p className="text-[#FEEBD8]/70 text-sm mb-3">
-                    {essay.college_name}
-                  </p>
-
-                  <div className="bg-neutral-800/50 rounded-lg p-3 mb-4">
-                    <p className="text-[#FEEBD8]/80 text-sm italic">
-                      "
-                      {essay.prompt
-                        ? essay.prompt.substring(0, 120) + "..."
-                        : "No prompt provided"}
-                      "
-                    </p>
-                  </div>
-
-                  <div className="flex flex-col sm:flex-row gap-4 mb-3">
-                    {/* Content Length */}
-                    <div className="text-sm">
-                      <span className="text-[#FEEBD8]/70">Word Count: </span>
-                      <span className="text-[#FEEBD8]">
-                        {essay.content ? essay.content.split(" ").length : 0}
-                      </span>
-                    </div>
-                    {/* AI Score */}
-                    <div className="text-sm">
-                      <span className="text-[#FEEBD8]/70">AI Score: </span>
-                      <span className={getAIScoreColor(essay.ai_score || 0)}>
-                        {essay.ai_score || 0}/10
-                      </span>
-                    </div>
-                    {/* Created Date */}
-                    <div className="text-sm text-[#FEEBD8]/70">
-                      Created: {new Date(essay.created_at).toLocaleDateString()}
-                    </div>
-                  </div>
-
-                  {/* AI Feedbacks */}
-                  {essay.ai_suggestion && (
-                    <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
-                      <p className="text-blue-300 text-sm">
-                        <strong>AI Feedback:</strong> {essay.ai_suggestion}
-                      </p>
-                    </div>
-                  )}
-                </div>
-
-                <div className="flex flex-col sm:flex-row sm:justify-end gap-2">
-                  <button
-                    onClick={() => handleEditClick(essay)}
-                    className="bg-[#FEEBD8] text-[#141414] px-4 py-2 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors flex items-center justify-center gap-2"
-                  >
-                    <FaEdit />
-                    <span>Edit</span>
-                  </button>
-                  <button
-                    onClick={() => handlePreviewClick(essay)}
-                    className="bg-blue-500/20 text-blue-400 px-4 py-2 rounded-lg font-medium hover:bg-blue-500/30 transition-colors flex items-center justify-center gap-2"
-                  >
-                    <FaEye />
-                    <span>Preview</span>
-                  </button>
-                  <button
-                    onClick={() => handleDeleteEssay(essay.id)}
-                    className="bg-red-500/20 text-red-400 px-4 py-2 rounded-lg font-medium hover:bg-red-500/30 transition-colors flex items-center justify-center gap-2"
-                  >
-                    <FaTrash />
-                    <span>Delete</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {filteredEssays.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-[#FEEBD8]/50 text-lg">
-              No essays found matching your criteria.
+        {/* Loading State */}
+        {isLoading ? (
+          <div className="flex items-center justify-center py-20">
+            <FaSpinner className="text-purple-400 animate-spin text-4xl" />
+          </div>
+        ) : filteredEssays.length === 0 ? (
+          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-12 text-center">
+            <FaFileAlt className="text-5xl text-white/20 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-white mb-2">
+              {essays.length === 0 ? "No essays yet" : "No essays found"}
+            </h3>
+            <p className="text-white/60 mb-6">
+              {essays.length === 0
+                ? "Start writing your first essay to get started"
+                : "Try adjusting your filters or search criteria"}
             </p>
+            {essays.length === 0 && (
+              <button
+                onClick={handleCreateEssay}
+                className="bg-gradient-to-r from-purple-500 to-purple-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-purple-600 hover:to-purple-700 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20 inline-flex items-center gap-2"
+              >
+                <FaPlus />
+                Create your first essay
+              </button>
+            )}
+          </div>
+        ) : (
+          /* Essays Grid */
+          <div className="grid gap-4">
+            {filteredEssays.map((essay) => {
+              const wordCount = essay.content
+                ? essay.content.split(/\s+/).filter((w) => w).length
+                : 0;
+
+              return (
+                <Link
+                  key={essay.id}
+                  href={`/dashboard/essays/${essay.id}`}
+                  className="group bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6 hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/10 transition-all duration-300"
+                >
+                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start gap-3 mb-3">
+                        <div className="p-2 bg-purple-500/10 rounded-lg flex-shrink-0 group-hover:bg-purple-500/20 transition-colors">
+                          <FaPen className="text-purple-400 text-lg" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-xl font-semibold text-white mb-1 group-hover:text-purple-400 transition-colors truncate">
+                            {essay.title}
+                          </h3>
+                          {essay.college_name && (
+                            <p className="text-white/50 text-sm">
+                              {essay.college_name}
+                            </p>
+                          )}
+                        </div>
+                        <span
+                          className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0 ${
+                            essay.status === EssayStatus.COMPLETED
+                              ? "bg-green-500/20 text-green-300"
+                              : essay.status === EssayStatus.IN_PROGRESS
+                              ? "bg-blue-500/20 text-blue-300"
+                              : essay.status === EssayStatus.REVIEW_NEEDED
+                              ? "bg-orange-500/20 text-orange-300"
+                              : essay.status === EssayStatus.SUBMITTED
+                              ? "bg-emerald-500/20 text-emerald-300"
+                              : "bg-neutral-500/20 text-neutral-300"
+                          }`}
+                        >
+                          {getStatusDisplayName(essay.status)}
+                        </span>
+                      </div>
+
+                      {essay.prompt && (
+                        <div className="bg-[#0a0a0a]/50 rounded-lg p-3 mb-3 border border-neutral-700/30">
+                          <p className="text-white/60 text-sm italic line-clamp-2">
+                            "{essay.prompt}"
+                          </p>
+                        </div>
+                      )}
+
+                      <div className="flex flex-wrap items-center gap-4 text-sm">
+                        <div className="flex items-center gap-1.5 text-white/50">
+                          <span className="font-medium">{wordCount}</span>
+                          <span>words</span>
+                        </div>
+                        {essay.ai_score !== undefined &&
+                          essay.ai_score !== null && (
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-white/50">AI Score:</span>
+                              <span className={getAIScoreColor(essay.ai_score)}>
+                                {essay.ai_score}/10
+                              </span>
+                            </div>
+                          )}
+                        <div className="text-white/40 text-xs">
+                          Updated{" "}
+                          {new Date(
+                            essay.updated_at || essay.created_at
+                          ).toLocaleDateString()}
+                        </div>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={(e) => handleDeleteEssay(essay.id, e)}
+                      className="flex-shrink-0 p-2 text-white/40 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                      title="Delete essay"
+                    >
+                      <FaTrash />
+                    </button>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         )}
       </div>
 
       <Footer />
-
-      {/* Modals */}
-      <AddEssayModal
-        isOpen={isAddEssayModalOpen}
-        onClose={() => setIsAddEssayModalOpen(false)}
-        onSave={handleAddEssay}
-      />
-
-      <EditEssayModal
-        isOpen={isEditEssayModalOpen}
-        onClose={() => setIsEditEssayModalOpen(false)}
-        onSave={handleEditEssay}
-        essay={selectedEssay}
-      />
-
-      <PreviewEssayModal
-        isOpen={isPreviewEssayModalOpen}
-        onClose={() => setIsPreviewEssayModalOpen(false)}
-        onEdit={handlePreviewEdit}
-        essay={selectedEssay}
-      />
     </div>
   );
 }

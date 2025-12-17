@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
 import { COLLEGE_MAJORS, POPULAR_MAJORS } from "../../../lib/majors";
 import { api, ApiError } from "../../../lib/api/college-applications";
@@ -35,6 +34,8 @@ import {
   FaChevronDown,
   FaSave,
   FaTimes,
+  FaMapMarkerAlt,
+  FaArrowRight,
 } from "react-icons/fa";
 
 // Types
@@ -75,7 +76,19 @@ const transformCollegeApplication = (
 ): CollegeDisplay => {
   // Calculate progress from checklists/tasks
   let progress = 0;
-  if (app.checklists && app.checklists.length > 0) {
+
+  // If application is submitted or beyond, consider it 100% complete
+  const submittedStatuses = [
+    "submitted",
+    "under_review",
+    "accepted",
+    "rejected",
+    "waitlisted",
+    "deferred",
+  ];
+  if (app.status && submittedStatuses.includes(app.status.toLowerCase())) {
+    progress = 100;
+  } else if (app.checklists && app.checklists.length > 0) {
     const totalTasks = app.checklists.reduce(
       (acc, checklist) => acc + checklist.tasks.length,
       0
@@ -170,6 +183,12 @@ export default function CollegeTracker() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("All");
   const [filterType, setFilterType] = useState("All");
+  const [activeTab, setActiveTab] = useState<
+    "all" | "submitted" | "in_progress"
+  >("all");
+  const [sortBy, setSortBy] = useState<
+    "alphabetic" | "deadline" | "updated" | "status"
+  >("alphabetic");
   const [showAddCollegeForm, setShowAddCollegeForm] = useState(false);
 
   // University search states
@@ -296,22 +315,69 @@ export default function CollegeTracker() {
     }
   }, [universitySearch, universities, selectedUniversity]);
 
-  const filteredCollegesMain = colleges.filter((college) => {
-    const matchesSearch =
-      college.universityName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (college.universityState &&
-        college.universityState
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase())) ||
-      college.universityCountry
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase());
-    const matchesStatus =
-      filterStatus === "All" || college.status === filterStatus;
-    const matchesType = filterType === "All" || college.type === filterType;
+  const filteredCollegesMain = colleges
+    .filter((college) => {
+      // Tab filtering
+      if (activeTab === "submitted") {
+        if (
+          college.status !== Status.SUBMITTED &&
+          college.status !== Status.UNDER_REVIEW &&
+          college.status !== Status.ACCEPTED &&
+          college.status !== Status.REJECTED &&
+          college.status !== Status.WAITLISTED &&
+          college.status !== Status.DEFERRED
+        ) {
+          return false;
+        }
+      } else if (activeTab === "in_progress") {
+        if (college.status !== Status.IN_PROGRESS) {
+          return false;
+        }
+      }
 
-    return matchesSearch && matchesStatus && matchesType;
-  });
+      const matchesSearch =
+        college.universityName
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase()) ||
+        (college.universityState &&
+          college.universityState
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase())) ||
+        college.universityCountry
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase());
+      const matchesStatus =
+        filterStatus === "All" || college.status === filterStatus;
+      const matchesType = filterType === "All" || college.type === filterType;
+
+      return matchesSearch && matchesStatus && matchesType;
+    })
+    .sort((a, b) => {
+      if (sortBy === "alphabetic") {
+        return a.universityName.localeCompare(b.universityName);
+      } else if (sortBy === "deadline") {
+        if (!a.deadline) return 1;
+        if (!b.deadline) return -1;
+        return new Date(a.deadline).getTime() - new Date(b.deadline).getTime();
+      } else if (sortBy === "status") {
+        const statusOrder: Record<Status, number> = {
+          [Status.NOT_STARTED]: 1,
+          [Status.IN_PROGRESS]: 2,
+          [Status.SUBMITTED]: 3,
+          [Status.UNDER_REVIEW]: 4,
+          [Status.DEFERRED]: 5,
+          [Status.WAITLISTED]: 6,
+          [Status.ACCEPTED]: 7,
+          [Status.REJECTED]: 8,
+          [Status.WITHDRAWN]: 9,
+        };
+        return statusOrder[a.status] - statusOrder[b.status];
+      } else {
+        return (
+          new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+        );
+      }
+    });
 
   const handleUniversitySelect = (university: University) => {
     setSelectedUniversity(university);
@@ -534,9 +600,7 @@ export default function CollegeTracker() {
   if (showAddCollegeForm) {
     return (
       <div className="min-h-screen bg-[#0a0a0a]">
-        <Navbar />
-
-        <div className="max-w-screen-xl mx-auto px-4 md:px-10 py-8 pt-28">
+        <div className="max-w-screen-xl mx-auto px-4 md:px-10 py-8">
           {/* Header */}
           <div className="flex items-center space-x-4 mb-8">
             <button
@@ -822,8 +886,7 @@ export default function CollegeTracker() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#0a0a0a]">
-        <Navbar />
-        <div className="max-w-screen-2xl mx-auto px-4 md:px-10 py-8 pt-28">
+        <div className="max-w-screen-2xl mx-auto px-4 md:px-10 py-8">
           <div className="flex items-center justify-center min-h-[400px]">
             <div className="text-white text-lg">
               Loading college applications...
@@ -837,61 +900,71 @@ export default function CollegeTracker() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a]">
-      <Navbar />
-
-      <div className="max-w-screen-2xl mx-auto px-4 md:px-10 py-8 pt-28">
+      <div className="max-w-screen-2xl mx-auto px-4 md:px-10 py-8">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-          <div className="flex items-center space-x-4">
+        <div className="mb-8">
+          <div className="flex items-center gap-4 mb-6">
             <button
               onClick={() => router.push("/dashboard")}
-              className="text-[#FEEBD8]/70 hover:text-[#FEEBD8] transition-colors"
+              className="text-white/70 hover:text-white transition-colors"
             >
               <FaArrowLeft size={20} />
             </button>
-            <div>
-              <h1 className="text-3xl sm:text-4xl font-bold text-[#FEEBD8]">
+            <div className="flex-1 min-w-0">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white">
                 College Applications
               </h1>
-              <p className="text-[#FEEBD8]/70 mt-2">
-                Manage your university applications with comprehensive tracking
+              <p className="text-white/70 mt-2 text-sm sm:text-base">
+                Track and manage your university applications
               </p>
             </div>
+            <button
+              onClick={() => setShowAddCollegeForm(true)}
+              className="bg-blue-500 text-white px-4 md:px-6 py-2.5 rounded-lg font-medium hover:bg-blue-600 transition-all flex items-center gap-2"
+            >
+              <FaPlus />
+              <span className="hidden sm:inline">Add Application</span>
+            </button>
           </div>
-          <button
-            onClick={() => setShowAddCollegeForm(true)}
-            className="bg-[#FEEBD8] text-[#141414] px-4 sm:px-6 py-3 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors flex items-center justify-center space-x-2 w-full sm:w-auto"
-          >
-            <FaPlus />
-            <span>Add Application</span>
-          </button>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
-            <div className="text-2xl font-bold text-[#FEEBD8] mb-1">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-4 hover:border-[#FEEBD8]/30 transition-all hover:shadow-lg hover:shadow-[#FEEBD8]/5">
+            <div className="flex items-center justify-between mb-2">
+              <FaUniversity className="text-xl text-blue-400" />
+            </div>
+            <div className="text-2xl font-bold text-white mb-0.5">
               {colleges.length}
             </div>
-            <div className="text-[#FEEBD8]/70 text-sm">Total Applications</div>
+            <div className="text-white/60 text-sm">Total Applications</div>
           </div>
 
-          <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
-            <div className="text-2xl font-bold text-green-400 mb-1">
+          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-4 hover:border-green-400/30 transition-all hover:shadow-lg hover:shadow-green-500/5">
+            <div className="flex items-center justify-between mb-2">
+              <FaCheckCircle className="text-xl text-green-400" />
+            </div>
+            <div className="text-2xl font-bold text-green-400 mb-0.5">
               {colleges.filter((c) => c.status === Status.SUBMITTED).length}
             </div>
-            <div className="text-[#FEEBD8]/70 text-sm">Submitted</div>
+            <div className="text-white/60 text-sm">Submitted</div>
           </div>
 
-          <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
-            <div className="text-2xl font-bold text-yellow-400 mb-1">
+          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-4 hover:border-yellow-400/30 transition-all hover:shadow-lg hover:shadow-yellow-500/5">
+            <div className="flex items-center justify-between mb-2">
+              <FaClock className="text-xl text-yellow-400" />
+            </div>
+            <div className="text-2xl font-bold text-yellow-400 mb-0.5">
               {colleges.filter((c) => c.status === Status.IN_PROGRESS).length}
             </div>
-            <div className="text-[#FEEBD8]/70 text-sm">In Progress</div>
+            <div className="text-white/60 text-sm">In Progress</div>
           </div>
 
-          <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6">
-            <div className="text-2xl font-bold text-blue-400 mb-1">
+          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-4 hover:border-purple-400/30 transition-all hover:shadow-lg hover:shadow-purple-500/5">
+            <div className="flex items-center justify-between mb-2">
+              <FaBell className="text-xl text-purple-400" />
+            </div>
+            <div className="text-2xl font-bold text-purple-400 mb-0.5">
               {
                 colleges.filter((c) => {
                   const days = getDaysUntilDeadlineMain(c.deadline);
@@ -899,333 +972,379 @@ export default function CollegeTracker() {
                 }).length
               }
             </div>
-            <div className="text-[#FEEBD8]/70 text-sm">Due Soon</div>
+            <div className="text-white/60 text-sm">Due Soon</div>
           </div>
         </div>
 
-        {/* Filters and Search */}
-        <div className="bg-[#141414] border border-neutral-700/50 rounded-lg p-6 mb-8">
-          <div className="flex flex-col md:flex-row gap-4">
-            {/* Search */}
+        {/* Search Bar and Filters */}
+        <div className="bg-white/[0.02] border border-neutral-700/30 rounded-xl p-3 mb-8">
+          <div className="flex items-center gap-4">
+            {/* Search Bar - Left Side (~50%) */}
             <div className="flex-1 relative">
-              <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#FEEBD8]/50" />
+              <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/40 text-sm" />
               <input
                 type="text"
-                placeholder="Search applications by university name, location..."
+                placeholder="Search colleges..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg pl-10 pr-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
+                className="w-full bg-white/5 border border-neutral-700/30 rounded-lg pl-12 pr-4 py-2.5 text-white placeholder:text-white/40 focus:outline-none focus:border-white/30 transition-all"
               />
             </div>
 
-            {/* Status Filter */}
-            <select
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
-              className="bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
-            >
-              <option value="All">All Statuses</option>
-              <option value={Status.NOT_STARTED}>Not Started</option>
-              <option value={Status.IN_PROGRESS}>In Progress</option>
-              <option value={Status.SUBMITTED}>Submitted</option>
-              <option value={Status.UNDER_REVIEW}>Under Review</option>
-              <option value={Status.ACCEPTED}>Accepted</option>
-              <option value={Status.REJECTED}>Rejected</option>
-              <option value={Status.DEFERRED}>Deferred</option>
-              <option value={Status.WAITLISTED}>Waitlisted</option>
-              <option value={Status.WITHDRAWN}>Withdrawn</option>
-            </select>
-
-            {/* Type Filter */}
-            <select
-              value={filterType}
-              onChange={(e) => setFilterType(e.target.value)}
-              className="bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-[#FEEBD8] focus:outline-none focus:border-[#FEEBD8]"
-            >
-              <option value="All">All Types</option>
-              <option value={ApplicationType.EARLY_DECISION}>
-                Early Decision
-              </option>
-              <option value={ApplicationType.EARLY_ACTION}>Early Action</option>
-              <option value={ApplicationType.REGULAR_DECISION}>
-                Regular Decision
-              </option>
-              <option value={ApplicationType.ROLLING_ADMISSION}>
-                Rolling Admission
-              </option>
-            </select>
+            {/* Tabs and Sort - Right Side (~50%) */}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setActiveTab("all")}
+                className={`px-4 py-2.5 rounded-lg font-medium transition-all whitespace-nowrap ${
+                  activeTab === "all"
+                    ? "bg-blue-500/20 text-blue-400 border border-blue-500/30"
+                    : "text-white/60 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                All Applications
+              </button>
+              <button
+                onClick={() => setActiveTab("submitted")}
+                className={`px-4 py-2.5 rounded-lg font-medium transition-all whitespace-nowrap ${
+                  activeTab === "submitted"
+                    ? "bg-blue-500/20 text-blue-400 border border-blue-500/30"
+                    : "text-white/60 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                Submitted
+              </button>
+              <button
+                onClick={() => setActiveTab("in_progress")}
+                className={`px-4 py-2.5 rounded-lg font-medium transition-all whitespace-nowrap ${
+                  activeTab === "in_progress"
+                    ? "bg-blue-500/20 text-blue-400 border border-blue-500/30"
+                    : "text-white/60 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                In Progress
+              </button>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+                className="px-4 py-2.5 rounded-lg text-white/80 bg-white/5 border border-neutral-700/30 hover:bg-white/10 hover:border-white/20 focus:outline-none focus:border-blue-500/50 transition-all whitespace-nowrap cursor-pointer"
+              >
+                <option value="alphabetic" className="bg-neutral-800">
+                  Alphabetic (A-Z)
+                </option>
+                <option value="deadline" className="bg-neutral-800">
+                  Deadline
+                </option>
+                <option value="updated" className="bg-neutral-800">
+                  Last Updated
+                </option>
+                <option value="status" className="bg-neutral-800">
+                  Status
+                </option>
+              </select>
+            </div>
           </div>
         </div>
 
-        {/* Applications Grid */}
-        <div className="grid gap-6">
+        {/* Applications List */}
+        <div className="space-y-3">
           {filteredCollegesMain.map((college) => {
             const daysUntil = getDaysUntilDeadlineMain(college.deadline);
             const isUrgent =
               daysUntil !== null && daysUntil <= 7 && daysUntil > 0;
 
+            // Get favicon URL
+            const websiteUrl = college.universityWebsite;
+            let faviconUrl = null;
+
+            if (websiteUrl) {
+              try {
+                const url = new URL(websiteUrl);
+                faviconUrl = `https://www.google.com/s2/favicons?domain=${url.hostname}&sz=64`;
+              } catch (e) {
+                faviconUrl = null;
+              }
+            }
+
             return (
               <div
                 key={college.id}
-                className={`bg-[#141414] border rounded-lg p-6 transition-colors ${
-                  isUrgent ? "border-red-500/50" : "border-neutral-700/50"
+                onClick={() => handleCollegeClick(college.id)}
+                className={`group flex items-center gap-4 p-4 bg-white/[0.02] hover:bg-white/[0.04] border rounded-xl cursor-pointer transition-all duration-200 ${
+                  isUrgent
+                    ? "border-red-400/30 hover:border-red-400/50"
+                    : "border-neutral-800/50 hover:border-blue-400/30"
                 }`}
               >
-                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                  <div className="flex-1">
-                    {/* College Header */}
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-3">
-                        <span
-                          className="text-xl font-semibold text-[#FEEBD8] hover:text-[#E5D5B7] cursor-pointer transition-colors"
-                          onClick={() => handleCollegeClick(college.id)}
-                        >
-                          {college.universityName}
-                        </span>
-                        <span
-                          className={`px-2 py-1 rounded-full text-xs text-white ${
-                            statusColors[college.status]
-                          }`}
-                        >
-                          {college.status}
-                        </span>
-                        <span
-                          className={`px-2 py-1 rounded-full text-xs text-white ${
-                            typeColors[college.type]
-                          }`}
-                        >
-                          {college.type}
-                        </span>
-                      </div>
-                    </div>
+                {/* College Icon */}
+                <div className="flex-shrink-0">
+                  {faviconUrl ? (
+                    <img
+                      src={faviconUrl}
+                      alt={`${college.universityName} logo`}
+                      className="w-12 h-12 rounded-lg object-cover bg-neutral-800/50 border border-neutral-700/30"
+                      onError={(e) => {
+                        e.currentTarget.style.display = "none";
+                        const fallback = e.currentTarget
+                          .nextElementSibling as HTMLElement;
+                        if (fallback) fallback.classList.remove("hidden");
+                      }}
+                      onLoad={(e) => {
+                        const img = e.currentTarget;
+                        if (img.naturalWidth <= 16 || img.naturalHeight <= 16) {
+                          img.style.display = "none";
+                          const fallback =
+                            img.nextElementSibling as HTMLElement;
+                          if (fallback) fallback.classList.remove("hidden");
+                        }
+                      }}
+                    />
+                  ) : null}
+                  <div
+                    className={`${
+                      faviconUrl ? "hidden" : ""
+                    } w-12 h-12 bg-neutral-800/50 rounded-lg flex items-center justify-center border border-neutral-700/30`}
+                  >
+                    <FaUniversity className="text-lg text-blue-400" />
+                  </div>
+                </div>
 
-                    {/* Location */}
-                    <div className="text-[#FEEBD8]/70 text-sm mb-2">
-                      {college.location || college.universityCountry}
-                    </div>
-
-                    {/* Deadline */}
-                    <div className="flex items-center gap-2 text-sm text-[#FEEBD8]/70 mb-3">
-                      <FaCalendar />
-                      <span>Due: {formatDeadlineMain(college.deadline)}</span>
-                      {daysUntil !== null && daysUntil > 0 && (
-                        <span
-                          className={`${
-                            isUrgent ? "text-red-400" : "text-yellow-400"
-                          }`}
-                        >
-                          ({daysUntil} days)
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Progress Bar */}
-                    <div className="mb-3">
-                      <div className="flex justify-between text-sm text-[#FEEBD8]/70 mb-1">
-                        <span>Progress</span>
-                        <span>{college.progress}%</span>
-                      </div>
-                      <div className="w-full bg-neutral-700 rounded-full h-2">
-                        <div
-                          className="bg-gradient-to-r from-[#FEEBD8] to-[#E5D5B7] h-2 rounded-full transition-all duration-300"
-                          style={{ width: `${college.progress}%` }}
-                        ></div>
-                      </div>
-                    </div>
-
-                    {/* Major */}
-                    {college.major && (
-                      <div className="text-[#FEEBD8]/70 text-sm mb-3">
-                        <strong>Major:</strong> {college.major}
-                      </div>
-                    )}
-
-                    {/* Tags */}
-                    {college.tags && college.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-2 mb-3">
-                        {college.tags.map((tag: string, idx: number) => (
-                          <span
-                            key={idx}
-                            className="px-2 py-1 bg-neutral-800 text-[#FEEBD8]/70 text-xs rounded-full"
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-
-                    {/* Notes */}
-                    {college.notes && (
-                      <div className="text-[#FEEBD8]/60 text-sm italic">
-                        {college.notes}
-                      </div>
+                {/* College Info */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h4 className="font-semibold text-white group-hover:text-blue-400 transition-colors truncate">
+                      {college.universityName}
+                    </h4>
+                    {isUrgent && (
+                      <span className="flex-shrink-0 text-xs bg-red-500/20 text-red-400 px-2 py-0.5 rounded-full flex items-center gap-1">
+                        <FaBell className="text-[10px]" />
+                        Urgent
+                      </span>
                     )}
                   </div>
-
-                  {/* Action Buttons - Separate Section to Avoid Nesting */}
-                  <div className="flex flex-col gap-3 min-w-[200px]">
-                    {editingCollegeId === college.id ? (
-                      // Edit Mode
+                  <div className="flex items-center gap-3 text-xs text-white/50">
+                    <span className="flex items-center gap-1">
+                      <FaMapMarkerAlt className="text-[10px]" />
+                      {college.location || college.universityCountry}
+                    </span>
+                    {college.major && (
                       <>
-                        <input
-                          type="text"
-                          value={editForm.name}
-                          onChange={(e) =>
-                            setEditForm({ ...editForm, name: e.target.value })
-                          }
-                          placeholder="University Name"
-                          className="px-3 py-2 bg-neutral-800 text-white rounded-lg border border-neutral-600"
-                        />
-                        <select
-                          value={editForm.status}
-                          onChange={(e) =>
-                            setEditForm({ ...editForm, status: e.target.value })
-                          }
-                          className="px-3 py-2 bg-neutral-800 text-white rounded-lg border border-neutral-600"
-                        >
-                          <option value="">Select Status</option>
-                          <option value={Status.NOT_STARTED}>
-                            Not Started
-                          </option>
-                          <option value={Status.IN_PROGRESS}>
-                            In Progress
-                          </option>
-                          <option value={Status.SUBMITTED}>Submitted</option>
-                          <option value={Status.UNDER_REVIEW}>
-                            Under Review
-                          </option>
-                          <option value={Status.ACCEPTED}>Accepted</option>
-                          <option value={Status.REJECTED}>Rejected</option>
-                          <option value={Status.DEFERRED}>Deferred</option>
-                          <option value={Status.WAITLISTED}>Waitlisted</option>
-                          <option value={Status.WITHDRAWN}>Withdrawn</option>
-                        </select>
-                        <select
-                          value={editForm.application_type}
-                          onChange={(e) =>
-                            setEditForm({
-                              ...editForm,
-                              application_type: e.target.value,
-                            })
-                          }
-                          className="px-3 py-2 bg-neutral-800 text-white rounded-lg border border-neutral-600"
-                        >
-                          <option value="">Select Application Type</option>
-                          <option value={ApplicationType.EARLY_DECISION}>
-                            Early Decision
-                          </option>
-                          <option value={ApplicationType.EARLY_ACTION}>
-                            Early Action
-                          </option>
-                          <option value={ApplicationType.REGULAR_DECISION}>
-                            Regular Decision
-                          </option>
-                          <option value={ApplicationType.ROLLING_ADMISSION}>
-                            Rolling Admission
-                          </option>
-                        </select>
-                        <select
-                          value={editForm.priority}
-                          onChange={(e) =>
-                            setEditForm({
-                              ...editForm,
-                              priority: e.target.value,
-                            })
-                          }
-                          className="px-3 py-2 bg-neutral-800 text-white rounded-lg border border-neutral-600"
-                        >
-                          <option value="">Select Priority</option>
-                          <option value={Priority.REACH}>Reach</option>
-                          <option value={Priority.TARGET}>Target</option>
-                          <option value={Priority.SAFETY}>Safety</option>
-                        </select>
-                        <div className="w-48">
-                          <DatePicker
-                            value={formatDateForInput(editForm.deadline)}
-                            onChange={(date) =>
-                              setEditForm({
-                                ...editForm,
-                                deadline: formatDateForBackend(date),
-                              })
-                            }
-                            placeholder="Select deadline"
-                          />
-                        </div>
-                        <input
-                          type="text"
-                          value={editForm.major}
-                          onChange={(e) =>
-                            setEditForm({ ...editForm, major: e.target.value })
-                          }
-                          placeholder="Major"
-                          className="px-3 py-2 bg-neutral-800 text-white rounded-lg border border-neutral-600"
-                        />
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => handleUpdateCollege(college.id)}
-                            className="flex-1 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center justify-center gap-2"
-                          >
-                            <FaSave size={14} />
-                            Save
-                          </button>
-                          <button
-                            onClick={handleCancelEdit}
-                            className="flex-1 px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 flex items-center justify-center gap-2"
-                          >
-                            <FaTimes size={14} />
-                            Cancel
-                          </button>
-                        </div>
-                      </>
-                    ) : (
-                      // View Mode - Clean Button Layout
-                      <>
-                        <button
-                          onClick={() => handleCollegeClick(college.id)}
-                          className="w-full px-3 py-2 bg-[#FEEBD8] text-[#141414] rounded-lg hover:bg-[#E5D5B7] flex items-center justify-center gap-2 text-sm font-semibold"
-                        >
-                          <FaChevronRight size={14} />
-                          View Details
-                        </button>
-                        <button
-                          onClick={() => handleDeleteCollege(college.id)}
-                          className="w-full px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center justify-center gap-2 text-sm"
-                        >
-                          <FaTrash size={14} />
-                          Delete
-                        </button>
+                        <span>•</span>
+                        <span>{college.major}</span>
                       </>
                     )}
                   </div>
                 </div>
+
+                {/* Status & Type */}
+                <div className="hidden sm:flex items-center gap-2 flex-shrink-0">
+                  <span
+                    className={`text-xs px-2.5 py-1 rounded-md font-medium ${
+                      college.status === Status.SUBMITTED
+                        ? "bg-green-500/10 text-green-400 border border-green-500/20"
+                        : college.status === Status.IN_PROGRESS
+                        ? "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20"
+                        : "bg-neutral-700/30 text-white/60 border border-neutral-600/30"
+                    }`}
+                  >
+                    {college.status.replace(/_/g, " ")}
+                  </span>
+                  <span
+                    className={`text-xs px-2.5 py-1 rounded-md font-medium ${
+                      college.type === ApplicationType.REACH
+                        ? "bg-purple-500/10 text-purple-400 border border-purple-500/20"
+                        : college.type === ApplicationType.TARGET
+                        ? "bg-blue-500/10 text-blue-400 border border-blue-500/20"
+                        : "bg-green-500/10 text-green-400 border border-green-500/20"
+                    }`}
+                  >
+                    {college.type}
+                  </span>
+                </div>
+
+                {/* Deadline */}
+                <div className="hidden md:flex items-center gap-1.5 text-sm text-white/70 flex-shrink-0 min-w-[140px]">
+                  <FaCalendar className="text-xs" />
+                  <span>{formatDeadlineMain(college.deadline)}</span>
+                  {daysUntil !== null && daysUntil > 0 && (
+                    <span
+                      className={`text-xs font-semibold ${
+                        isUrgent ? "text-red-400" : "text-yellow-400"
+                      }`}
+                    >
+                      ({daysUntil}d)
+                    </span>
+                  )}
+                </div>
+
+                {/* Progress */}
+                <div className="hidden lg:flex items-center gap-3 flex-shrink-0 min-w-[140px]">
+                  <div className="flex-1">
+                    <div className="w-full bg-neutral-700/30 rounded-full h-1.5">
+                      <div
+                        className="bg-blue-500 h-1.5 rounded-full transition-all duration-300"
+                        style={{ width: `${college.progress}%` }}
+                      />
+                    </div>
+                  </div>
+                  <span className="text-xs font-semibold text-white/70 w-10 text-right">
+                    {college.progress}%
+                  </span>
+                </div>
+
+                {/* Arrow */}
+                <FaArrowRight className="text-white/30 group-hover:text-blue-400 group-hover:translate-x-1 transition-all text-sm flex-shrink-0" />
               </div>
             );
           })}
         </div>
 
+        {/* Edit/Delete Modal - Moved outside grid */}
+        {editingCollegeId && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div className="bg-[#141414] border border-neutral-700 rounded-xl p-6 max-w-md w-full">
+              <h3 className="text-xl font-bold text-[#FEEBD8] mb-4">
+                Edit Application
+              </h3>
+              <div className="flex flex-col gap-3">
+                <input
+                  type="text"
+                  value={editForm.name}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, name: e.target.value })
+                  }
+                  placeholder="University Name"
+                  className="px-3 py-2 bg-neutral-800 text-white rounded-lg border border-neutral-600"
+                />
+                <select
+                  value={editForm.status}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, status: e.target.value })
+                  }
+                  className="px-3 py-2 bg-neutral-800 text-white rounded-lg border border-neutral-600"
+                >
+                  <option value="">Select Status</option>
+                  <option value={Status.NOT_STARTED}>Not Started</option>
+                  <option value={Status.IN_PROGRESS}>In Progress</option>
+                  <option value={Status.SUBMITTED}>Submitted</option>
+                  <option value={Status.UNDER_REVIEW}>Under Review</option>
+                  <option value={Status.ACCEPTED}>Accepted</option>
+                  <option value={Status.REJECTED}>Rejected</option>
+                  <option value={Status.DEFERRED}>Deferred</option>
+                  <option value={Status.WAITLISTED}>Waitlisted</option>
+                  <option value={Status.WITHDRAWN}>Withdrawn</option>
+                </select>
+                <select
+                  value={editForm.application_type}
+                  onChange={(e) =>
+                    setEditForm({
+                      ...editForm,
+                      application_type: e.target.value,
+                    })
+                  }
+                  className="px-3 py-2 bg-neutral-800 text-white rounded-lg border border-neutral-600"
+                >
+                  <option value="">Select Application Type</option>
+                  <option value={ApplicationType.EARLY_DECISION}>
+                    Early Decision
+                  </option>
+                  <option value={ApplicationType.EARLY_ACTION}>
+                    Early Action
+                  </option>
+                  <option value={ApplicationType.REGULAR_DECISION}>
+                    Regular Decision
+                  </option>
+                  <option value={ApplicationType.ROLLING_ADMISSION}>
+                    Rolling Admission
+                  </option>
+                </select>
+                <select
+                  value={editForm.priority}
+                  onChange={(e) =>
+                    setEditForm({
+                      ...editForm,
+                      priority: e.target.value,
+                    })
+                  }
+                  className="px-3 py-2 bg-neutral-800 text-white rounded-lg border border-neutral-600"
+                >
+                  <option value="">Select Priority</option>
+                  <option value={Priority.REACH}>Reach</option>
+                  <option value={Priority.TARGET}>Target</option>
+                  <option value={Priority.SAFETY}>Safety</option>
+                </select>
+                <div>
+                  <DatePicker
+                    value={formatDateForInput(editForm.deadline)}
+                    onChange={(date) =>
+                      setEditForm({
+                        ...editForm,
+                        deadline: formatDateForBackend(date),
+                      })
+                    }
+                    placeholder="Select deadline"
+                  />
+                </div>
+                <input
+                  type="text"
+                  value={editForm.major}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, major: e.target.value })
+                  }
+                  placeholder="Major"
+                  className="px-3 py-2 bg-neutral-800 text-white rounded-lg border border-neutral-600"
+                />
+                <div className="flex gap-2 mt-2">
+                  <button
+                    onClick={() =>
+                      handleUpdateCollege(
+                        filteredCollegesMain.find(
+                          (c) => c.id === editingCollegeId
+                        )?.id || ""
+                      )
+                    }
+                    className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-500 to-violet-500 text-white rounded-lg hover:from-blue-600 hover:to-violet-600 flex items-center justify-center gap-2 font-medium"
+                  >
+                    <FaSave size={14} />
+                    Save Changes
+                  </button>
+                  <button
+                    onClick={handleCancelEdit}
+                    className="px-4 py-2 bg-neutral-700 text-white rounded-lg hover:bg-neutral-600 flex items-center justify-center gap-2"
+                  >
+                    <FaTimes size={14} />
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {filteredCollegesMain.length === 0 && (
-          <div className="text-center py-12">
+          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-12 text-center">
             {colleges.length === 0 ? (
-              <div className="max-w-md mx-auto">
-                <FaUniversity className="mx-auto text-[#FEEBD8]/30 text-6xl mb-6" />
-                <h3 className="text-xl font-semibold text-[#FEEBD8] mb-3">
-                  No College Applications Yet
+              <>
+                <FaUniversity className="text-5xl text-[#FEEBD8]/30 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-[#FEEBD8] mb-2">
+                  No applications yet
                 </h3>
-                <p className="text-[#FEEBD8]/70 mb-6">
-                  Start your college application journey by adding your first
-                  university.
+                <p className="text-[#FEEBD8]/60 mb-6">
+                  Start tracking your college applications to stay organized
                 </p>
                 <button
                   onClick={() => setShowAddCollegeForm(true)}
-                  className="bg-[#FEEBD8] text-[#141414] px-6 py-3 rounded-lg font-medium hover:bg-[#E5D5B7] transition-colors"
+                  className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-500 to-violet-500 text-white px-6 py-3 rounded-lg font-semibold hover:from-blue-600 hover:to-violet-600 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/20"
                 >
-                  Add Your First Application
+                  <FaPlus /> Add your first college
                 </button>
-              </div>
+              </>
             ) : (
-              <p className="text-[#FEEBD8]/50 text-lg">
-                No applications found matching your criteria.
-              </p>
+              <>
+                <FaSearch className="text-4xl text-[#FEEBD8]/30 mx-auto mb-4" />
+                <p className="text-[#FEEBD8]/60 text-lg">
+                  No applications match your search criteria
+                </p>
+              </>
             )}
           </div>
         )}

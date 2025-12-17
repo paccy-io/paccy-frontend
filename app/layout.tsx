@@ -1,5 +1,11 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Inter, Climate_Crisis } from "next/font/google";
+import {
+  Geist,
+  Geist_Mono,
+  Inter,
+  Climate_Crisis,
+  Lexend,
+} from "next/font/google";
 import "../styles/globals.css";
 import { AuthProvider } from "../components/AuthProvider";
 
@@ -91,6 +97,11 @@ const climateCrisis = Climate_Crisis({
   subsets: ["latin"],
 });
 
+const lexend = Lexend({
+  variable: "--font-lexend",
+  subsets: ["latin"],
+});
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -150,7 +161,7 @@ export default function RootLayout({
         <meta name="application-name" content="Paccy" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${climateCrisis.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${climateCrisis.variable} ${lexend.variable} antialiased`}
       >
         <AuthProvider>{children}</AuthProvider>
       </body>
