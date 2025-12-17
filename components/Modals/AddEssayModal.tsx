@@ -117,9 +117,7 @@ export default function AddEssayModal({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <FaPen className="text-purple-400 text-xl" />
-              <h2 className="text-xl font-bold text-white">
-                Add New Essay
-              </h2>
+              <h2 className="text-xl font-bold text-white">Add New Essay</h2>
             </div>
             <button
               onClick={onClose}
