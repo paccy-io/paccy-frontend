@@ -1306,345 +1306,450 @@ export default function CollegeDetail() {
 
         {/* Checklists */}
         <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-white flex items-center gap-3">
-              <FaClipboardList />
-              Application Checklists
-            </h2>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-bold text-white flex items-center gap-3 mb-2">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+                  <FaClipboardList className="text-white text-lg" />
+                </div>
+                Application Checklists
+              </h2>
+              <p className="text-white/60 text-sm">
+                Track your application progress and stay organized
+              </p>
+            </div>
             <button
               onClick={() => setShowAddChecklistModal(true)}
-              className="bg-blue-500 text-white px-4 py-2 rounded-xl font-medium hover:bg-blue-600 transition-colors flex items-center gap-2"
+              className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-blue-600 hover:to-blue-700 transition-all flex items-center gap-2 shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 hover:scale-105"
             >
-              <FaPlus />
+              <FaPlus className="text-sm" />
               <span>Add Checklist</span>
             </button>
           </div>
 
-          {backendChecklists.map((checklist) => (
-            <div
-              key={checklist.id}
-              className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl overflow-hidden"
-            >
+          {backendChecklists.length === 0 ? (
+            <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border-2 border-dashed border-neutral-700/50 rounded-xl p-12 text-center">
+              <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-neutral-800/50 flex items-center justify-center">
+                <FaClipboardList className="text-4xl text-white/30" />
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-2">
+                No checklists yet
+              </h3>
+              <p className="text-white/60 mb-6">
+                Create your first checklist to start tracking your application
+                progress
+              </p>
               <button
-                onClick={() => toggleChecklist(checklist.id)}
-                className="w-full p-4 sm:p-6 text-left hover:bg-neutral-800/50 transition-colors"
+                onClick={() => setShowAddChecklistModal(true)}
+                className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-blue-600 hover:to-blue-700 transition-all inline-flex items-center gap-2"
               >
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div className="flex items-center gap-4 flex-1">
-                    {expandedChecklists.has(checklist.id) ? (
-                      <FaChevronDown className="text-white/50 flex-shrink-0" />
-                    ) : (
-                      <FaChevronRight className="text-white/50 flex-shrink-0" />
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-lg font-semibold text-white">
-                        {checklist.name}
-                      </h3>
-                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mt-2">
-                        <div className="text-sm text-white/70">
-                          {
-                            checklist.tasks.filter((task) => task.completed)
-                              .length
-                          }{" "}
-                          of {checklist.tasks.length} completed
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <div className="w-24 sm:w-32 bg-neutral-700/50 rounded-full h-2">
-                            <div
-                              className="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full transition-all duration-300"
-                              style={{
-                                width: `${
-                                  checklist.tasks.length > 0
-                                    ? Math.round(
-                                        (checklist.tasks.filter(
-                                          (task) => task.completed
-                                        ).length /
-                                          checklist.tasks.length) *
-                                          100
-                                      )
-                                    : 0
-                                }%`,
-                              }}
-                            ></div>
-                          </div>
-                          <span className="text-sm text-white/70">
-                            {checklist.tasks.length > 0
-                              ? Math.round(
-                                  (checklist.tasks.filter(
-                                    (task) => task.completed
-                                  ).length /
-                                    checklist.tasks.length) *
-                                    100
-                                )
-                              : 0}
-                            %
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div
-                    className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 min-w-0"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <button
-                      onClick={() => {
-                        setEditingChecklist(checklist);
-                        setEditingChecklistId(checklist.id);
-                        setShowEditChecklistModal(true);
-                      }}
-                      className="px-3 py-2 bg-yellow-600 text-white rounded text-sm hover:bg-yellow-700 transition-colors flex items-center gap-1 justify-center touch-manipulation"
-                      title="Edit Checklist"
-                    >
-                      <FaEdit size={12} />
-                      <span>Edit</span>
-                    </button>
-                    <button
-                      onClick={() => handleDeleteChecklist(checklist.id)}
-                      className="px-3 py-2 bg-red-600 text-white rounded text-sm hover:bg-red-700 transition-colors flex items-center gap-1 justify-center touch-manipulation"
-                      title="Delete Checklist"
-                    >
-                      <FaTrash size={12} />
-                      <span>Delete</span>
-                    </button>
-                  </div>
-                </div>
+                <FaPlus />
+                Create Checklist
               </button>
+            </div>
+          ) : (
+            backendChecklists.map((checklist) => {
+              const completedTasks = checklist.tasks.filter(
+                (task) => task.completed
+              ).length;
+              const totalTasks = checklist.tasks.length;
+              const completionPercentage =
+                totalTasks > 0
+                  ? Math.round((completedTasks / totalTasks) * 100)
+                  : 0;
+              const isExpanded = expandedChecklists.has(checklist.id);
 
-              {expandedChecklists.has(checklist.id) && (
-                <div className="border-t border-neutral-700/50">
-                  <div className="p-6 space-y-3">
-                    {checklist.tasks.map((task) => (
-                      <div
-                        key={task.id}
-                        className="p-4 bg-neutral-800/30 rounded-xl border border-neutral-700/30 cursor-pointer hover:bg-neutral-800/40 transition-colors"
-                        onClick={() => {
-                          if (
-                            task.priority ||
-                            task.status ||
-                            task.responsible ||
-                            task.type ||
-                            task.component ||
-                            task.notes
-                          ) {
-                            toggleTask(task.id);
-                          }
-                        }}
-                      >
-                        <div className="flex items-start justify-between mb-3">
-                          <div className="flex items-center gap-3 flex-1">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                const newStatus = task.completed
-                                  ? TaskStatus.NOT_STARTED
-                                  : TaskStatus.COMPLETED;
+              return (
+                <div
+                  key={checklist.id}
+                  className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border-2 border-neutral-700/50 rounded-xl overflow-hidden hover:border-blue-500/30 transition-all shadow-lg hover:shadow-xl"
+                >
+                  <button
+                    onClick={() => toggleChecklist(checklist.id)}
+                    className="w-full p-6 text-left hover:bg-neutral-800/30 transition-all"
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      <div className="flex items-start gap-4 flex-1">
+                        <div className="mt-1">
+                          {isExpanded ? (
+                            <FaChevronDown className="text-white/70 text-lg transition-transform" />
+                          ) : (
+                            <FaChevronRight className="text-white/70 text-lg transition-transform" />
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-3 mb-3">
+                            <h3 className="text-xl font-bold text-white">
+                              {checklist.name}
+                            </h3>
+                            {completionPercentage === 100 && (
+                              <span className="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full font-semibold flex items-center gap-1">
+                                <FaCheckCircle className="text-xs" />
+                                Complete
+                              </span>
+                            )}
+                          </div>
 
-                                handleUpdateTask(checklist.id, task.id, {
-                                  completed: !task.completed,
-                                  status: newStatus,
-                                });
-                              }}
-                              className={`text-xl flex-shrink-0 ${
-                                task.completed
-                                  ? "text-green-400 hover:text-green-300"
-                                  : "text-neutral-500 hover:text-neutral-400"
-                              } transition-colors`}
-                            >
-                              {task.completed ? (
-                                <FaCheckCircle />
-                              ) : (
-                                <FaTimesCircle />
-                              )}
-                            </button>
-                            <div className="flex-1">
-                              <h4
-                                className={`text-lg font-medium ${
-                                  task.completed
-                                    ? "text-white/70 line-through"
-                                    : "text-white"
+                          {checklist.description && (
+                            <p className="text-white/60 text-sm mb-3">
+                              {checklist.description}
+                            </p>
+                          )}
+
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                            <div className="text-sm text-white/70 font-medium">
+                              <span className="text-white font-bold">
+                                {completedTasks}
+                              </span>{" "}
+                              of{" "}
+                              <span className="text-white font-bold">
+                                {totalTasks}
+                              </span>{" "}
+                              tasks completed
+                            </div>
+                            <div className="flex items-center gap-3 flex-1 max-w-md">
+                              <div className="flex-1 bg-neutral-700/50 rounded-full h-3 overflow-hidden">
+                                <div
+                                  className={`h-full rounded-full transition-all duration-500 ${
+                                    completionPercentage === 100
+                                      ? "bg-gradient-to-r from-green-500 to-emerald-500"
+                                      : completionPercentage >= 50
+                                      ? "bg-gradient-to-r from-blue-500 to-blue-600"
+                                      : "bg-gradient-to-r from-yellow-500 to-orange-500"
+                                  }`}
+                                  style={{ width: `${completionPercentage}%` }}
+                                ></div>
+                              </div>
+                              <span
+                                className={`text-sm font-bold min-w-[3rem] ${
+                                  completionPercentage === 100
+                                    ? "text-green-400"
+                                    : completionPercentage >= 50
+                                    ? "text-blue-400"
+                                    : "text-yellow-400"
                                 }`}
                               >
-                                {task.name}
-                              </h4>
-                              {task.deadline && (
-                                <div className="text-sm text-white/50 mt-1 flex items-center gap-1">
-                                  <FaCalendar />
-                                  Due: {formatDeadline(task.deadline)}
-                                  {(() => {
-                                    const days = getDaysUntilDeadline(
-                                      task.deadline
-                                    );
-                                    if (days !== null && days > 0) {
-                                      return (
-                                        <span
-                                          className={`ml-2 ${
-                                            days <= 7
-                                              ? "text-red-400"
-                                              : "text-yellow-400"
-                                          }`}
-                                        >
-                                          ({days} days remaining)
-                                        </span>
-                                      );
-                                    }
-                                    return null;
-                                  })()}
-                                </div>
-                              )}
+                                {completionPercentage}%
+                              </span>
                             </div>
                           </div>
-                          <div className="flex items-center gap-2">
-                            {(task.priority ||
+                        </div>
+                      </div>
+
+                      <div
+                        className="flex flex-row sm:flex-row items-center gap-2"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <button
+                          onClick={() => {
+                            setEditingChecklist(checklist);
+                            setEditingChecklistId(checklist.id);
+                            setShowEditChecklistModal(true);
+                          }}
+                          className="px-4 py-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-lg text-sm font-medium hover:from-yellow-600 hover:to-orange-600 transition-all flex items-center gap-2 shadow-md hover:shadow-lg hover:scale-105"
+                          title="Edit Checklist"
+                        >
+                          <FaEdit className="text-sm" />
+                          <span className="hidden sm:inline">Edit</span>
+                        </button>
+                        <button
+                          onClick={() => handleDeleteChecklist(checklist.id)}
+                          className="px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg text-sm font-medium hover:from-red-600 hover:to-red-700 transition-all flex items-center gap-2 shadow-md hover:shadow-lg hover:scale-105"
+                          title="Delete Checklist"
+                        >
+                          <FaTrash className="text-sm" />
+                          <span className="hidden sm:inline">Delete</span>
+                        </button>
+                      </div>
+                    </div>
+                  </button>
+
+                  {isExpanded && (
+                    <div className="border-t-2 border-neutral-700/50 bg-[#0a0a0a]/50">
+                      <div className="p-6 space-y-3">
+                        {checklist.tasks.length === 0 ? (
+                          <div className="text-center py-8">
+                            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-neutral-800/50 flex items-center justify-center">
+                              <FaTasks className="text-2xl text-white/30" />
+                            </div>
+                            <p className="text-white/60 mb-4">
+                              No tasks yet in this checklist
+                            </p>
+                            <button
+                              onClick={() => {
+                                setSelectedChecklistForTask(checklist.id);
+                                setShowAddTaskModal(true);
+                              }}
+                              className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:from-blue-600 hover:to-blue-700 transition-all inline-flex items-center gap-2"
+                            >
+                              <FaPlus />
+                              Add First Task
+                            </button>
+                          </div>
+                        ) : (
+                          checklist.tasks.map((task) => {
+                            const isTaskExpanded = expandedTasks.has(task.id);
+                            const hasDetails =
+                              task.priority ||
                               task.status ||
                               task.responsible ||
                               task.type ||
                               task.component ||
-                              task.notes) && (
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  toggleTask(task.id);
+                              task.notes;
+                            const daysUntilDeadline = task.deadline
+                              ? getDaysUntilDeadline(task.deadline)
+                              : null;
+
+                            return (
+                              <div
+                                key={task.id}
+                                className={`p-4 rounded-xl border-2 transition-all cursor-pointer ${
+                                  task.completed
+                                    ? "bg-green-500/5 border-green-500/30 hover:border-green-500/50"
+                                    : "bg-neutral-800/30 border-neutral-700/30 hover:border-blue-500/30 hover:bg-neutral-800/50"
+                                }`}
+                                onClick={() => {
+                                  if (hasDetails) {
+                                    toggleTask(task.id);
+                                  }
                                 }}
-                                className="text-white/50 hover:text-white transition-colors flex-shrink-0"
-                                title={
-                                  expandedTasks.has(task.id)
-                                    ? "Show less"
-                                    : "Show more"
-                                }
                               >
-                                {expandedTasks.has(task.id) ? (
-                                  <FaChevronUp />
-                                ) : (
-                                  <FaChevronDown />
-                                )}
-                              </button>
-                            )}
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setEditingTask(task);
-                                setEditingChecklistId(checklist.id);
-                                setEditingTaskId(task.id);
-                                setShowEditTaskModal(true);
-                              }}
-                              className="text-white/50 hover:text-yellow-400 transition-colors flex-shrink-0"
-                              title="Edit Task"
-                            >
-                              <FaEdit />
-                            </button>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDeleteTask(checklist.id, task.id);
-                              }}
-                              className="text-white/50 hover:text-red-400 transition-colors flex-shrink-0"
-                              title="Delete Task"
-                            >
-                              <FaTrash />
-                            </button>
-                          </div>
-                        </div>
+                                <div className="flex items-start justify-between mb-2">
+                                  <div className="flex items-start gap-3 flex-1">
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        const newStatus = task.completed
+                                          ? TaskStatus.NOT_STARTED
+                                          : TaskStatus.COMPLETED;
 
-                        {/* Task Details - Only show when expanded */}
-                        {expandedTasks.has(task.id) && (
-                          <>
-                            {(task.priority ||
-                              task.status ||
-                              task.responsible ||
-                              task.type) && (
-                              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-3">
-                                {task.priority && (
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-white/50 text-xs">
-                                      Priority:
-                                    </span>
-                                    <span
-                                      className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(
-                                        task.priority
-                                      )}`}
+                                        handleUpdateTask(
+                                          checklist.id,
+                                          task.id,
+                                          {
+                                            completed: !task.completed,
+                                            status: newStatus,
+                                          }
+                                        );
+                                      }}
+                                      className={`text-2xl flex-shrink-0 mt-0.5 transition-all hover:scale-110 ${
+                                        task.completed
+                                          ? "text-green-400 hover:text-green-300"
+                                          : "text-neutral-600 hover:text-white"
+                                      }`}
                                     >
-                                      {task.priority}
-                                    </span>
+                                      {task.completed ? (
+                                        <FaCheckCircle />
+                                      ) : (
+                                        <div className="w-6 h-6 rounded-full border-2 border-neutral-600 hover:border-white"></div>
+                                      )}
+                                    </button>
+                                    <div className="flex-1 min-w-0">
+                                      <h4
+                                        className={`text-base font-semibold mb-1 ${
+                                          task.completed
+                                            ? "text-white/50 line-through"
+                                            : "text-white"
+                                        }`}
+                                      >
+                                        {task.name}
+                                      </h4>
+                                      {task.deadline && (
+                                        <div
+                                          className={`text-sm flex items-center gap-1.5 ${
+                                            task.completed
+                                              ? "text-white/40"
+                                              : daysUntilDeadline !== null &&
+                                                daysUntilDeadline <= 3
+                                              ? "text-red-400"
+                                              : daysUntilDeadline !== null &&
+                                                daysUntilDeadline <= 7
+                                              ? "text-yellow-400"
+                                              : "text-white/60"
+                                          }`}
+                                        >
+                                          <FaClock className="text-xs" />
+                                          <span>
+                                            Due: {formatDeadline(task.deadline)}
+                                          </span>
+                                          {daysUntilDeadline !== null &&
+                                            daysUntilDeadline > 0 &&
+                                            !task.completed && (
+                                              <span
+                                                className={`ml-1 px-2 py-0.5 rounded-full text-xs font-semibold ${
+                                                  daysUntilDeadline <= 3
+                                                    ? "bg-red-500/20 text-red-400"
+                                                    : daysUntilDeadline <= 7
+                                                    ? "bg-yellow-500/20 text-yellow-400"
+                                                    : "bg-blue-500/20 text-blue-400"
+                                                }`}
+                                              >
+                                                {daysUntilDeadline}d left
+                                              </span>
+                                            )}
+                                        </div>
+                                      )}
+                                    </div>
                                   </div>
-                                )}
-                                {task.status && (
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-white/50 text-xs">
-                                      Status:
-                                    </span>
-                                    <span className="px-2 py-1 bg-blue-500/20 text-blue-300 rounded-full text-xs font-medium">
-                                      {task.status}
-                                    </span>
+                                  <div className="flex items-center gap-2 ml-2">
+                                    {hasDetails && (
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          toggleTask(task.id);
+                                        }}
+                                        className="p-2 text-white/50 hover:text-white hover:bg-neutral-700/50 rounded-lg transition-all"
+                                        title={
+                                          isTaskExpanded
+                                            ? "Show less"
+                                            : "Show more"
+                                        }
+                                      >
+                                        {isTaskExpanded ? (
+                                          <FaChevronUp />
+                                        ) : (
+                                          <FaChevronDown />
+                                        )}
+                                      </button>
+                                    )}
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setEditingTask(task);
+                                        setEditingChecklistId(checklist.id);
+                                        setEditingTaskId(task.id);
+                                        setShowEditTaskModal(true);
+                                      }}
+                                      className="p-2 text-white/50 hover:text-yellow-400 hover:bg-yellow-400/10 rounded-lg transition-all"
+                                      title="Edit Task"
+                                    >
+                                      <FaEdit />
+                                    </button>
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleDeleteTask(checklist.id, task.id);
+                                      }}
+                                      className="p-2 text-white/50 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-all"
+                                      title="Delete Task"
+                                    >
+                                      <FaTrash />
+                                    </button>
                                   </div>
-                                )}
-                                {task.responsible && (
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-white/50 text-xs">
-                                      Assigned:
-                                    </span>
-                                    <span className="px-2 py-1 bg-purple-500/20 text-purple-300 rounded-full text-xs font-medium">
-                                      {task.responsible}
-                                    </span>
-                                  </div>
-                                )}
-                                {task.type && (
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-white/50 text-xs">
-                                      Type:
-                                    </span>
-                                    <span className="px-2 py-1 bg-orange-500/20 text-orange-300 rounded-full text-xs font-medium">
-                                      {task.type}
-                                    </span>
-                                  </div>
-                                )}
-                              </div>
-                            )}
+                                </div>
 
-                            {(task.component || task.notes) && (
-                              <div className="mt-3 pt-3 border-t border-neutral-700/30">
-                                {task.component && (
-                                  <div className="mb-2">
-                                    <span className="text-white/50 text-xs">
-                                      Component:{" "}
-                                    </span>
-                                    <span className="px-2 py-1 bg-teal-500/20 text-teal-300 rounded-full text-xs font-medium">
-                                      {task.component}
-                                    </span>
-                                  </div>
-                                )}
-                                {task.notes && (
-                                  <div>
-                                    <span className="text-white/50 text-xs">
-                                      Notes:{" "}
-                                    </span>
-                                    <span className="text-white/70 text-sm">
-                                      {task.notes}
-                                    </span>
+                                {/* Task Details - Only show when expanded */}
+                                {isTaskExpanded && hasDetails && (
+                                  <div className="mt-4 pt-4 border-t border-neutral-700/30">
+                                    {(task.priority ||
+                                      task.status ||
+                                      task.responsible ||
+                                      task.type) && (
+                                      <div className="flex flex-wrap gap-2 mb-3">
+                                        {task.priority && (
+                                          <div className="flex items-center gap-1.5">
+                                            <span className="text-white/50 text-xs font-medium">
+                                              Priority:
+                                            </span>
+                                            <span
+                                              className={`px-3 py-1 rounded-full text-xs font-bold ${getPriorityColor(
+                                                task.priority
+                                              )}`}
+                                            >
+                                              {task.priority.toUpperCase()}
+                                            </span>
+                                          </div>
+                                        )}
+                                        {task.status && (
+                                          <div className="flex items-center gap-1.5">
+                                            <span className="text-white/50 text-xs font-medium">
+                                              Status:
+                                            </span>
+                                            <span className="px-3 py-1 bg-blue-500/20 text-blue-300 border border-blue-500/30 rounded-full text-xs font-bold">
+                                              {task.status
+                                                .replace("_", " ")
+                                                .toUpperCase()}
+                                            </span>
+                                          </div>
+                                        )}
+                                        {task.responsible && (
+                                          <div className="flex items-center gap-1.5">
+                                            <span className="text-white/50 text-xs font-medium">
+                                              Assigned:
+                                            </span>
+                                            <span className="px-3 py-1 bg-purple-500/20 text-purple-300 border border-purple-500/30 rounded-full text-xs font-bold flex items-center gap-1">
+                                              <FaUser className="text-xs" />
+                                              {task.responsible
+                                                .replace("_", " ")
+                                                .toUpperCase()}
+                                            </span>
+                                          </div>
+                                        )}
+                                        {task.type && (
+                                          <div className="flex items-center gap-1.5">
+                                            <span className="text-white/50 text-xs font-medium">
+                                              Type:
+                                            </span>
+                                            <span className="px-3 py-1 bg-orange-500/20 text-orange-300 border border-orange-500/30 rounded-full text-xs font-bold">
+                                              {task.type
+                                                .replace("_", " ")
+                                                .toUpperCase()}
+                                            </span>
+                                          </div>
+                                        )}
+                                      </div>
+                                    )}
+
+                                    {(task.component || task.notes) && (
+                                      <div className="space-y-3">
+                                        {task.component && (
+                                          <div className="flex items-center gap-2">
+                                            <span className="text-white/50 text-xs font-medium">
+                                              Component:
+                                            </span>
+                                            <span className="px-3 py-1 bg-teal-500/20 text-teal-300 border border-teal-500/30 rounded-full text-xs font-bold">
+                                              {task.component
+                                                .replace("_", " ")
+                                                .toUpperCase()}
+                                            </span>
+                                          </div>
+                                        )}
+                                        {task.notes && (
+                                          <div className="bg-neutral-800/50 rounded-lg p-3 border border-neutral-700/30">
+                                            <div className="text-white/50 text-xs font-medium mb-1 flex items-center gap-1">
+                                              <FaFileAlt className="text-xs" />
+                                              Notes:
+                                            </div>
+                                            <p className="text-white/80 text-sm leading-relaxed">
+                                              {task.notes}
+                                            </p>
+                                          </div>
+                                        )}
+                                      </div>
+                                    )}
                                   </div>
                                 )}
                               </div>
-                            )}
-                          </>
+                            );
+                          })
                         )}
+                        <button
+                          onClick={() => {
+                            setSelectedChecklistForTask(checklist.id);
+                            setShowAddTaskModal(true);
+                          }}
+                          className="w-full p-4 border-2 border-dashed border-neutral-600 rounded-xl text-white/60 hover:text-white hover:border-blue-500/50 hover:bg-blue-500/5 transition-all flex items-center justify-center gap-2 font-semibold group"
+                        >
+                          <FaPlus className="group-hover:scale-110 transition-transform" />
+                          <span>Add Task</span>
+                        </button>
                       </div>
-                    ))}
-                    <button
-                      onClick={() => {
-                        setSelectedChecklistForTask(checklist.id);
-                        setShowAddTaskModal(true);
-                      }}
-                      className="w-full p-3 border border-neutral-600 border-dashed rounded-xl text-white/50 hover:text-white hover:border-blue-500/30 transition-colors flex items-center justify-center gap-2"
-                    >
-                      <FaPlus />
-                      <span>Add Task</span>
-                    </button>
-                  </div>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-          ))}
+              );
+            })
+          )}
         </div>
       </div>
 
@@ -2370,17 +2475,12 @@ export default function CollegeDetail() {
                         priority: e.target.value as TaskPriority,
                       }))
                     }
-                    className="w-full bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-3 text-white"
+                    className="w-full bg-[#1a1a1a] border border-neutral-700/50 rounded-xl p-3 text-white focus:border-blue-500 focus:outline-none"
+                    style={{ colorScheme: "dark" }}
                   >
-                    <option className="bg-[#1a1a1a] text-white" value="low">
-                      Low
-                    </option>
-                    <option className="bg-[#1a1a1a] text-white" value="medium">
-                      Medium
-                    </option>
-                    <option className="bg-[#1a1a1a] text-white" value="high">
-                      High
-                    </option>
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
                   </select>
                 </div>
               </div>
@@ -2398,47 +2498,19 @@ export default function CollegeDetail() {
                         type: e.target.value as TaskType,
                       }))
                     }
-                    className="w-full bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-3 text-white"
+                    className="w-full bg-[#1a1a1a] border border-neutral-700/50 rounded-xl p-3 text-white focus:border-blue-500 focus:outline-none"
+                    style={{ colorScheme: "dark" }}
                   >
-                    <option
-                      className="bg-[#1a1a1a] text-white"
-                      value="document_preparation"
-                    >
+                    <option value="document_preparation">
                       Document Preparation
                     </option>
-                    <option
-                      className="bg-[#1a1a1a] text-white"
-                      value="submission"
-                    >
-                      Submission
-                    </option>
-                    <option className="bg-[#1a1a1a] text-white" value="review">
-                      Review
-                    </option>
-                    <option
-                      className="bg-[#1a1a1a] text-white"
-                      value="follow_up"
-                    >
-                      Follow Up
-                    </option>
-                    <option
-                      className="bg-[#1a1a1a] text-white"
-                      value="research"
-                    >
-                      Research
-                    </option>
-                    <option className="bg-[#1a1a1a] text-white" value="writing">
-                      Writing
-                    </option>
-                    <option
-                      className="bg-[#1a1a1a] text-white"
-                      value="scheduling"
-                    >
-                      Scheduling
-                    </option>
-                    <option className="bg-[#1a1a1a] text-white" value="other">
-                      Other
-                    </option>
+                    <option value="submission">Submission</option>
+                    <option value="review">Review</option>
+                    <option value="follow_up">Follow Up</option>
+                    <option value="research">Research</option>
+                    <option value="writing">Writing</option>
+                    <option value="scheduling">Scheduling</option>
+                    <option value="other">Other</option>
                   </select>
                 </div>
 
@@ -2454,47 +2526,24 @@ export default function CollegeDetail() {
                         component: e.target.value as TaskComponent,
                       }))
                     }
-                    className="w-full bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-3 text-white"
+                    className="w-full bg-[#1a1a1a] border border-neutral-700/50 rounded-xl p-3 text-white focus:border-blue-500 focus:outline-none"
+                    style={{ colorScheme: "dark" }}
                   >
-                    <option
-                      className="bg-[#1a1a1a] text-white"
-                      value="common_app"
-                    >
-                      Common App
-                    </option>
-                    <option
-                      className="bg-[#1a1a1a] text-white"
-                      value="supplemental_essay"
-                    >
+                    <option value="common_app">Common App</option>
+                    <option value="supplemental_essay">
                       Supplemental Essay
                     </option>
-                    <option
-                      className="bg-[#1a1a1a] text-white"
-                      value="academic_records"
-                    >
-                      Academic Records
-                    </option>
-                    <option
-                      className="bg-[#1a1a1a] text-white"
-                      value="standardized_tests"
-                    >
+                    <option value="academic_records">Academic Records</option>
+                    <option value="standardized_tests">
                       Standardized Tests
                     </option>
-                    <option
-                      className="bg-[#1a1a1a] text-white"
-                      value="supporting_documents"
-                    >
+                    <option value="supporting_documents">
                       Supporting Documents
                     </option>
-                    <option
-                      className="bg-[#1a1a1a] text-white"
-                      value="financial_documents"
-                    >
+                    <option value="financial_documents">
                       Financial Documents
                     </option>
-                    <option className="bg-[#1a1a1a] text-white" value="other">
-                      Other
-                    </option>
+                    <option value="other">Other</option>
                   </select>
                 </div>
               </div>
@@ -2512,35 +2561,14 @@ export default function CollegeDetail() {
                         status: e.target.value as TaskStatus,
                       }))
                     }
-                    className="w-full bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-3 text-white"
+                    className="w-full bg-[#1a1a1a] border border-neutral-700/50 rounded-xl p-3 text-white focus:border-blue-500 focus:outline-none"
+                    style={{ colorScheme: "dark" }}
                   >
-                    <option
-                      className="bg-[#1a1a1a] text-white"
-                      value="not_started"
-                    >
-                      Not Started
-                    </option>
-                    <option
-                      className="bg-[#1a1a1a] text-white"
-                      value="in_progress"
-                    >
-                      In Progress
-                    </option>
-                    <option
-                      className="bg-[#1a1a1a] text-white"
-                      value="under_review"
-                    >
-                      Under Review
-                    </option>
-                    <option
-                      className="bg-[#1a1a1a] text-white"
-                      value="completed"
-                    >
-                      Completed
-                    </option>
-                    <option className="bg-[#1a1a1a] text-white" value="waiting">
-                      Waiting
-                    </option>
+                    <option value="not_started">Not Started</option>
+                    <option value="in_progress">In Progress</option>
+                    <option value="under_review">Under Review</option>
+                    <option value="completed">Completed</option>
+                    <option value="waiting">Waiting</option>
                   </select>
                 </div>
 
@@ -2556,32 +2584,15 @@ export default function CollegeDetail() {
                         responsible: e.target.value as TaskResponsible,
                       }))
                     }
-                    className="w-full bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-3 text-white"
+                    className="w-full bg-[#1a1a1a] border border-neutral-700/50 rounded-xl p-3 text-white focus:border-blue-500 focus:outline-none"
+                    style={{ colorScheme: "dark" }}
                   >
-                    <option className="bg-[#1a1a1a] text-white" value="student">
-                      Student
-                    </option>
-                    <option className="bg-[#1a1a1a] text-white" value="parent">
-                      Parent
-                    </option>
-                    <option
-                      className="bg-[#1a1a1a] text-white"
-                      value="counselor"
-                    >
-                      Counselor
-                    </option>
-                    <option className="bg-[#1a1a1a] text-white" value="teacher">
-                      Teacher
-                    </option>
-                    <option
-                      className="bg-[#1a1a1a] text-white"
-                      value="school_office"
-                    >
-                      School Office
-                    </option>
-                    <option className="bg-[#1a1a1a] text-white" value="other">
-                      Other
-                    </option>
+                    <option value="student">Student</option>
+                    <option value="parent">Parent</option>
+                    <option value="counselor">Counselor</option>
+                    <option value="teacher">Teacher</option>
+                    <option value="school_office">School Office</option>
+                    <option value="other">Other</option>
                   </select>
                 </div>
               </div>
@@ -2696,17 +2707,12 @@ export default function CollegeDetail() {
                           : null
                       )
                     }
-                    className="w-full bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-3 text-white"
+                    className="w-full bg-[#1a1a1a] border border-neutral-700/50 rounded-xl p-3 text-white focus:border-blue-500 focus:outline-none"
+                    style={{ colorScheme: "dark" }}
                   >
-                    <option className="bg-[#1a1a1a] text-white" value="low">
-                      Low
-                    </option>
-                    <option className="bg-[#1a1a1a] text-white" value="medium">
-                      Medium
-                    </option>
-                    <option className="bg-[#1a1a1a] text-white" value="high">
-                      High
-                    </option>
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
                   </select>
                 </div>
               </div>
@@ -2725,47 +2731,19 @@ export default function CollegeDetail() {
                           : null
                       )
                     }
-                    className="w-full bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-3 text-white"
+                    className="w-full bg-[#1a1a1a] border border-neutral-700/50 rounded-xl p-3 text-white focus:border-blue-500 focus:outline-none"
+                    style={{ colorScheme: "dark" }}
                   >
-                    <option
-                      className="bg-[#1a1a1a] text-white"
-                      value="document_preparation"
-                    >
+                    <option value="document_preparation">
                       Document Preparation
                     </option>
-                    <option
-                      className="bg-[#1a1a1a] text-white"
-                      value="submission"
-                    >
-                      Submission
-                    </option>
-                    <option className="bg-[#1a1a1a] text-white" value="review">
-                      Review
-                    </option>
-                    <option
-                      className="bg-[#1a1a1a] text-white"
-                      value="follow_up"
-                    >
-                      Follow Up
-                    </option>
-                    <option
-                      className="bg-[#1a1a1a] text-white"
-                      value="research"
-                    >
-                      Research
-                    </option>
-                    <option className="bg-[#1a1a1a] text-white" value="writing">
-                      Writing
-                    </option>
-                    <option
-                      className="bg-[#1a1a1a] text-white"
-                      value="scheduling"
-                    >
-                      Scheduling
-                    </option>
-                    <option className="bg-[#1a1a1a] text-white" value="other">
-                      Other
-                    </option>
+                    <option value="submission">Submission</option>
+                    <option value="review">Review</option>
+                    <option value="follow_up">Follow Up</option>
+                    <option value="research">Research</option>
+                    <option value="writing">Writing</option>
+                    <option value="scheduling">Scheduling</option>
+                    <option value="other">Other</option>
                   </select>
                 </div>
 
@@ -2785,47 +2763,24 @@ export default function CollegeDetail() {
                           : null
                       )
                     }
-                    className="w-full bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-3 text-white"
+                    className="w-full bg-[#1a1a1a] border border-neutral-700/50 rounded-xl p-3 text-white focus:border-blue-500 focus:outline-none"
+                    style={{ colorScheme: "dark" }}
                   >
-                    <option
-                      className="bg-[#1a1a1a] text-white"
-                      value="common_app"
-                    >
-                      Common App
-                    </option>
-                    <option
-                      className="bg-[#1a1a1a] text-white"
-                      value="supplemental_essay"
-                    >
+                    <option value="common_app">Common App</option>
+                    <option value="supplemental_essay">
                       Supplemental Essay
                     </option>
-                    <option
-                      className="bg-[#1a1a1a] text-white"
-                      value="academic_records"
-                    >
-                      Academic Records
-                    </option>
-                    <option
-                      className="bg-[#1a1a1a] text-white"
-                      value="standardized_tests"
-                    >
+                    <option value="academic_records">Academic Records</option>
+                    <option value="standardized_tests">
                       Standardized Tests
                     </option>
-                    <option
-                      className="bg-[#1a1a1a] text-white"
-                      value="supporting_documents"
-                    >
+                    <option value="supporting_documents">
                       Supporting Documents
                     </option>
-                    <option
-                      className="bg-[#1a1a1a] text-white"
-                      value="financial_documents"
-                    >
+                    <option value="financial_documents">
                       Financial Documents
                     </option>
-                    <option className="bg-[#1a1a1a] text-white" value="other">
-                      Other
-                    </option>
+                    <option value="other">Other</option>
                   </select>
                 </div>
               </div>
@@ -2844,35 +2799,14 @@ export default function CollegeDetail() {
                           : null
                       )
                     }
-                    className="w-full bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-3 text-white"
+                    className="w-full bg-[#1a1a1a] border border-neutral-700/50 rounded-xl p-3 text-white focus:border-blue-500 focus:outline-none"
+                    style={{ colorScheme: "dark" }}
                   >
-                    <option
-                      className="bg-[#1a1a1a] text-white"
-                      value="not_started"
-                    >
-                      Not Started
-                    </option>
-                    <option
-                      className="bg-[#1a1a1a] text-white"
-                      value="in_progress"
-                    >
-                      In Progress
-                    </option>
-                    <option
-                      className="bg-[#1a1a1a] text-white"
-                      value="under_review"
-                    >
-                      Under Review
-                    </option>
-                    <option
-                      className="bg-[#1a1a1a] text-white"
-                      value="completed"
-                    >
-                      Completed
-                    </option>
-                    <option className="bg-[#1a1a1a] text-white" value="waiting">
-                      Waiting
-                    </option>
+                    <option value="not_started">Not Started</option>
+                    <option value="in_progress">In Progress</option>
+                    <option value="under_review">Under Review</option>
+                    <option value="completed">Completed</option>
+                    <option value="waiting">Waiting</option>
                   </select>
                 </div>
 
@@ -2892,32 +2826,15 @@ export default function CollegeDetail() {
                           : null
                       )
                     }
-                    className="w-full bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-3 text-white"
+                    className="w-full bg-[#1a1a1a] border border-neutral-700/50 rounded-xl p-3 text-white focus:border-blue-500 focus:outline-none"
+                    style={{ colorScheme: "dark" }}
                   >
-                    <option className="bg-[#1a1a1a] text-white" value="student">
-                      Student
-                    </option>
-                    <option className="bg-[#1a1a1a] text-white" value="parent">
-                      Parent
-                    </option>
-                    <option
-                      className="bg-[#1a1a1a] text-white"
-                      value="counselor"
-                    >
-                      Counselor
-                    </option>
-                    <option className="bg-[#1a1a1a] text-white" value="teacher">
-                      Teacher
-                    </option>
-                    <option
-                      className="bg-[#1a1a1a] text-white"
-                      value="school_office"
-                    >
-                      School Office
-                    </option>
-                    <option className="bg-[#1a1a1a] text-white" value="other">
-                      Other
-                    </option>
+                    <option value="student">Student</option>
+                    <option value="parent">Parent</option>
+                    <option value="counselor">Counselor</option>
+                    <option value="teacher">Teacher</option>
+                    <option value="school_office">School Office</option>
+                    <option value="other">Other</option>
                   </select>
                 </div>
               </div>
