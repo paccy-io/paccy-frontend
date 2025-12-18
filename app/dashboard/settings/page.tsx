@@ -192,6 +192,38 @@ export default function Settings() {
   const [updateError, setUpdateError] = useState<string | null>(null);
   const [updateSuccess, setUpdateSuccess] = useState<string | null>(null);
 
+  // Gemini API Key management (stored in localStorage only)
+  const [geminiApiKey, setGeminiApiKey] = useState("");
+  const [showGeminiKey, setShowGeminiKey] = useState(false);
+
+  // Load Gemini API key from localStorage
+  useEffect(() => {
+    const savedKey = localStorage.getItem("gemini_api_key");
+    if (savedKey) {
+      setGeminiApiKey(savedKey);
+    }
+  }, []);
+
+  // Save Gemini API key to localStorage
+  const saveGeminiApiKey = () => {
+    if (geminiApiKey.trim()) {
+      localStorage.setItem("gemini_api_key", geminiApiKey.trim());
+      setUpdateSuccess("Gemini API key saved successfully!");
+      setTimeout(() => setUpdateSuccess(null), 3000);
+    } else {
+      setUpdateError("Please enter a valid API key");
+      setTimeout(() => setUpdateError(null), 3000);
+    }
+  };
+
+  // Delete Gemini API key from localStorage
+  const deleteGeminiApiKey = () => {
+    localStorage.removeItem("gemini_api_key");
+    setGeminiApiKey("");
+    setUpdateSuccess("Gemini API key deleted successfully!");
+    setTimeout(() => setUpdateSuccess(null), 3000);
+  };
+
   // Helper function to convert ISO date to MM-DD-YYYY
   const formatDateToDisplay = (isoDate: string): string => {
     if (!isoDate) return "";
@@ -1296,6 +1328,82 @@ export default function Settings() {
               <option value="vi-VN">Tiếng Việt (Việt Nam)</option>
             </select>
           </div>
+        </div>
+      </div>
+
+      {/* Gemini API Key Section */}
+      <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6">
+        <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+          <span>🤖</span>
+          Gemini API Key
+        </h3>
+        <p className="text-white/60 text-sm mb-4">
+          Add your Gemini API key to enable AI-powered essay evaluation. Your
+          key is stored locally in your browser only and is never sent to our
+          servers.
+        </p>
+
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-white/70 mb-2">
+              API Key
+            </label>
+            <div className="relative">
+              <input
+                type={showGeminiKey ? "text" : "password"}
+                value={geminiApiKey}
+                onChange={(e) => setGeminiApiKey(e.target.value)}
+                placeholder="Enter your Gemini API key"
+                className="w-full bg-neutral-800/50 border border-neutral-700 rounded-lg px-4 py-2 pr-24 text-white focus:outline-none focus:border-blue-500/50"
+              />
+              <button
+                type="button"
+                onClick={() => setShowGeminiKey(!showGeminiKey)}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-white/50 hover:text-white/80 transition-colors"
+              >
+                {showGeminiKey ? "Hide" : "Show"}
+              </button>
+            </div>
+            <p className="text-white/40 text-xs mt-2">
+              Get your API key from{" "}
+              <a
+                href="https://makersuite.google.com/app/apikey"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-400 hover:text-blue-300 underline"
+              >
+                Google AI Studio
+              </a>
+            </p>
+          </div>
+
+          <div className="flex gap-3">
+            <button
+              onClick={saveGeminiApiKey}
+              disabled={!geminiApiKey.trim()}
+              className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:from-blue-600 hover:to-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Save API Key
+            </button>
+
+            {geminiApiKey && (
+              <button
+                onClick={deleteGeminiApiKey}
+                className="bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-2 rounded-lg font-medium hover:from-red-600 hover:to-red-700 transition-colors"
+              >
+                Delete API Key
+              </button>
+            )}
+          </div>
+
+          {geminiApiKey && (
+            <div className="flex items-center gap-2 bg-green-500/10 border border-green-500/30 rounded-lg px-3 py-2">
+              <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+              <span className="text-green-400 text-sm">
+                API Key is configured
+              </span>
+            </div>
+          )}
         </div>
       </div>
     </div>

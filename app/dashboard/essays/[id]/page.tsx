@@ -15,7 +15,13 @@ import {
   FaCheckCircle,
   FaExclamationTriangle,
   FaInfoCircle,
+  FaMagic,
 } from "react-icons/fa";
+import {
+  evaluateEssayWithGemini,
+  getGeminiApiKey,
+  GeminiEvaluationResult,
+} from "../../../../lib/gemini";
 
 export default function EssayEditorPage() {
   const router = useRouter();
@@ -28,6 +34,8 @@ export default function EssayEditorPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [isEvaluating, setIsEvaluating] = useState(false);
+  const [evaluationError, setEvaluationError] = useState<string | null>(null);
 
   // Form fields
   const [title, setTitle] = useState("");
@@ -107,6 +115,66 @@ export default function EssayEditorPage() {
       }
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleAIEvaluation = async () => {
+    try {
+      setIsEvaluating(true);
+      setEvaluationError(null);
+
+      // Check if API key exists
+      const apiKey = getGeminiApiKey();
+      if (!apiKey) {
+        setEvaluationError(
+          "Gemini API key not found. Please add your API key in Settings > Preferences."
+        );
+        return;
+      }
+
+      // Validate essay content
+      if (!content.trim()) {
+        setEvaluationError("Please write some content before evaluating.");
+        return;
+      }
+
+      if (!prompt.trim()) {
+        setEvaluationError("Please add an essay prompt before evaluating.");
+        return;
+      }
+
+      // Call Gemini API
+      const result: GeminiEvaluationResult = await evaluateEssayWithGemini(
+        {
+          prompt,
+          content,
+        },
+        apiKey
+      );
+
+      // Update essay with AI evaluation results
+      await essaysApi.update(essayId, {
+        title,
+        content,
+        prompt,
+        status,
+        ai_score: result.ai_score,
+        ai_feedbacks: result.ai_feedbacks,
+        ai_suggestion: result.ai_suggestion,
+      });
+
+      // Reload essay to get updated data
+      const updatedEssay = await essaysApi.getById(essayId);
+      setEssay(updatedEssay);
+
+      showSuccess("Essay evaluated successfully!");
+    } catch (error: any) {
+      console.error("Failed to evaluate essay:", error);
+      setEvaluationError(
+        error.message || "Failed to evaluate essay. Please try again."
+      );
+    } finally {
+      setIsEvaluating(false);
     }
   };
 
@@ -398,9 +466,50 @@ export default function EssayEditorPage() {
 
                 {/* AI Evaluation Section */}
                 <div className="pt-4 border-t border-neutral-700/50">
-                  <h4 className="text-white/80 font-medium text-sm mb-3">
-                    AI Evaluation
-                  </h4>
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="text-white/80 font-medium text-sm">
+                      AI Evaluation
+                    </h4>
+                    <button
+                      onClick={handleAIEvaluation}
+                      disabled={
+                        isEvaluating || !content.trim() || !prompt.trim()
+                      }
+                      className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 disabled:from-neutral-700 disabled:to-neutral-600 disabled:cursor-not-allowed text-white text-xs font-medium rounded-lg transition-all"
+                    >
+                      {isEvaluating ? (
+                        <>
+                          <FaSpinner className="animate-spin" />
+                          Evaluating...
+                        </>
+                      ) : (
+                        <>
+                          <FaMagic />
+                          Evaluate
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                  {evaluationError && (
+                    <div className="mb-3 p-3 bg-red-500/10 border border-red-500/30 rounded-lg">
+                      <div className="flex items-start gap-2">
+                        <FaExclamationTriangle className="text-red-400 text-sm mt-0.5 flex-shrink-0" />
+                        <p className="text-red-400 text-xs">
+                          {evaluationError}
+                        </p>
+                      </div>
+                      {evaluationError.includes("API key") && (
+                        <Link
+                          href="/dashboard/settings?tab=preferences"
+                          className="inline-block mt-2 text-blue-400 hover:text-blue-300 text-xs underline"
+                        >
+                          Go to Settings
+                        </Link>
+                      )}
+                    </div>
+                  )}
+
                   {(essay?.ai_score && essay.ai_score > 0) ||
                   (essay?.ai_feedbacks && essay.ai_feedbacks.length > 0) ||
                   essay?.ai_suggestion ? (
@@ -409,7 +518,7 @@ export default function EssayEditorPage() {
                         <div className="flex justify-between items-center text-sm">
                           <span className="text-white/60">AI Score</span>
                           <span
-                            className={`font-bold ${
+                            className={`font-bold text-lg ${
                               essay.ai_score >= 8
                                 ? "text-green-400"
                                 : essay.ai_score >= 6
@@ -426,14 +535,14 @@ export default function EssayEditorPage() {
                           <span className="text-white/60 block mb-2">
                             AI Feedback
                           </span>
-                          <ul className="space-y-1">
+                          <ul className="space-y-1.5">
                             {essay.ai_feedbacks.map((feedback, idx) => (
                               <li
                                 key={idx}
                                 className="text-white/80 text-xs flex gap-2"
                               >
-                                <span className="text-blue-400">•</span>
-                                <span>{feedback}</span>
+                                <span className="text-blue-400 mt-0.5">•</span>
+                                <span className="flex-1">{feedback}</span>
                               </li>
                             ))}
                           </ul>
@@ -444,7 +553,7 @@ export default function EssayEditorPage() {
                           <span className="text-white/60 block mb-2">
                             AI Suggestion
                           </span>
-                          <p className="text-white/80 text-xs">
+                          <p className="text-white/80 text-xs leading-relaxed">
                             {essay.ai_suggestion}
                           </p>
                         </div>
