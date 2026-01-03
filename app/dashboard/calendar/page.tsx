@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Footer from "../../../components/Footer";
+import { useTheme } from "../../../components/ThemeProvider";
 import AddEventModal from "../../../components/Modals/AddEventModal";
 import EditEventModal from "../../../components/Modals/EditEventModal";
 import EventDetailsModal from "../../../components/Modals/EventDetailsModal";
@@ -62,6 +63,7 @@ const getTimeFromDate = (isoDate?: string): string | null => {
 };
 
 export default function Calendar() {
+  const { theme } = useTheme();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [viewMode, setViewMode] = useState<"month" | "week" | "list">("month");
   const [events, setEvents] = useState<CalendarEvent[]>([]);

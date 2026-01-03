@@ -17,24 +17,34 @@ const ThemeContext = createContext<ThemeContextType>({
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>("dark");
   const [mounted, setMounted] = useState(false);
+  const isProduction = process.env.NODE_ENV === "production";
 
   useEffect(() => {
-    // Load theme from localStorage on mount
+    // In production, force dark mode only
+    if (isProduction) {
+      setTheme("dark");
+      setMounted(true);
+      return;
+    }
+
+    // Load theme from localStorage on mount (development only)
     const savedTheme = localStorage.getItem("theme") as Theme | null;
     if (savedTheme) {
       setTheme(savedTheme);
     }
     setMounted(true);
-  }, []);
+  }, [isProduction]);
 
   useEffect(() => {
-    // Save theme to localStorage whenever it changes
-    if (mounted) {
+    // Save theme to localStorage whenever it changes (development only)
+    if (mounted && !isProduction) {
       localStorage.setItem("theme", theme);
     }
-  }, [theme, mounted]);
+  }, [theme, mounted, isProduction]);
 
   const toggleTheme = () => {
+    // Prevent theme toggle in production
+    if (isProduction) return;
     setTheme((prev) => (prev === "dark" ? "light" : "dark"));
   };
 

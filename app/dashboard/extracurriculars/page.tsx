@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Footer from "../../../components/Footer";
+import { useTheme } from "../../../components/ThemeProvider";
 import { extracurricularsApi } from "../../../lib/api/extracurriculars";
 import { Extracurricular } from "../../../lib/types";
 import { useToast } from "../../../lib/hooks/useToast";
@@ -119,6 +120,7 @@ const renderAiScoreBadge = (aiScore?: string) => {
 
 export default function ExtracurricularsPage() {
   const router = useRouter();
+  const { theme } = useTheme();
   const [extracurriculars, setExtracurriculars] = useState<Extracurricular[]>(
     []
   );
@@ -165,22 +167,40 @@ export default function ExtracurricularsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white">
+    <div
+      className={`min-h-screen ${
+        theme === "dark"
+          ? "bg-[#0a0a0a] text-white"
+          : "bg-gray-50 text-gray-900"
+      }`}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
             <Link
               href="/dashboard"
-              className="text-white/70 hover:text-white transition-colors"
+              className={`${
+                theme === "dark"
+                  ? "text-white/70 hover:text-white"
+                  : "text-gray-600 hover:text-gray-900"
+              } transition-colors`}
             >
               <FaArrowLeft size={20} />
             </Link>
             <div className="flex-1 min-w-0">
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white">
+              <h1
+                className={`text-2xl sm:text-3xl lg:text-4xl font-bold ${
+                  theme === "dark" ? "text-white" : "text-gray-900"
+                }`}
+              >
                 Extracurricular Activities
               </h1>
-              <p className="text-white/70 mt-2 text-sm sm:text-base">
+              <p
+                className={`mt-2 text-sm sm:text-base ${
+                  theme === "dark" ? "text-white/70" : "text-gray-600"
+                }`}
+              >
                 Track and manage your extracurricular activities and
                 achievements
               </p>
@@ -197,13 +217,29 @@ export default function ExtracurricularsPage() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6">
+          <div
+            className={`bg-gradient-to-br ${
+              theme === "dark"
+                ? "from-[#141414] to-[#1a1a1a] border-neutral-700/50"
+                : "from-gray-50 to-gray-100 border-gray-200"
+            } border rounded-xl p-6`}
+          >
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-3xl font-bold text-white mb-1">
+                <div
+                  className={`text-3xl font-bold mb-1 ${
+                    theme === "dark" ? "text-white" : "text-gray-900"
+                  }`}
+                >
                   {extracurriculars.length}
                 </div>
-                <div className="text-white/60 text-sm">Total Activities</div>
+                <div
+                  className={`text-sm ${
+                    theme === "dark" ? "text-white/60" : "text-gray-600"
+                  }`}
+                >
+                  Total Activities
+                </div>
               </div>
               <div className="p-3 bg-purple-500/10 rounded-lg">
                 <FaUsers className="text-2xl text-purple-400" />
@@ -211,7 +247,13 @@ export default function ExtracurricularsPage() {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6">
+          <div
+            className={`bg-gradient-to-br ${
+              theme === "dark"
+                ? "from-[#141414] to-[#1a1a1a] border-neutral-700/50"
+                : "from-gray-50 to-gray-100 border-gray-200"
+            } border rounded-xl p-6`}
+          >
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-3xl font-bold text-blue-400 mb-1">
@@ -220,7 +262,13 @@ export default function ExtracurricularsPage() {
                     0
                   )}
                 </div>
-                <div className="text-white/60 text-sm">Hours per Week</div>
+                <div
+                  className={`text-sm ${
+                    theme === "dark" ? "text-white/60" : "text-gray-600"
+                  }`}
+                >
+                  Hours per Week
+                </div>
               </div>
               <div className="p-3 bg-blue-500/10 rounded-lg">
                 <FaClock className="text-2xl text-blue-400" />
@@ -228,7 +276,13 @@ export default function ExtracurricularsPage() {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6">
+          <div
+            className={`bg-gradient-to-br ${
+              theme === "dark"
+                ? "from-[#141414] to-[#1a1a1a] border-neutral-700/50"
+                : "from-gray-50 to-gray-100 border-gray-200"
+            } border rounded-xl p-6`}
+          >
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-3xl font-bold text-yellow-400 mb-1">
@@ -238,7 +292,13 @@ export default function ExtracurricularsPage() {
                     ).size
                   }
                 </div>
-                <div className="text-white/60 text-sm">Active Categories</div>
+                <div
+                  className={`text-sm ${
+                    theme === "dark" ? "text-white/60" : "text-gray-600"
+                  }`}
+                >
+                  Active Categories
+                </div>
               </div>
               <div className="p-3 bg-yellow-500/10 rounded-lg">
                 <FaStar className="text-2xl text-yellow-400" />
@@ -246,39 +306,83 @@ export default function ExtracurricularsPage() {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6 hover:border-blue-500/30 transition-colors">
+          <div
+            className={`bg-gradient-to-br ${
+              theme === "dark"
+                ? "from-[#141414] to-[#1a1a1a] border-neutral-700/50 hover:border-blue-500/30"
+                : "from-gray-50 to-gray-100 border-gray-200 hover:border-blue-400"
+            } border rounded-xl p-6 transition-colors`}
+          >
             <div className="flex items-center justify-between mb-3">
               <div className="p-2 bg-green-500/10 rounded-lg">
                 <FaTrophy className="text-green-400" />
               </div>
             </div>
-            <div className="text-2xl font-bold text-white">
+            <div
+              className={`text-2xl font-bold ${
+                theme === "dark" ? "text-white" : "text-gray-900"
+              }`}
+            >
               {extracurriculars.reduce(
                 (total, activity) =>
                   total + (activity.achievements?.length || 0),
                 0
               )}
             </div>
-            <div className="text-white/70 text-sm">Achievements</div>
+            <div
+              className={`text-sm ${
+                theme === "dark" ? "text-white/70" : "text-gray-600"
+              }`}
+            >
+              Achievements
+            </div>
           </div>
         </div>
 
         {/* Activities List */}
         <div className="space-y-6">
           {loading ? (
-            <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-12 text-center">
+            <div
+              className={`bg-gradient-to-br ${
+                theme === "dark"
+                  ? "from-[#141414] to-[#1a1a1a] border-neutral-700/50"
+                  : "from-gray-50 to-gray-100 border-gray-200"
+              } border rounded-xl p-12 text-center`}
+            >
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-              <p className="text-white/70">
+              <p
+                className={`${
+                  theme === "dark" ? "text-white/70" : "text-gray-600"
+                }`}
+              >
                 Loading extracurricular activities...
               </p>
             </div>
           ) : extracurriculars.length === 0 ? (
-            <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-12 text-center">
-              <FaStar className="text-6xl text-white/30 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-white mb-2">
+            <div
+              className={`bg-gradient-to-br ${
+                theme === "dark"
+                  ? "from-[#141414] to-[#1a1a1a] border-neutral-700/50"
+                  : "from-gray-50 to-gray-100 border-gray-200"
+              } border rounded-xl p-12 text-center`}
+            >
+              <FaStar
+                className={`text-6xl mx-auto mb-4 ${
+                  theme === "dark" ? "text-white/30" : "text-gray-300"
+                }`}
+              />
+              <h3
+                className={`text-xl font-semibold mb-2 ${
+                  theme === "dark" ? "text-white" : "text-gray-900"
+                }`}
+              >
                 No Activities Yet
               </h3>
-              <p className="text-white/70 mb-6">
+              <p
+                className={`mb-6 ${
+                  theme === "dark" ? "text-white/70" : "text-gray-600"
+                }`}
+              >
                 Start building your profile by adding your extracurricular
                 activities, volunteer work, and achievements.
               </p>
@@ -294,7 +398,11 @@ export default function ExtracurricularsPage() {
             extracurriculars.map((activity) => (
               <div
                 key={activity.id}
-                className="group bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6 hover:border-green-500/50 hover:shadow-lg hover:shadow-green-500/10 transition-all duration-300"
+                className={`group bg-gradient-to-br ${
+                  theme === "dark"
+                    ? "from-[#141414] to-[#1a1a1a] border-neutral-700/50 hover:border-green-500/50"
+                    : "from-gray-50 to-gray-100 border-gray-200 hover:border-green-400"
+                } border rounded-xl p-6 hover:shadow-lg hover:shadow-green-500/10 transition-all duration-300`}
               >
                 <div className="flex flex-col lg:flex-row gap-6">
                   <div className="flex-1">
@@ -305,7 +413,13 @@ export default function ExtracurricularsPage() {
                         </div>
                         <div>
                           <div className="flex items-center gap-3 mb-2">
-                            <h3 className="text-xl font-semibold text-white group-hover:text-green-400 transition-colors">
+                            <h3
+                              className={`text-xl font-semibold group-hover:text-green-400 transition-colors ${
+                                theme === "dark"
+                                  ? "text-white"
+                                  : "text-gray-900"
+                              }`}
+                            >
                               {activity.activity_name}
                             </h3>
                             <span
@@ -317,7 +431,13 @@ export default function ExtracurricularsPage() {
                             </span>
                             {renderAiScoreBadge(activity.ai_score)}
                           </div>
-                          <p className="text-white/80 font-medium">
+                          <p
+                            className={`font-medium ${
+                              theme === "dark"
+                                ? "text-white/80"
+                                : "text-gray-700"
+                            }`}
+                          >
                             {activity.position}
                             {activity.location && ` • ${activity.location}`}
                           </p>
@@ -326,7 +446,11 @@ export default function ExtracurricularsPage() {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                      <div className="flex items-center gap-2 text-sm text-white/70">
+                      <div
+                        className={`flex items-center gap-2 text-sm ${
+                          theme === "dark" ? "text-white/70" : "text-gray-600"
+                        }`}
+                      >
                         <FaCalendarAlt />
                         <span>
                           {activity.start_date} -{" "}
@@ -335,18 +459,28 @@ export default function ExtracurricularsPage() {
                             : activity.end_date}
                         </span>
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-white/70">
+                      <div
+                        className={`flex items-center gap-2 text-sm ${
+                          theme === "dark" ? "text-white/70" : "text-gray-600"
+                        }`}
+                      >
                         <FaClock />
                         <span>{activity.hours_per_week} hours/week</span>
                       </div>
                       {activity.website && (
-                        <div className="flex items-center gap-2 text-sm text-white/70">
+                        <div
+                          className={`flex items-center gap-2 text-sm ${
+                            theme === "dark" ? "text-white/70" : "text-gray-600"
+                          }`}
+                        >
                           <FaGlobe />
                           <a
                             href={activity.website}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-white hover:underline"
+                            className={`hover:underline ${
+                              theme === "dark" ? "text-white" : "text-gray-900"
+                            }`}
                           >
                             Website
                           </a>
@@ -354,12 +488,22 @@ export default function ExtracurricularsPage() {
                       )}
                     </div>
 
-                    <p className="text-white/80 mb-4">{activity.description}</p>
+                    <p
+                      className={`mb-4 ${
+                        theme === "dark" ? "text-white/80" : "text-gray-700"
+                      }`}
+                    >
+                      {activity.description}
+                    </p>
 
                     {activity.achievements &&
                       activity.achievements.length > 0 && (
                         <div className="mb-4">
-                          <h4 className="text-white font-medium mb-2 flex items-center gap-2">
+                          <h4
+                            className={`font-medium mb-2 flex items-center gap-2 ${
+                              theme === "dark" ? "text-white" : "text-gray-900"
+                            }`}
+                          >
                             <FaTrophy className="text-yellow-400" />
                             Key Achievements
                           </h4>
@@ -368,7 +512,11 @@ export default function ExtracurricularsPage() {
                               (achievement, index) => (
                                 <li
                                   key={index}
-                                  className="text-white/80 text-sm flex items-center gap-2"
+                                  className={`text-sm flex items-center gap-2 ${
+                                    theme === "dark"
+                                      ? "text-white/80"
+                                      : "text-gray-700"
+                                  }`}
                                 >
                                   <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
                                   {achievement}
@@ -384,7 +532,11 @@ export default function ExtracurricularsPage() {
                         {activity.skills.map((skill, index) => (
                           <span
                             key={index}
-                            className="bg-neutral-800/50 text-white px-3 py-1 rounded-full text-sm border border-neutral-700/30"
+                            className={`px-3 py-1 rounded-full text-sm border ${
+                              theme === "dark"
+                                ? "bg-neutral-800/50 text-white border-neutral-700/30"
+                                : "bg-gray-100 text-gray-900 border-gray-300"
+                            }`}
                           >
                             {skill}
                           </span>
@@ -426,18 +578,38 @@ export default function ExtracurricularsPage() {
       {/* Preview Modal */}
       {previewActivity && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+          <div
+            className={`bg-gradient-to-br ${
+              theme === "dark"
+                ? "from-[#141414] to-[#1a1a1a] border-neutral-700/50"
+                : "from-gray-50 to-gray-100 border-gray-200"
+            } border rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto`}
+          >
             {/* Modal Header */}
-            <div className="sticky top-0 bg-gradient-to-br from-[#141414] to-[#1a1a1a] border-b border-neutral-700/50 p-6 flex items-center justify-between">
+            <div
+              className={`sticky top-0 bg-gradient-to-br ${
+                theme === "dark"
+                  ? "from-[#141414] to-[#1a1a1a] border-neutral-700/50"
+                  : "from-gray-50 to-gray-100 border-gray-200"
+              } border-b p-6 flex items-center justify-between`}
+            >
               <div className="flex items-center gap-4">
                 <div className="text-3xl">
                   {categoryIcons[previewActivity.category]}
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-white">
+                  <h2
+                    className={`text-2xl font-bold ${
+                      theme === "dark" ? "text-white" : "text-gray-900"
+                    }`}
+                  >
                     {previewActivity.activity_name}
                   </h2>
-                  <p className="text-white/70">
+                  <p
+                    className={`${
+                      theme === "dark" ? "text-white/70" : "text-gray-600"
+                    }`}
+                  >
                     {previewActivity.position}
                     {previewActivity.location &&
                       ` • ${previewActivity.location}`}
@@ -446,7 +618,11 @@ export default function ExtracurricularsPage() {
               </div>
               <button
                 onClick={() => setPreviewActivity(null)}
-                className="text-white/70 hover:text-white transition-colors p-2"
+                className={`transition-colors p-2 ${
+                  theme === "dark"
+                    ? "text-white/70 hover:text-white"
+                    : "text-gray-600 hover:text-gray-900"
+                }`}
               >
                 <FaTimes size={24} />
               </button>
@@ -468,30 +644,62 @@ export default function ExtracurricularsPage() {
 
               {/* Time Details */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-neutral-800/30 rounded-lg p-4">
-                  <div className="flex items-center gap-2 text-white/70 text-sm mb-1">
+                <div
+                  className={`rounded-lg p-4 ${
+                    theme === "dark" ? "bg-neutral-800/30" : "bg-gray-100"
+                  }`}
+                >
+                  <div
+                    className={`flex items-center gap-2 text-sm mb-1 ${
+                      theme === "dark" ? "text-white/70" : "text-gray-600"
+                    }`}
+                  >
                     <FaCalendarAlt />
                     <span>Duration</span>
                   </div>
-                  <div className="text-white font-medium">
+                  <div
+                    className={`font-medium ${
+                      theme === "dark" ? "text-white" : "text-gray-900"
+                    }`}
+                  >
                     {previewActivity.start_date} -{" "}
                     {previewActivity.end_date === "present"
                       ? "Present"
                       : previewActivity.end_date}
                   </div>
                 </div>
-                <div className="bg-neutral-800/30 rounded-lg p-4">
-                  <div className="flex items-center gap-2 text-white/70 text-sm mb-1">
+                <div
+                  className={`rounded-lg p-4 ${
+                    theme === "dark" ? "bg-neutral-800/30" : "bg-gray-100"
+                  }`}
+                >
+                  <div
+                    className={`flex items-center gap-2 text-sm mb-1 ${
+                      theme === "dark" ? "text-white/70" : "text-gray-600"
+                    }`}
+                  >
                     <FaClock />
                     <span>Time Commitment</span>
                   </div>
-                  <div className="text-white font-medium">
+                  <div
+                    className={`font-medium ${
+                      theme === "dark" ? "text-white" : "text-gray-900"
+                    }`}
+                  >
                     {previewActivity.hours_per_week} hours/week
                   </div>
                 </div>
                 {previewActivity.website && (
-                  <div className="bg-neutral-800/30 rounded-lg p-4">
-                    <div className="flex items-center gap-2 text-white/70 text-sm mb-1">
+                  <div
+                    className={`rounded-lg p-4 ${
+                      theme === "dark" ? "bg-neutral-800/30" : "bg-gray-100"
+                    }`}
+                  >
+                    <div
+                      className={`flex items-center gap-2 text-sm mb-1 ${
+                        theme === "dark" ? "text-white/70" : "text-gray-600"
+                      }`}
+                    >
                       <FaGlobe />
                       <span>Website</span>
                     </div>
@@ -510,8 +718,18 @@ export default function ExtracurricularsPage() {
               {/* Description */}
               {previewActivity.description && (
                 <div>
-                  <h3 className="text-white font-semibold mb-2">Description</h3>
-                  <p className="text-white/80 leading-relaxed">
+                  <h3
+                    className={`font-semibold mb-2 ${
+                      theme === "dark" ? "text-white" : "text-gray-900"
+                    }`}
+                  >
+                    Description
+                  </h3>
+                  <p
+                    className={`leading-relaxed ${
+                      theme === "dark" ? "text-white/80" : "text-gray-700"
+                    }`}
+                  >
                     {previewActivity.description}
                   </p>
                 </div>
@@ -521,7 +739,11 @@ export default function ExtracurricularsPage() {
               {previewActivity.achievements &&
                 previewActivity.achievements.length > 0 && (
                   <div>
-                    <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
+                    <h3
+                      className={`font-semibold mb-3 flex items-center gap-2 ${
+                        theme === "dark" ? "text-white" : "text-gray-900"
+                      }`}
+                    >
                       <FaTrophy className="text-yellow-400" />
                       Key Achievements
                     </h3>
@@ -530,7 +752,11 @@ export default function ExtracurricularsPage() {
                         (achievement, index) => (
                           <li
                             key={index}
-                            className="text-white/80 flex items-start gap-3"
+                            className={`flex items-start gap-3 ${
+                              theme === "dark"
+                                ? "text-white/80"
+                                : "text-gray-700"
+                            }`}
                           >
                             <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 flex-shrink-0" />
                             <span>{achievement}</span>
@@ -544,14 +770,22 @@ export default function ExtracurricularsPage() {
               {/* Skills */}
               {previewActivity.skills && previewActivity.skills.length > 0 && (
                 <div>
-                  <h3 className="text-white font-semibold mb-3">
+                  <h3
+                    className={`font-semibold mb-3 ${
+                      theme === "dark" ? "text-white" : "text-gray-900"
+                    }`}
+                  >
                     Skills Developed
                   </h3>
                   <div className="flex flex-wrap gap-2">
                     {previewActivity.skills.map((skill, index) => (
                       <span
                         key={index}
-                        className="bg-neutral-800/50 text-white px-4 py-2 rounded-lg text-sm border border-neutral-700/50"
+                        className={`px-4 py-2 rounded-lg text-sm border ${
+                          theme === "dark"
+                            ? "bg-neutral-800/50 text-white border-neutral-700/50"
+                            : "bg-gray-100 text-gray-900 border-gray-300"
+                        }`}
                       >
                         {skill}
                       </span>
@@ -561,7 +795,11 @@ export default function ExtracurricularsPage() {
               )}
 
               {/* Action Buttons */}
-              <div className="flex gap-3 pt-4 border-t border-neutral-700/50">
+              <div
+                className={`flex gap-3 pt-4 border-t ${
+                  theme === "dark" ? "border-neutral-700/50" : "border-gray-200"
+                }`}
+              >
                 <Link
                   href={`/dashboard/extracurriculars/${previewActivity.id}`}
                   className="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2"
@@ -571,7 +809,11 @@ export default function ExtracurricularsPage() {
                 </Link>
                 <button
                   onClick={() => setPreviewActivity(null)}
-                  className="px-6 py-3 bg-neutral-800 hover:bg-neutral-700 text-white rounded-lg font-semibold transition-colors"
+                  className={`px-6 py-3 rounded-lg font-semibold transition-colors ${
+                    theme === "dark"
+                      ? "bg-neutral-800 hover:bg-neutral-700 text-white"
+                      : "bg-gray-200 hover:bg-gray-300 text-gray-900"
+                  }`}
                 >
                   Close
                 </button>

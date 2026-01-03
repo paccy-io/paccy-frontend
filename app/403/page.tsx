@@ -40,10 +40,10 @@ export default function Forbidden() {
           </Link>
 
           <Link
-            href="/alpha"
+            href="/auth"
             className="inline-block px-6 py-3 bg-[#1A1A1A] border border-[#FEEBD8]/20 text-white rounded-xl font-medium hover:bg-[#FEEBD8]/10 transition-all duration-300"
           >
-            Join Alpha Program
+            Sign In
           </Link>
         </div>
       </div>

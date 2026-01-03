@@ -20,13 +20,13 @@ export default function HowItWorks() {
     <div className="">
       <Navbar />
 
-      <div className="min-h-screen bg-[#141414] py-20 pt-28">
+      <div className="min-h-screen bg-[#0a0a0a] py-20 pt-28">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
-            <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-[#FEEBD8] via-blue-300 to-purple-500 bg-clip-text text-transparent mb-6 font-climate-crisis">
+            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 font-climate-crisis">
               How Paccy Works
             </h1>
-            <p className="text-xl text-white/80 max-w-3xl mx-auto">
+            <p className="text-xl text-white/70 max-w-3xl mx-auto">
               A simple, step-by-step guide to mastering your college
               applications with AI-powered assistance.
             </p>
@@ -37,10 +37,10 @@ export default function HowItWorks() {
             <div className="grid md:grid-cols-2 gap-12 items-center">
               <div>
                 <div className="flex items-center mb-4">
-                  <span className="bg-gradient-to-r from-[#FEEBD8] to-blue-300 text-[#141414] font-bold text-xl w-10 h-10 rounded-full flex items-center justify-center mr-4">
+                  <span className="bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold text-xl w-10 h-10 rounded-full flex items-center justify-center mr-4">
                     1
                   </span>
-                  <h2 className="text-2xl font-bold text-[#FEEBD8]">
+                  <h2 className="text-2xl font-bold text-white">
                     Create Your Profile
                   </h2>
                 </div>
@@ -51,9 +51,9 @@ export default function HowItWorks() {
                   suggest reach, target, and safety options.
                 </p>
               </div>
-              <div className="bg-[#1A1A1A] rounded-xl p-8 border border-[#FEEBD8]/20">
+              <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] rounded-xl p-8 border border-neutral-700/50">
                 <div className="text-4xl mb-4">🎓</div>
-                <h3 className="text-xl font-bold text-[#FEEBD8] mb-2">
+                <h3 className="text-xl font-bold text-white mb-2">
                   Academic Tracking
                 </h3>
                 <p className="text-white/70 text-sm">
@@ -64,9 +64,9 @@ export default function HowItWorks() {
 
             <div className="grid md:grid-cols-2 gap-12 items-center">
               <div className="order-2 md:order-1">
-                <div className="bg-[#1A1A1A] rounded-xl p-8 border border-[#FEEBD8]/20">
+                <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] rounded-xl p-8 border border-neutral-700/50">
                   <div className="text-4xl mb-4">📝</div>
-                  <h3 className="text-xl font-bold text-[#FEEBD8] mb-2">
+                  <h3 className="text-xl font-bold text-white mb-2">
                     Essay Manager + AI
                   </h3>
                   <p className="text-white/70 text-sm">
@@ -76,10 +76,10 @@ export default function HowItWorks() {
               </div>
               <div className="order-1 md:order-2">
                 <div className="flex items-center mb-4">
-                  <span className="bg-gradient-to-r from-blue-400 to-indigo-500 text-white font-bold text-xl w-10 h-10 rounded-full flex items-center justify-center mr-4">
+                  <span className="bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold text-xl w-10 h-10 rounded-full flex items-center justify-center mr-4">
                     2
                   </span>
-                  <h2 className="text-2xl font-bold text-[#FEEBD8]">
+                  <h2 className="text-2xl font-bold text-white">
                     Write & Refine Essays
                   </h2>
                 </div>
@@ -95,10 +95,10 @@ export default function HowItWorks() {
             <div className="grid md:grid-cols-2 gap-12 items-center">
               <div>
                 <div className="flex items-center mb-4">
-                  <span className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-bold text-xl w-10 h-10 rounded-full flex items-center justify-center mr-4">
+                  <span className="bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold text-xl w-10 h-10 rounded-full flex items-center justify-center mr-4">
                     3
                   </span>
-                  <h2 className="text-2xl font-bold text-[#FEEBD8]">
+                  <h2 className="text-2xl font-bold text-white">
                     Stay Organized
                   </h2>
                 </div>
@@ -109,9 +109,9 @@ export default function HowItWorks() {
                   reminders and progress tracking.
                 </p>
               </div>
-              <div className="bg-[#1A1A1A] rounded-xl p-8 border border-[#FEEBD8]/20">
+              <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] rounded-xl p-8 border border-neutral-700/50">
                 <div className="text-4xl mb-4">📆</div>
-                <h3 className="text-xl font-bold text-[#FEEBD8] mb-2">
+                <h3 className="text-xl font-bold text-white mb-2">
                   Smart Calendar
                 </h3>
                 <p className="text-white/70 text-sm">
@@ -122,9 +122,9 @@ export default function HowItWorks() {
 
             <div className="grid md:grid-cols-2 gap-12 items-center">
               <div className="order-2 md:order-1">
-                <div className="bg-[#1A1A1A] rounded-xl p-8 border border-[#FEEBD8]/20">
+                <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] rounded-xl p-8 border border-neutral-700/50">
                   <div className="text-4xl mb-4">🌍</div>
-                  <h3 className="text-xl font-bold text-[#FEEBD8] mb-2">
+                  <h3 className="text-xl font-bold text-white mb-2">
                     Peer Network
                   </h3>
                   <p className="text-white/70 text-sm">
@@ -134,10 +134,10 @@ export default function HowItWorks() {
               </div>
               <div className="order-1 md:order-2">
                 <div className="flex items-center mb-4">
-                  <span className="bg-gradient-to-r from-purple-600 to-blue-500 text-white font-bold text-xl w-10 h-10 rounded-full flex items-center justify-center mr-4">
+                  <span className="bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold text-xl w-10 h-10 rounded-full flex items-center justify-center mr-4">
                     4
                   </span>
-                  <h2 className="text-2xl font-bold text-[#FEEBD8]">
+                  <h2 className="text-2xl font-bold text-white">
                     Connect & Collaborate
                   </h2>
                 </div>
@@ -153,15 +153,17 @@ export default function HowItWorks() {
 
           {/* CTA Section */}
           <div className="mt-20 text-center">
-            <div className="bg-gradient-to-r from-[#FEEBD8] to-blue-300 rounded-2xl p-8 text-[#141414]">
-              <h2 className="text-3xl font-bold mb-4">Ready to Get Started?</h2>
-              <p className="text-xl mb-6 opacity-80">
+            <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl p-8">
+              <h2 className="text-3xl font-bold mb-4 text-white">
+                Ready to Get Started?
+              </h2>
+              <p className="text-xl mb-6 text-white/90">
                 Join thousands of students who are using Paccy to streamline
                 their college applications.
               </p>
               <button
                 onClick={navigateToAuth}
-                className="px-8 py-4 bg-[#141414] text-[#FEEBD8] font-bold rounded-xl hover:bg-gray-800 transition-all duration-300"
+                className="px-8 py-4 bg-white text-blue-600 font-bold rounded-xl hover:bg-gray-100 transition-all duration-300"
               >
                 Start Building Your Profile
               </button>

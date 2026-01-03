@@ -154,13 +154,15 @@ export default function Roadmap() {
         <div className="flex items-center space-x-4 mb-8">
           <Link
             href="/dashboard"
-            className="text-[#FEEBD8]/70 hover:text-[#FEEBD8] transition-colors"
+            className="text-white/70 hover:text-white transition-colors"
           >
             <span className="text-2xl">←</span>
           </Link>
           <div>
-            <h1 className="text-4xl font-bold text-[#FEEBD8]">Paccy Roadmap</h1>
-            <p className="text-[#FEEBD8]/70 mt-2">
+            <h1 className="text-4xl font-bold text-white font-climate-crisis">
+              Paccy Roadmap
+            </h1>
+            <p className="text-white/70 mt-2">
               See what's live, what's coming soon, and what's planned for the
               future!
             </p>
@@ -174,7 +176,7 @@ export default function Roadmap() {
             >
               <div className="flex items-center gap-3 mb-4">
                 {section.icon}
-                <h2 className="text-2xl font-bold text-[#FEEBD8]">
+                <h2 className="text-2xl font-bold text-white">
                   {section.title}
                 </h2>
               </div>
@@ -182,14 +184,14 @@ export default function Roadmap() {
                 {section.features.map((feature) => (
                   <div
                     key={feature.name}
-                    className="bg-[#141414] border border-neutral-700 rounded-xl p-4 flex items-start gap-4 relative"
+                    className="bg-gradient-to-br from-[#0a0a0a] to-[#141414] border border-neutral-700/50 rounded-xl p-4 flex items-start gap-4 relative"
                   >
                     <div className="mt-1">{feature.icon}</div>
                     <div>
-                      <h3 className="text-lg font-semibold text-[#FEEBD8]">
+                      <h3 className="text-lg font-semibold text-white">
                         {feature.name}
                       </h3>
-                      <p className="text-[#FEEBD8]/70 text-sm mb-1">
+                      <p className="text-white/70 text-sm mb-1">
                         {feature.description}
                       </p>
                       {feature.alert && (
@@ -208,11 +210,11 @@ export default function Roadmap() {
           ))}
         </div>
         <div className="mt-12 text-center">
-          <p className="text-[#FEEBD8]/70 text-lg">
+          <p className="text-white/70 text-lg">
             Have a feature request or want to give feedback?{" "}
             <a
               href="mailto:support@paccy.io"
-              className="text-[#FEEBD8] underline hover:text-[#E5D5B7]"
+              className="text-blue-400 underline hover:text-blue-300"
             >
               Contact us
             </a>{" "}

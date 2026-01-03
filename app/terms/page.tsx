@@ -10,20 +10,20 @@ export default function Terms() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#141414] flex flex-col">
+    <div className="min-h-screen bg-[#0a0a0a] flex flex-col">
       <Navbar />
 
       <div className="flex-1 px-4 py-20 pt-28">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-[#1A1A1A] rounded-2xl border border-[#FEEBD8]/20 p-8">
-            <h1 className="text-4xl font-bold text-[#FEEBD8] mb-8 text-center">
+          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] rounded-2xl border border-neutral-700/50 p-8 md:p-12 shadow-xl">
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-8 text-center font-climate-crisis">
               Terms of Service
             </h1>
 
             <div className="prose prose-invert max-w-none">
-              <div className="space-y-8 text-white/80">
+              <div className="space-y-8 text-white/70">
                 <section>
-                  <h2 className="text-2xl font-bold text-[#FEEBD8] mb-4">
+                  <h2 className="text-2xl font-bold text-white mb-4">
                     1. Acceptance of Terms
                   </h2>
                   <p className="mb-4">
@@ -35,7 +35,7 @@ export default function Terms() {
                 </section>
 
                 <section>
-                  <h2 className="text-2xl font-bold text-[#FEEBD8] mb-4">
+                  <h2 className="text-2xl font-bold text-white mb-4">
                     2. Description of Service
                   </h2>
                   <p className="mb-4">
@@ -47,7 +47,7 @@ export default function Terms() {
                 </section>
 
                 <section>
-                  <h2 className="text-2xl font-bold text-[#FEEBD8] mb-4">
+                  <h2 className="text-2xl font-bold text-white mb-4">
                     3. User Accounts
                   </h2>
                   <p className="mb-4">
@@ -68,7 +68,7 @@ export default function Terms() {
                 </section>
 
                 <section>
-                  <h2 className="text-2xl font-bold text-[#FEEBD8] mb-4">
+                  <h2 className="text-2xl font-bold text-white mb-4">
                     4. Privacy Policy
                   </h2>
                   <p className="mb-4">
@@ -81,7 +81,7 @@ export default function Terms() {
                 </section>
 
                 <section>
-                  <h2 className="text-2xl font-bold text-[#FEEBD8] mb-4">
+                  <h2 className="text-2xl font-bold text-white mb-4">
                     5. User Conduct
                   </h2>
                   <p className="mb-4">You agree not to:</p>
@@ -98,7 +98,7 @@ export default function Terms() {
                 </section>
 
                 <section>
-                  <h2 className="text-2xl font-bold text-[#FEEBD8] mb-4">
+                  <h2 className="text-2xl font-bold text-white mb-4">
                     6. Intellectual Property
                   </h2>
                   <p className="mb-4">
@@ -110,7 +110,7 @@ export default function Terms() {
                 </section>
 
                 <section>
-                  <h2 className="text-2xl font-bold text-[#FEEBD8] mb-4">
+                  <h2 className="text-2xl font-bold text-white mb-4">
                     7. Payment Terms
                   </h2>
                   <p className="mb-4">
@@ -121,7 +121,7 @@ export default function Terms() {
                 </section>
 
                 <section>
-                  <h2 className="text-2xl font-bold text-[#FEEBD8] mb-4">
+                  <h2 className="text-2xl font-bold text-white mb-4">
                     8. Limitation of Liability
                   </h2>
                   <p className="mb-4">
@@ -133,7 +133,7 @@ export default function Terms() {
                 </section>
 
                 <section>
-                  <h2 className="text-2xl font-bold text-[#FEEBD8] mb-4">
+                  <h2 className="text-2xl font-bold text-white mb-4">
                     9. Termination
                   </h2>
                   <p className="mb-4">
@@ -145,7 +145,7 @@ export default function Terms() {
                 </section>
 
                 <section>
-                  <h2 className="text-2xl font-bold text-[#FEEBD8] mb-4">
+                  <h2 className="text-2xl font-bold text-white mb-4">
                     10. Changes to Terms
                   </h2>
                   <p className="mb-4">
@@ -157,7 +157,7 @@ export default function Terms() {
                 </section>
 
                 <section>
-                  <h2 className="text-2xl font-bold text-[#FEEBD8] mb-4">
+                  <h2 className="text-2xl font-bold text-white mb-4">
                     11. Contact Information
                   </h2>
                   <p className="mb-4">
@@ -169,8 +169,8 @@ export default function Terms() {
                   </p>
                 </section>
 
-                <section className="mt-12 pt-8 border-t border-[#FEEBD8]/20">
-                  <p className="text-[#FEEBD8]/60 text-sm">
+                <section className="mt-12 pt-8 border-t border-neutral-700/50">
+                  <p className="text-white/40 text-sm">
                     Last updated: August 10, 2025
                   </p>
                 </section>

@@ -47,32 +47,32 @@ export default function Contact() {
     {
       title: "Email",
       description: "support@paccy.io",
-      icon: <MdEmail className="w-8 h-8 text-[#FEEBD8]" />,
+      icon: <MdEmail className="w-8 h-8 text-blue-400" />,
       action: handleEmailCopy,
     },
     {
       title: "Location",
       description: "Global Remote Team",
-      icon: <MdLocationOn className="w-8 h-8 text-[#FEEBD8]" />,
+      icon: <MdLocationOn className="w-8 h-8 text-blue-400" />,
       action: () => {},
     },
     {
       title: "Response Time",
       description: "24-48 hours",
-      icon: <MdPhone className="w-8 h-8 text-[#FEEBD8]" />,
+      icon: <MdPhone className="w-8 h-8 text-blue-400" />,
       action: () => {},
     },
   ];
 
   return (
-    <div className="min-h-screen bg-[#141414] py-20">
+    <div className="min-h-screen bg-[#0a0a0a] py-20">
       <div className="max-w-6xl mx-auto px-6">
         {/* Header */}
         <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-[#FEEBD8] via-blue-300 to-purple-500 bg-clip-text text-transparent mb-6 font-climate-crisis">
+          <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 font-climate-crisis">
             Get in Touch
           </h1>
-          <p className="text-xl text-white/80 max-w-3xl mx-auto">
+          <p className="text-xl text-white/70 max-w-3xl mx-auto">
             Have questions about Paccy? Need help with your college
             applications? We're here to support your journey to higher
             education.
@@ -81,8 +81,8 @@ export default function Contact() {
 
         <div className="grid lg:grid-cols-2 gap-12">
           {/* Contact Form */}
-          <div className="bg-[#1A1A1A] rounded-2xl p-8 border border-[#FEEBD8]/20">
-            <h2 className="text-2xl font-bold text-[#FEEBD8] mb-6">
+          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] rounded-2xl p-8 border border-neutral-700/50">
+            <h2 className="text-2xl font-bold text-white mb-6">
               Send us a Message
             </h2>
 
@@ -102,7 +102,7 @@ export default function Contact() {
                     value={formData.name}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-3 bg-[#141414] border border-[#FEEBD8]/30 rounded-xl text-white placeholder-white/50 focus:border-[#FEEBD8] focus:outline-none transition-colors"
+                    className="w-full px-4 py-3 bg-[#0a0a0a] border border-neutral-700/50 rounded-xl text-white placeholder-white/50 focus:border-blue-500 focus:outline-none transition-colors"
                     placeholder="Your name"
                   />
                 </div>
@@ -120,7 +120,7 @@ export default function Contact() {
                     value={formData.email}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-3 bg-[#141414] border border-[#FEEBD8]/30 rounded-xl text-white placeholder-white/50 focus:border-[#FEEBD8] focus:outline-none transition-colors"
+                    className="w-full px-4 py-3 bg-[#0a0a0a] border border-neutral-700/50 rounded-xl text-white placeholder-white/50 focus:border-blue-500 focus:outline-none transition-colors"
                     placeholder="your.email@example.com"
                   />
                 </div>
@@ -140,7 +140,7 @@ export default function Contact() {
                   value={formData.subject}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-4 py-3 bg-[#141414] border border-[#FEEBD8]/30 rounded-xl text-white placeholder-white/50 focus:border-[#FEEBD8] focus:outline-none transition-colors"
+                  className="w-full px-4 py-3 bg-[#0a0a0a] border border-neutral-700/50 rounded-xl text-white placeholder-white/50 focus:border-blue-500 focus:outline-none transition-colors"
                   placeholder="What can we help you with?"
                 />
               </div>
@@ -159,14 +159,14 @@ export default function Contact() {
                   onChange={handleInputChange}
                   required
                   rows={5}
-                  className="w-full px-4 py-3 bg-[#141414] border border-[#FEEBD8]/30 rounded-xl text-white placeholder-white/50 focus:border-[#FEEBD8] focus:outline-none transition-colors resize-none"
+                  className="w-full px-4 py-3 bg-[#0a0a0a] border border-neutral-700/50 rounded-xl text-white placeholder-white/50 focus:border-blue-500 focus:outline-none transition-colors resize-none"
                   placeholder="Tell us more about your question or how we can help..."
                 />
               </div>
 
               <button
                 type="submit"
-                className="w-full px-6 py-4 bg-gradient-to-r from-[#FEEBD8] to-blue-300 text-[#141414] rounded-xl font-bold hover:opacity-90 transition-all duration-300"
+                className="w-full px-6 py-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl font-bold hover:from-blue-600 hover:to-blue-700 transition-all duration-300"
               >
                 Send Message
               </button>
@@ -180,12 +180,12 @@ export default function Contact() {
               {contactInfo.map((info, index) => (
                 <div
                   key={index}
-                  className="bg-[#1A1A1A] rounded-xl p-6 border border-[#FEEBD8]/20 flex items-center space-x-4 cursor-pointer hover:bg-[#1A1A1A]/80 transition-all duration-300"
+                  className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] rounded-xl p-6 border border-neutral-700/50 flex items-center space-x-4 cursor-pointer hover:border-blue-500/50 transition-all duration-300"
                   onClick={info.action}
                 >
                   <div className="flex-shrink-0">{info.icon}</div>
                   <div>
-                    <h3 className="text-[#FEEBD8] font-semibold text-lg">
+                    <h3 className="text-white font-semibold text-lg">
                       {info.title}
                     </h3>
                     <p className="text-white/70">{info.description}</p>
@@ -195,8 +195,8 @@ export default function Contact() {
             </div>
 
             {/* Social Media */}
-            <div className="bg-[#1A1A1A] rounded-xl p-6 border border-[#FEEBD8]/20">
-              <h3 className="text-[#FEEBD8] font-semibold text-lg mb-4">
+            <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] rounded-xl p-6 border border-neutral-700/50">
+              <h3 className="text-white font-semibold text-lg mb-4">
                 Follow Us
               </h3>
               <div className="flex space-x-4">
@@ -204,32 +204,32 @@ export default function Contact() {
                   href="https://github.com/paccy-io"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-12 h-12 bg-[#141414] rounded-xl flex items-center justify-center hover:bg-gray-800 transition-colors"
+                  className="w-12 h-12 bg-[#0a0a0a] rounded-xl flex items-center justify-center hover:bg-blue-500/10 hover:border hover:border-blue-500/50 transition-colors"
                 >
-                  <FaGithub className="w-6 h-6 text-[#FEEBD8]" />
+                  <FaGithub className="w-6 h-6 text-blue-400" />
                 </a>
                 <a
                   href="https://instagram.com/paccy.io"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-12 h-12 bg-[#141414] rounded-xl flex items-center justify-center hover:bg-gray-800 transition-colors"
+                  className="w-12 h-12 bg-[#0a0a0a] rounded-xl flex items-center justify-center hover:bg-blue-500/10 hover:border hover:border-blue-500/50 transition-colors"
                 >
-                  <FaInstagram className="w-6 h-6 text-[#FEEBD8]" />
+                  <FaInstagram className="w-6 h-6 text-blue-400" />
                 </a>
                 <a
                   href="https://twitter.com/paccyio"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-12 h-12 bg-[#141414] rounded-xl flex items-center justify-center hover:bg-gray-800 transition-colors"
+                  className="w-12 h-12 bg-[#0a0a0a] rounded-xl flex items-center justify-center hover:bg-blue-500/10 hover:border hover:border-blue-500/50 transition-colors"
                 >
-                  <FaTwitter className="w-6 h-6 text-[#FEEBD8]" />
+                  <FaTwitter className="w-6 h-6 text-blue-400" />
                 </a>
               </div>
             </div>
 
             {/* FAQ Quick Links */}
-            <div className="bg-gradient-to-br from-blue-600/20 to-indigo-700/20 rounded-xl p-6 border border-blue-400/50">
-              <h3 className="text-[#FEEBD8] font-semibold text-lg mb-4">
+            <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] rounded-xl p-6 border border-blue-500/30">
+              <h3 className="text-white font-semibold text-lg mb-4">
                 Quick Help
               </h3>
               <div className="space-y-3">

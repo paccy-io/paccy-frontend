@@ -16,7 +16,7 @@ export default function Home() {
     <div className="relative min-h-screen overflow-hidden">
       {/* Background behind everything, including under navbar */}
       <div
-        className="fixed inset-0 z-0 bg-[#141414] pointer-events-none"
+        className="fixed inset-0 z-0 bg-[#0a0a0a] pointer-events-none"
         aria-hidden="true"
       />
       <Navbar />

@@ -374,11 +374,43 @@ function AuthContent() {
     <div className="">
       <Navbar />
 
-      <div className="min-h-screen bg-[#141414] py-20 pt-28">
-        {/* Background decorative elements */}
-        <div className="absolute top-20 left-10 w-32 h-32 bg-[#FEEBD8]/10 rounded-full blur-xl"></div>
-        <div className="absolute bottom-32 right-16 w-48 h-48 bg-blue-400/10 rounded-full blur-xl"></div>
-        <div className="absolute top-1/2 left-1/3 w-24 h-24 bg-purple-500/10 rounded-full blur-xl"></div>
+      <div className="min-h-screen bg-[#0a0a0a] py-20 pt-28 relative overflow-hidden">
+        {/* Animated Background Grid */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff03_1px,transparent_1px),linear-gradient(to_bottom,#ffffff03_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_110%)]" />
+
+        {/* Enhanced gradient orbs with animation - GPU accelerated to prevent square outline */}
+        <div
+          className="absolute top-20 left-10 w-72 h-72 rounded-full animate-pulse"
+          style={{
+            background:
+              "radial-gradient(circle, rgba(254, 235, 216, 0.2) 0%, rgba(255, 165, 0, 0.2) 50%, transparent 100%)",
+            filter: "blur(48px)",
+            transform: "translateZ(0)",
+            willChange: "filter",
+          }}
+        />
+        <div
+          className="absolute bottom-32 right-16 w-96 h-96 rounded-full animate-pulse"
+          style={{
+            background:
+              "radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, rgba(147, 51, 234, 0.2) 50%, transparent 100%)",
+            animationDelay: "1s",
+            filter: "blur(48px)",
+            transform: "translateZ(0)",
+            willChange: "filter",
+          }}
+        />
+        <div
+          className="absolute top-1/2 left-1/4 w-64 h-64 rounded-full animate-pulse"
+          style={{
+            background:
+              "radial-gradient(circle, rgba(147, 51, 234, 0.1) 0%, rgba(236, 72, 153, 0.1) 50%, transparent 100%)",
+            animationDelay: "2s",
+            filter: "blur(48px)",
+            transform: "translateZ(0)",
+            willChange: "filter",
+          }}
+        />
 
         {/* Development Notice Banner */}
         <div className="max-w-4xl mx-auto px-6 mb-8">
@@ -392,331 +424,379 @@ function AuthContent() {
           </div>
         </div>
 
-        <div className="max-w-md mx-auto px-6 relative z-10">
+        <div className="max-w-2xl mx-auto px-6 relative z-10">
           {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#FEEBD8] via-blue-300 to-purple-500 bg-clip-text text-transparent mb-4 font-climate-crisis">
-              {isLogin ? "Welcome Back" : "Start Your Journey"}
-            </h1>
-            <p className="text-white/70 text-lg">
+          <div className="text-center mb-10">
+            <div className="inline-block mb-4">
+              <div className="relative">
+                <h1 className="text-5xl md:text-6xl font-bold text-white mb-2 font-climate-crisis leading-tight">
+                  {isLogin ? "Welcome Back" : "Join Paccy"}
+                </h1>
+                <div className="absolute -bottom-2 left-0 right-0 h-1 bg-blue-500/50" />
+              </div>
+            </div>
+            <p className="text-white/60 text-base max-w-md mx-auto">
               {isLogin
-                ? "Sign in to continue your college application journey"
-                : "Create your account and unlock your potential"}
+                ? "Access your personalized college application dashboard"
+                : "Transform your college application journey with AI-powered insights"}
             </p>
           </div>
 
           {/* Auth Card */}
-          <div className="bg-[#1A1A1A] rounded-2xl p-8 border border-[#FEEBD8]/20 backdrop-blur-sm">
-            {/* Mode Toggle */}
-            <div className="flex mb-8 bg-[#141414] rounded-xl p-1">
-              <button
-                onClick={() => setIsLogin(true)}
-                className={`flex-1 py-3 px-4 rounded-lg text-sm font-medium transition-all duration-300 ${
-                  isLogin
-                    ? "bg-gradient-to-r from-[#FEEBD8] to-blue-300 text-[#141414] font-bold"
-                    : "text-white/70 hover:text-white"
-                }`}
-              >
-                Sign In
-              </button>
-              <button
-                onClick={() => setIsLogin(false)}
-                className={`flex-1 py-3 px-4 rounded-lg text-sm font-medium transition-all duration-300 ${
-                  !isLogin
-                    ? "bg-gradient-to-r from-[#FEEBD8] to-blue-300 text-[#141414] font-bold"
-                    : "text-white/70 hover:text-white"
-                }`}
-              >
-                Sign Up
-              </button>
-            </div>
+          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] rounded-2xl p-8 md:p-10 border border-neutral-700/50 backdrop-blur-xl shadow-2xl shadow-blue-500/10 relative overflow-hidden">
+            {/* Subtle gradient overlay */}
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-purple-500/5 pointer-events-none" />
 
-            {/* Form */}
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Name Fields (Register only) */}
-              {!isLogin && (
-                <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-[#FEEBD8] text-sm font-medium mb-2">
-                        First Name
-                      </label>
-                      <input
-                        type="text"
-                        name="firstName"
-                        value={formData.firstName}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-3 bg-[#141414] border border-[#FEEBD8]/20 rounded-xl text-white placeholder-white/50 focus:border-[#FEEBD8] focus:outline-none transition-colors"
-                        placeholder="John"
-                        required={!isLogin}
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-[#FEEBD8] text-sm font-medium mb-2">
-                        Last Name
-                      </label>
-                      <input
-                        type="text"
-                        name="lastName"
-                        value={formData.lastName}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-3 bg-[#141414] border border-[#FEEBD8]/20 rounded-xl text-white placeholder-white/50 focus:border-[#FEEBD8] focus:outline-none transition-colors"
-                        placeholder="Doe"
-                        required={!isLogin}
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-[#FEEBD8] text-sm font-medium mb-2">
-                      Username
-                    </label>
-                    <input
-                      type="text"
-                      name="username"
-                      value={formData.username}
-                      onChange={handleInputChange}
-                      className={`w-full px-4 py-3 bg-[#141414] border rounded-xl text-white placeholder-white/50 focus:outline-none transition-colors ${
-                        usernameError
-                          ? "border-red-500/50 focus:border-red-500"
-                          : formData.username && !usernameError
-                          ? "border-green-500/50 focus:border-green-500"
-                          : "border-[#FEEBD8]/20 focus:border-[#FEEBD8]"
-                      }`}
-                      placeholder="johndoe123"
-                      required={!isLogin}
-                      maxLength={50}
-                    />
-                    <div className="mt-2 text-xs">
-                      <p className="text-white/50 mb-1">
-                        3-50 characters, letters and numbers only
-                      </p>
-                      {usernameError && (
-                        <p className="text-red-400">{usernameError}</p>
-                      )}
-                      {formData.username && !usernameError && (
-                        <p className="text-green-400">✓ Username is valid</p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Email */}
-              <div>
-                <label className="block text-[#FEEBD8] text-sm font-medium mb-2">
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 bg-[#141414] border border-[#FEEBD8]/20 rounded-xl text-white placeholder-white/50 focus:border-[#FEEBD8] focus:outline-none transition-colors"
-                  placeholder="you@example.com"
-                  required
-                />
-              </div>
-
-              {/* Password */}
-              <div>
-                <label className="block text-[#FEEBD8] text-sm font-medium mb-2">
-                  Password
-                </label>
-                <input
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 bg-[#141414] border border-[#FEEBD8]/20 rounded-xl text-white placeholder-white/50 focus:border-[#FEEBD8] focus:outline-none transition-colors"
-                  placeholder="••••••••"
-                  required
-                />
-              </div>
-
-              {/* Confirm Password (Register only) */}
-              {!isLogin && (
-                <div>
-                  <label className="block text-[#FEEBD8] text-sm font-medium mb-2">
-                    Confirm Password
-                  </label>
-                  <input
-                    type="password"
-                    name="confirmPassword"
-                    value={formData.confirmPassword}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 bg-[#141414] border border-[#FEEBD8]/20 rounded-xl text-white placeholder-white/50 focus:border-[#FEEBD8] focus:outline-none transition-colors"
-                    placeholder="••••••••"
-                    required={!isLogin}
-                  />
-                </div>
-              )}
-
-              {/* Terms & Conditions (Register only) */}
-              {!isLogin && (
-                <div className="flex items-start space-x-3">
-                  <input
-                    type="checkbox"
-                    name="acceptTerms"
-                    checked={formData.acceptTerms}
-                    onChange={handleInputChange}
-                    className="mt-1 w-4 h-4 text-[#FEEBD8] bg-[#141414] border border-[#FEEBD8]/20 rounded focus:ring-[#FEEBD8]"
-                    required={!isLogin}
-                  />
-                  <label className="text-white/70 text-sm">
-                    I agree to the{" "}
-                    <button
-                      type="button"
-                      onClick={() => window.open("/terms", "_blank")}
-                      className="text-[#FEEBD8] hover:underline bg-transparent border-none cursor-pointer"
-                    >
-                      Terms of Service
-                    </button>{" "}
-                    and{" "}
-                    <button
-                      type="button"
-                      onClick={() => window.open("/privacy", "_blank")}
-                      className="text-[#FEEBD8] hover:underline bg-transparent border-none cursor-pointer"
-                    >
-                      Privacy Policy
-                    </button>
-                  </label>
-                </div>
-              )}
-
-              {/* Forgot Password (Login only) */}
-              {isLogin && (
-                <div className="text-right">
-                  <a
-                    href="#"
-                    className="text-[#FEEBD8] text-sm hover:underline"
-                  >
-                    Forgot your password?
-                  </a>
-                </div>
-              )}
-
-              {/* Error Display */}
-              {error && (
-                <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 mb-4">
-                  <p className="text-red-400 text-sm">{error}</p>
-                </div>
-              )}
-
-              {/* Success Display */}
-              {success && (
-                <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3 mb-4">
-                  <p className="text-green-400 text-sm">{success}</p>
-                </div>
-              )}
-
-              {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full px-6 py-4 bg-gradient-to-r from-[#FEEBD8] to-blue-300 text-[#141414] rounded-xl font-bold text-lg hover:opacity-90 transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-              >
-                {loading ? (
-                  <div className="flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#141414] mr-2"></div>
-                    {isLogin ? "Signing In..." : "Creating Account..."}
-                  </div>
-                ) : isLogin ? (
-                  "Sign In to Paccy"
-                ) : (
-                  "Create Your Account"
-                )}
-              </button>
-            </form>
-
-            {/* Divider */}
-            <div className="my-8 flex items-center">
-              <div className="flex-1 border-t border-[#FEEBD8]/20"></div>
-              <span className="px-4 text-white/50 text-sm">or</span>
-              <div className="flex-1 border-t border-[#FEEBD8]/20"></div>
-            </div>
-
-            {/* Social Login */}
-            <div className="space-y-3">
-              <button
-                onClick={() => handleSocialLogin("Google")}
-                className="w-full px-6 py-3 bg-[#141414] border border-[#FEEBD8]/20 rounded-xl text-white font-medium hover:bg-[#FEEBD8]/10 transition-all duration-300 flex items-center justify-center space-x-3"
-              >
-                <svg className="w-5 h-5" viewBox="0 0 24 24">
-                  <path
-                    fill="#4285f4"
-                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                  />
-                  <path
-                    fill="#34a853"
-                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                  />
-                  <path
-                    fill="#fbbc05"
-                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                  />
-                  <path
-                    fill="#ea4335"
-                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                  />
-                </svg>
-                <span>Continue with Google</span>
-              </button>
-
-              <button
-                onClick={() => handleSocialLogin("GitHub")}
-                className="w-full px-6 py-3 bg-[#141414] border border-[#FEEBD8]/20 rounded-xl text-white font-medium hover:bg-[#FEEBD8]/10 transition-all duration-300 flex items-center justify-center space-x-3"
-              >
-                <svg
-                  className="w-5 h-5"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.174-.105-.949-.199-2.403.041-3.439.219-.937 1.219-5.166 1.219-5.166s-.312-.623-.312-1.544c0-1.448.839-2.529 1.884-2.529.888 0 1.319.664 1.319 1.46 0 .888-.565 2.212-.857 3.441-.244 1.03.517 1.871 1.533 1.871 1.84 0 3.258-1.944 3.258-4.75 0-2.484-1.785-4.221-4.34-4.221-2.958 0-4.694 2.214-4.694 4.499 0 .891.344 1.848.772 2.365.085.102.097.192.072.297-.08.331-.256 1.04-.292 1.186-.047.188-.154.228-.355.137-1.279-.595-2.077-2.462-2.077-3.965 0-3.275 2.381-6.283 6.86-6.283 3.6 0 6.397 2.565 6.397 5.996 0 3.578-2.254 6.455-5.38 6.455-1.05 0-2.039-.546-2.376-1.195 0 0-.519 1.979-.645 2.464-.234.897-.867 2.019-1.291 2.7.973.301 2.003.462 3.07.462 6.624 0 11.99-5.367 11.99-11.987C24.007 5.367 18.641.001 12.017.001" />
-                </svg>
-                <span>Continue with GitHub</span>
-              </button>
-            </div>
-
-            {/* Switch Mode */}
-            <div className="mt-8 text-center">
-              <p className="text-white/70">
-                {isLogin
-                  ? "Don't have an account?"
-                  : "Already have an account?"}{" "}
+            <div className="relative z-10">
+              {/* Mode Toggle */}
+              <div className="flex mb-8 bg-[#0a0a0a] rounded-xl p-1.5 border border-neutral-800">
                 <button
-                  onClick={toggleMode}
-                  className="text-[#FEEBD8] hover:underline font-medium"
+                  onClick={() => setIsLogin(true)}
+                  className={`flex-1 py-3 px-4 rounded-lg text-sm font-semibold transition-all duration-300 ${
+                    isLogin
+                      ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/50"
+                      : "text-white/50 hover:text-white/80"
+                  }`}
                 >
-                  {isLogin ? "Sign up for free" : "Sign in"}
+                  Sign In
                 </button>
-              </p>
+                <button
+                  onClick={() => setIsLogin(false)}
+                  className={`flex-1 py-3 px-4 rounded-lg text-sm font-semibold transition-all duration-300 ${
+                    !isLogin
+                      ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/50"
+                      : "text-white/50 hover:text-white/80"
+                  }`}
+                >
+                  Sign Up
+                </button>
+              </div>
+
+              {/* Form */}
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Name Fields (Register only) */}
+                {!isLogin && (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-white/90 text-sm font-medium mb-2">
+                          First Name
+                        </label>
+                        <input
+                          type="text"
+                          name="firstName"
+                          value={formData.firstName}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-3 bg-[#0a0a0a] border border-neutral-700/50 rounded-xl text-white placeholder-white/30 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 focus:outline-none transition-all"
+                          placeholder="John"
+                          required={!isLogin}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-white/90 text-sm font-medium mb-2">
+                          Last Name
+                        </label>
+                        <input
+                          type="text"
+                          name="lastName"
+                          value={formData.lastName}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-3 bg-[#0a0a0a] border border-neutral-700/50 rounded-xl text-white placeholder-white/30 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 focus:outline-none transition-all"
+                          placeholder="Doe"
+                          required={!isLogin}
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-white/90 text-sm font-medium mb-2">
+                        Username
+                      </label>
+                      <input
+                        type="text"
+                        name="username"
+                        value={formData.username}
+                        onChange={handleInputChange}
+                        className={`w-full px-4 py-3 bg-[#0a0a0a] border rounded-xl text-white placeholder-white/30 focus:outline-none focus:ring-1 transition-all ${
+                          usernameError
+                            ? "border-red-500/70 focus:border-red-500 focus:ring-red-500/50"
+                            : formData.username && !usernameError
+                            ? "border-green-500/70 focus:border-green-500 focus:ring-green-500/50"
+                            : "border-neutral-700/50 focus:border-blue-500 focus:ring-blue-500/50"
+                        }`}
+                        placeholder="johndoe123"
+                        required={!isLogin}
+                        maxLength={50}
+                      />
+                      <div className="mt-2 text-xs">
+                        <p className="text-white/40 mb-1">
+                          3-50 characters, letters and numbers only
+                        </p>
+                        {usernameError && (
+                          <p className="text-red-400">{usernameError}</p>
+                        )}
+                        {formData.username && !usernameError && (
+                          <p className="text-green-400">✓ Username is valid</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Email & Password (Login - vertical) */}
+                {isLogin ? (
+                  <>
+                    <div>
+                      <label className="block text-white/90 text-sm font-medium mb-2">
+                        Email Address
+                      </label>
+                      <input
+                        type="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 bg-[#0a0a0a] border border-neutral-700/50 rounded-xl text-white placeholder-white/30 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 focus:outline-none transition-all"
+                        placeholder="you@example.com"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-white/90 text-sm font-medium mb-2">
+                        Password
+                      </label>
+                      <input
+                        type="password"
+                        name="password"
+                        value={formData.password}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 bg-[#0a0a0a] border border-neutral-700/50 rounded-xl text-white placeholder-white/30 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 focus:outline-none transition-all"
+                        placeholder="••••••••"
+                        required
+                      />
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    {/* Email */}
+                    <div>
+                      <label className="block text-white/90 text-sm font-medium mb-2">
+                        Email Address
+                      </label>
+                      <input
+                        type="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 bg-[#0a0a0a] border border-neutral-700/50 rounded-xl text-white placeholder-white/30 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 focus:outline-none transition-all"
+                        placeholder="you@example.com"
+                        required
+                      />
+                    </div>
+
+                    {/* Password & Confirm Password (side by side for signup) */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-white/90 text-sm font-medium mb-2">
+                          Password
+                        </label>
+                        <input
+                          type="password"
+                          name="password"
+                          value={formData.password}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-3 bg-[#0a0a0a] border border-neutral-700/50 rounded-xl text-white placeholder-white/30 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 focus:outline-none transition-all"
+                          placeholder="••••••••"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-white/90 text-sm font-medium mb-2">
+                          Confirm Password
+                        </label>
+                        <input
+                          type="password"
+                          name="confirmPassword"
+                          value={formData.confirmPassword}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-3 bg-[#0a0a0a] border border-neutral-700/50 rounded-xl text-white placeholder-white/30 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 focus:outline-none transition-all"
+                          placeholder="••••••••"
+                          required={!isLogin}
+                        />
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {/* Terms & Conditions (Register only) */}
+                {!isLogin && (
+                  <div className="flex items-start space-x-3">
+                    <input
+                      type="checkbox"
+                      name="acceptTerms"
+                      checked={formData.acceptTerms}
+                      onChange={handleInputChange}
+                      className="mt-1 w-4 h-4 text-blue-500 bg-[#0a0a0a] border border-neutral-700 rounded focus:ring-blue-500 focus:ring-2"
+                      required={!isLogin}
+                    />
+                    <label className="text-white/60 text-sm">
+                      I agree to the{" "}
+                      <button
+                        type="button"
+                        onClick={() => window.open("/terms", "_blank")}
+                        className="text-blue-400 hover:text-blue-300 hover:underline bg-transparent border-none cursor-pointer transition-colors"
+                      >
+                        Terms of Service
+                      </button>{" "}
+                      and{" "}
+                      <button
+                        type="button"
+                        onClick={() => window.open("/privacy", "_blank")}
+                        className="text-blue-400 hover:text-blue-300 hover:underline bg-transparent border-none cursor-pointer transition-colors"
+                      >
+                        Privacy Policy
+                      </button>
+                    </label>
+                  </div>
+                )}
+
+                {/* Forgot Password (Login only) */}
+                {isLogin && (
+                  <div className="text-right">
+                    <a
+                      href="#"
+                      className="text-blue-400 text-sm hover:text-blue-300 hover:underline transition-colors"
+                    >
+                      Forgot your password?
+                    </a>
+                  </div>
+                )}
+
+                {/* Error Display */}
+                {error && (
+                  <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 mb-4">
+                    <p className="text-red-400 text-sm">{error}</p>
+                  </div>
+                )}
+
+                {/* Success Display */}
+                {success && (
+                  <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3 mb-4">
+                    <p className="text-green-400 text-sm">{success}</p>
+                  </div>
+                )}
+
+                {/* Submit Button */}
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full px-6 py-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl font-bold text-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40"
+                >
+                  {loading ? (
+                    <div className="flex items-center justify-center">
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#141414] mr-2"></div>
+                      {isLogin ? "Signing In..." : "Creating Account..."}
+                    </div>
+                  ) : isLogin ? (
+                    "Sign In to Paccy"
+                  ) : (
+                    "Create Your Account"
+                  )}
+                </button>
+              </form>
+
+              {/* Divider */}
+              <div className="my-8 flex items-center">
+                <div className="flex-1 border-t border-neutral-700/50"></div>
+                <span className="px-4 text-white/40 text-sm">or</span>
+                <div className="flex-1 border-t border-neutral-700/50"></div>
+              </div>
+
+              {/* Social Login */}
+              <div className="space-y-3">
+                <button
+                  onClick={() => handleSocialLogin("Google")}
+                  className="w-full px-6 py-3 bg-[#0a0a0a] border border-neutral-700/50 rounded-xl text-white font-medium hover:border-neutral-600 hover:bg-neutral-900/50 transition-all duration-300 flex items-center justify-center space-x-3 group"
+                >
+                  <svg className="w-5 h-5" viewBox="0 0 24 24">
+                    <path
+                      fill="#4285f4"
+                      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                    />
+                    <path
+                      fill="#34a853"
+                      d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                    />
+                    <path
+                      fill="#fbbc05"
+                      d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                    />
+                    <path
+                      fill="#ea4335"
+                      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                    />
+                  </svg>
+                  <span>Continue with Google</span>
+                </button>
+
+                <button
+                  onClick={() => handleSocialLogin("GitHub")}
+                  className="w-full px-6 py-3 bg-[#0a0a0a] border border-neutral-700/50 rounded-xl text-white font-medium hover:border-neutral-600 hover:bg-neutral-900/50 transition-all duration-300 flex items-center justify-center space-x-3 group"
+                >
+                  <svg
+                    className="w-5 h-5"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.174-.105-.949-.199-2.403.041-3.439.219-.937 1.219-5.166 1.219-5.166s-.312-.623-.312-1.544c0-1.448.839-2.529 1.884-2.529.888 0 1.319.664 1.319 1.46 0 .888-.565 2.212-.857 3.441-.244 1.03.517 1.871 1.533 1.871 1.84 0 3.258-1.944 3.258-4.75 0-2.484-1.785-4.221-4.34-4.221-2.958 0-4.694 2.214-4.694 4.499 0 .891.344 1.848.772 2.365.085.102.097.192.072.297-.08.331-.256 1.04-.292 1.186-.047.188-.154.228-.355.137-1.279-.595-2.077-2.462-2.077-3.965 0-3.275 2.381-6.283 6.86-6.283 3.6 0 6.397 2.565 6.397 5.996 0 3.578-2.254 6.455-5.38 6.455-1.05 0-2.039-.546-2.376-1.195 0 0-.519 1.979-.645 2.464-.234.897-.867 2.019-1.291 2.7.973.301 2.003.462 3.07.462 6.624 0 11.99-5.367 11.99-11.987C24.007 5.367 18.641.001 12.017.001" />
+                  </svg>
+                  <span>Continue with GitHub</span>
+                </button>
+              </div>
+
+              {/* Switch Mode */}
+              <div className="mt-8 text-center">
+                <p className="text-white/60">
+                  {isLogin
+                    ? "Don't have an account?"
+                    : "Already have an account?"}{" "}
+                  <button
+                    onClick={toggleMode}
+                    className="text-blue-400 hover:text-blue-300 font-semibold hover:underline transition-colors"
+                  >
+                    {isLogin ? "Sign up for free" : "Sign in"}
+                  </button>
+                </p>
+              </div>
             </div>
           </div>
 
           {/* Benefits Section (Register only) */}
           {!isLogin && (
-            <div className="mt-8 bg-gradient-to-r from-blue-600/20 to-indigo-700/20 rounded-2xl p-6 border border-blue-400/30">
-              <h3 className="text-[#FEEBD8] font-bold text-lg mb-4">
-                What you'll get:
-              </h3>
-              <ul className="space-y-2 text-white/80">
-                <li className="flex items-center">
-                  <span className="text-green-400 mr-3">✓</span>
-                  Free profile tracking and essay reviews
-                </li>
-                <li className="flex items-center">
-                  <span className="text-green-400 mr-3">✓</span>
-                  Personalized college recommendations
-                </li>
-                <li className="flex items-center">
-                  <span className="text-green-400 mr-3">✓</span>
-                  Smart deadline reminders
-                </li>
-                <li className="flex items-center">
-                  <span className="text-green-400 mr-3">✓</span>
-                  Access to our college application community
-                </li>
-              </ul>
+            <div className="mt-8 bg-gradient-to-br from-[#141414] to-[#1a1a1a] rounded-2xl p-6 border border-blue-500/30 relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10 pointer-events-none" />
+              <div className="relative z-10">
+                <h3 className="text-white font-bold text-lg mb-4 flex items-center gap-2">
+                  <span className="text-xl">✨</span>
+                  What you'll get:
+                </h3>
+                <ul className="space-y-3 text-white/70">
+                  <li className="flex items-start gap-3">
+                    <span className="text-green-400 mt-0.5 text-lg">✓</span>
+                    <span>Free profile tracking and essay reviews</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="text-green-400 mt-0.5 text-lg">✓</span>
+                    <span>Personalized college recommendations</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="text-green-400 mt-0.5 text-lg">✓</span>
+                    <span>Smart deadline reminders</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="text-green-400 mt-0.5 text-lg">✓</span>
+                    <span>Access to our college application community</span>
+                  </li>
+                </ul>
+              </div>
             </div>
           )}
         </div>
@@ -724,22 +804,22 @@ function AuthContent() {
 
       {/* Development Modal */}
       {showDevModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-[#1A1A1A] rounded-2xl p-8 border border-[#FEEBD8]/20 max-w-md w-full mx-4">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-50 p-4">
+          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] rounded-2xl p-8 border border-neutral-700/50 max-w-md w-full mx-4 shadow-2xl">
             <div className="text-center">
               <div className="mb-4">
-                <div className="w-16 h-16 bg-orange-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-2xl">🚧</span>
+                <div className="w-16 h-16 bg-gradient-to-br from-orange-500/20 to-yellow-500/20 rounded-full flex items-center justify-center mx-auto mb-4 border border-orange-500/30">
+                  <span className="text-3xl">🚧</span>
                 </div>
-                <h3 className="text-2xl font-bold text-[#FEEBD8] mb-2">
+                <h3 className="text-2xl font-bold text-white mb-3">
                   Feature Under Development
                 </h3>
-                <p className="text-white/70 mb-6">
+                <p className="text-white/60 mb-6 leading-relaxed">
                   Authentication is currently being developed. This is a
                   demonstration of the UI design.
                   <br />
                   <br />
-                  <span className="text-orange-300 font-medium">
+                  <span className="text-orange-400 font-medium">
                     Interested in trying our alpha version? Join our closed
                     alpha program to get early access to dashboard features.
                   </span>
@@ -749,13 +829,13 @@ function AuthContent() {
               <div className="flex space-x-3">
                 <button
                   onClick={() => setShowDevModal(false)}
-                  className="flex-1 px-4 py-2 bg-[#141414] border border-[#FEEBD8]/20 rounded-lg text-white text-sm font-medium hover:bg-[#FEEBD8]/10 transition-all duration-300"
+                  className="flex-1 px-4 py-3 bg-[#0a0a0a] border border-neutral-700 rounded-lg text-white text-sm font-medium hover:bg-neutral-900/50 hover:border-neutral-600 transition-all duration-300"
                 >
                   Go Back
                 </button>
                 <button
                   onClick={handleActualSubmit}
-                  className="flex-1 px-4 py-2 bg-gradient-to-r from-[#FEEBD8] to-blue-300 text-[#141414] rounded-lg text-sm font-bold hover:opacity-90 transition-all duration-300"
+                  className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg text-sm font-bold hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-lg shadow-blue-500/30"
                 >
                   Join Alpha Program
                 </button>

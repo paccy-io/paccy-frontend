@@ -330,35 +330,39 @@ export default function DashboardSidebar({
           </ul>
         </nav>
 
-        {/* Theme Toggle */}
-        <div
-          className={`border-t p-4 ${
-            theme === "dark" ? "border-neutral-800" : "border-gray-200"
-          }`}
-        >
-          <button
-            onClick={toggleTheme}
-            className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors ${
-              theme === "dark"
-                ? "text-white/70 hover:text-white hover:bg-[#141414]"
-                : "text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+        {/* Theme Toggle - Hidden in Production */}
+        {process.env.NODE_ENV !== "production" && (
+          <div
+            className={`border-t p-4 ${
+              theme === "dark" ? "border-neutral-800" : "border-gray-200"
             }`}
-            title={
-              theme === "dark" ? "Switch to light mode" : "Switch to dark mode"
-            }
           >
-            {theme === "dark" ? (
-              <FaSun className="w-5 h-5" />
-            ) : (
-              <FaMoon className="w-5 h-5" />
-            )}
-            {!collapsed && (
-              <span className="text-sm font-medium">
-                {theme === "dark" ? "Light Mode" : "Dark Mode"}
-              </span>
-            )}
-          </button>
-        </div>
+            <button
+              onClick={toggleTheme}
+              className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors ${
+                theme === "dark"
+                  ? "text-white/70 hover:text-white hover:bg-[#141414]"
+                  : "text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+              }`}
+              title={
+                theme === "dark"
+                  ? "Switch to light mode"
+                  : "Switch to dark mode"
+              }
+            >
+              {theme === "dark" ? (
+                <FaSun className="w-5 h-5" />
+              ) : (
+                <FaMoon className="w-5 h-5" />
+              )}
+              {!collapsed && (
+                <span className="text-sm font-medium">
+                  {theme === "dark" ? "Light Mode" : "Dark Mode"}
+                </span>
+              )}
+            </button>
+          </div>
+        )}
 
         {/* Collapse Toggle (Desktop Only) */}
         <div

@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Footer from "../../../components/Footer";
 import { useToast } from "../../../lib/hooks/useToast";
+import { useTheme } from "../../../components/ThemeProvider";
 import { essaysApi } from "../../../lib/api/essays";
 import { collegeApplicationsApi } from "../../../lib/api/college-applications";
 import { Essay, EssayStatus, CollegeApplication } from "../../../lib/types";
@@ -60,11 +61,22 @@ const getStatusDisplayName = (status: string) => {
 };
 
 export default function EssayManager() {
+  const { theme } = useTheme();
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
-          <div className="text-[#FEEBD8] text-lg">Loading essays...</div>
+        <div
+          className={`min-h-screen ${
+            theme === "dark" ? "bg-[#0a0a0a]" : "bg-gray-50"
+          } flex items-center justify-center`}
+        >
+          <div
+            className={`text-lg ${
+              theme === "dark" ? "text-[#FEEBD8]" : "text-gray-900"
+            }`}
+          >
+            Loading essays...
+          </div>
         </div>
       }
     >
@@ -75,6 +87,7 @@ export default function EssayManager() {
 
 function EssayManagerContent() {
   const { success: showSuccess, error: showError } = useToast();
+  const { theme } = useTheme();
   const searchParams = useSearchParams();
   const router = useRouter();
   const [essays, setEssays] = useState<Essay[]>([]);
@@ -241,22 +254,38 @@ function EssayManagerContent() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a]">
+    <div
+      className={`min-h-screen ${
+        theme === "dark" ? "bg-[#0a0a0a]" : "bg-gray-50"
+      }`}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
             <Link
               href="/dashboard"
-              className="text-white/70 hover:text-white transition-colors"
+              className={`${
+                theme === "dark"
+                  ? "text-white/70 hover:text-white"
+                  : "text-gray-600 hover:text-gray-900"
+              } transition-colors`}
             >
               <FaArrowLeft size={20} />
             </Link>
             <div className="flex-1 min-w-0">
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white">
+              <h1
+                className={`text-2xl sm:text-3xl lg:text-4xl font-bold ${
+                  theme === "dark" ? "text-white" : "text-gray-900"
+                }`}
+              >
                 Essays
               </h1>
-              <p className="text-white/70 mt-2 text-sm sm:text-base">
+              <p
+                className={`mt-2 text-sm sm:text-base ${
+                  theme === "dark" ? "text-white/70" : "text-gray-600"
+                }`}
+              >
                 Write and organize your application essays
               </p>
             </div>
@@ -272,13 +301,29 @@ function EssayManagerContent() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6">
+          <div
+            className={`bg-gradient-to-br ${
+              theme === "dark"
+                ? "from-[#141414] to-[#1a1a1a] border-neutral-700/50"
+                : "from-gray-50 to-gray-100 border-gray-200"
+            } border rounded-xl p-6`}
+          >
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-3xl font-bold text-white mb-1">
+                <div
+                  className={`text-3xl font-bold mb-1 ${
+                    theme === "dark" ? "text-white" : "text-gray-900"
+                  }`}
+                >
                   {essays.length}
                 </div>
-                <div className="text-white/60 text-sm">Total Essays</div>
+                <div
+                  className={`text-sm ${
+                    theme === "dark" ? "text-white/60" : "text-gray-600"
+                  }`}
+                >
+                  Total Essays
+                </div>
               </div>
               <div className="p-3 bg-purple-500/10 rounded-lg">
                 <FaFileAlt className="text-2xl text-purple-400" />
@@ -286,7 +331,13 @@ function EssayManagerContent() {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6">
+          <div
+            className={`bg-gradient-to-br ${
+              theme === "dark"
+                ? "from-[#141414] to-[#1a1a1a] border-neutral-700/50"
+                : "from-gray-50 to-gray-100 border-gray-200"
+            } border rounded-xl p-6`}
+          >
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-3xl font-bold text-green-400 mb-1">
@@ -295,7 +346,13 @@ function EssayManagerContent() {
                       .length
                   }
                 </div>
-                <div className="text-white/60 text-sm">Completed</div>
+                <div
+                  className={`text-sm ${
+                    theme === "dark" ? "text-white/60" : "text-gray-600"
+                  }`}
+                >
+                  Completed
+                </div>
               </div>
               <div className="p-3 bg-green-500/10 rounded-lg">
                 <FaCheckCircle className="text-2xl text-green-400" />
@@ -303,7 +360,13 @@ function EssayManagerContent() {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6">
+          <div
+            className={`bg-gradient-to-br ${
+              theme === "dark"
+                ? "from-[#141414] to-[#1a1a1a] border-neutral-700/50"
+                : "from-gray-50 to-gray-100 border-gray-200"
+            } border rounded-xl p-6`}
+          >
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-3xl font-bold text-blue-400 mb-1">
@@ -312,7 +375,13 @@ function EssayManagerContent() {
                       .length
                   }
                 </div>
-                <div className="text-white/60 text-sm">In Progress</div>
+                <div
+                  className={`text-sm ${
+                    theme === "dark" ? "text-white/60" : "text-gray-600"
+                  }`}
+                >
+                  In Progress
+                </div>
               </div>
               <div className="p-3 bg-blue-500/10 rounded-lg">
                 <FaClock className="text-2xl text-blue-400" />
@@ -320,7 +389,13 @@ function EssayManagerContent() {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6">
+          <div
+            className={`bg-gradient-to-br ${
+              theme === "dark"
+                ? "from-[#141414] to-[#1a1a1a] border-neutral-700/50"
+                : "from-gray-50 to-gray-100 border-gray-200"
+            } border rounded-xl p-6`}
+          >
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-3xl font-bold text-orange-400 mb-1">
@@ -329,7 +404,13 @@ function EssayManagerContent() {
                       .length
                   }
                 </div>
-                <div className="text-white/60 text-sm">Need Review</div>
+                <div
+                  className={`text-sm ${
+                    theme === "dark" ? "text-white/60" : "text-gray-600"
+                  }`}
+                >
+                  Need Review
+                </div>
               </div>
               <div className="p-3 bg-orange-500/10 rounded-lg">
                 <FaExclamationTriangle className="text-2xl text-orange-400" />
@@ -339,27 +420,49 @@ function EssayManagerContent() {
         </div>
 
         {/* Filters and Search */}
-        <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6 mb-8">
+        <div
+          className={`bg-gradient-to-br ${
+            theme === "dark"
+              ? "from-[#141414] to-[#1a1a1a] border-neutral-700/50"
+              : "from-gray-50 to-gray-100 border-gray-200"
+          } border rounded-xl p-6 mb-8`}
+        >
           <div className="flex flex-col lg:flex-row gap-4">
             {/* Search */}
             <div className="flex-1 relative">
-              <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/40" />
+              <FaSearch
+                className={`absolute left-4 top-1/2 transform -translate-y-1/2 ${
+                  theme === "dark" ? "text-white/40" : "text-gray-400"
+                }`}
+              />
               <input
                 type="text"
                 placeholder="Search essays by title or college..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full bg-[#0a0a0a]/50 border border-neutral-700/50 rounded-xl pl-11 pr-4 py-3 text-white placeholder:text-white/40 focus:outline-none focus:border-purple-500/50 focus:bg-[#0a0a0a]/80 transition-all"
+                className={`w-full ${
+                  theme === "dark"
+                    ? "bg-[#0a0a0a]/50 border-neutral-700/50 text-white placeholder:text-white/40 focus:bg-[#0a0a0a]/80"
+                    : "bg-white border-gray-300 text-gray-900 placeholder:text-gray-400 focus:bg-white"
+                } border rounded-xl pl-11 pr-4 py-3 focus:outline-none focus:border-purple-500/50 transition-all`}
               />
             </div>
 
             {/* Status Filter */}
             <div className="relative">
-              <FaFilter className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/40 pointer-events-none" />
+              <FaFilter
+                className={`absolute left-4 top-1/2 transform -translate-y-1/2 pointer-events-none ${
+                  theme === "dark" ? "text-white/40" : "text-gray-400"
+                }`}
+              />
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="bg-[#0a0a0a]/50 border border-neutral-700/50 rounded-xl pl-11 pr-10 py-3 text-white focus:outline-none focus:border-purple-500/50 focus:bg-[#0a0a0a]/80 transition-all appearance-none cursor-pointer min-w-[160px]"
+                className={`${
+                  theme === "dark"
+                    ? "bg-[#0a0a0a]/50 border-neutral-700/50 text-white focus:bg-[#0a0a0a]/80"
+                    : "bg-white border-gray-300 text-gray-900 focus:bg-white"
+                } border rounded-xl pl-11 pr-10 py-3 focus:outline-none focus:border-purple-500/50 transition-all appearance-none cursor-pointer min-w-[160px]`}
               >
                 <option value="All">All Statuses</option>
                 <option value={EssayStatus.NOT_STARTED}>Not Started</option>
@@ -375,7 +478,11 @@ function EssayManagerContent() {
             <select
               value={filterCollege}
               onChange={(e) => handleCollegeFilterChange(e.target.value)}
-              className="bg-[#0a0a0a]/50 border border-neutral-700/50 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500/50 focus:bg-[#0a0a0a]/80 transition-all cursor-pointer min-w-[180px]"
+              className={`${
+                theme === "dark"
+                  ? "bg-[#0a0a0a]/50 border-neutral-700/50 text-white focus:bg-[#0a0a0a]/80"
+                  : "bg-white border-gray-300 text-gray-900 focus:bg-white"
+              } border rounded-xl px-4 py-3 focus:outline-none focus:border-purple-500/50 transition-all cursor-pointer min-w-[180px]`}
             >
               <option value="All">All Colleges</option>
               {collegeNames.map((collegeName) => (
@@ -393,12 +500,30 @@ function EssayManagerContent() {
             <FaSpinner className="text-purple-400 animate-spin text-4xl" />
           </div>
         ) : filteredEssays.length === 0 ? (
-          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-12 text-center">
-            <FaFileAlt className="text-5xl text-white/20 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-white mb-2">
+          <div
+            className={`bg-gradient-to-br ${
+              theme === "dark"
+                ? "from-[#141414] to-[#1a1a1a] border-neutral-700/50"
+                : "from-gray-50 to-gray-100 border-gray-200"
+            } border rounded-xl p-12 text-center`}
+          >
+            <FaFileAlt
+              className={`text-5xl mx-auto mb-4 ${
+                theme === "dark" ? "text-white/20" : "text-gray-300"
+              }`}
+            />
+            <h3
+              className={`text-xl font-semibold mb-2 ${
+                theme === "dark" ? "text-white" : "text-gray-900"
+              }`}
+            >
               {essays.length === 0 ? "No essays yet" : "No essays found"}
             </h3>
-            <p className="text-white/60 mb-6">
+            <p
+              className={`mb-6 ${
+                theme === "dark" ? "text-white/60" : "text-gray-600"
+              }`}
+            >
               {essays.length === 0
                 ? "Start writing your first essay to get started"
                 : "Try adjusting your filters or search criteria"}
@@ -425,7 +550,11 @@ function EssayManagerContent() {
                 <Link
                   key={essay.id}
                   href={`/dashboard/essays/${essay.id}`}
-                  className="group bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6 hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/10 transition-all duration-300"
+                  className={`group bg-gradient-to-br ${
+                    theme === "dark"
+                      ? "from-[#141414] to-[#1a1a1a] border-neutral-700/50"
+                      : "from-gray-50 to-gray-100 border-gray-200"
+                  } border rounded-xl p-6 hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/10 transition-all duration-300`}
                 >
                   <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
                     <div className="flex-1 min-w-0">
@@ -434,11 +563,21 @@ function EssayManagerContent() {
                           <FaPen className="text-purple-400 text-lg" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h3 className="text-xl font-semibold text-white mb-1 group-hover:text-purple-400 transition-colors truncate">
+                          <h3
+                            className={`text-xl font-semibold mb-1 group-hover:text-purple-400 transition-colors truncate ${
+                              theme === "dark" ? "text-white" : "text-gray-900"
+                            }`}
+                          >
                             {essay.title}
                           </h3>
                           {essay.college_name && (
-                            <p className="text-white/50 text-sm">
+                            <p
+                              className={`text-sm ${
+                                theme === "dark"
+                                  ? "text-white/50"
+                                  : "text-gray-500"
+                              }`}
+                            >
                               {essay.college_name}
                             </p>
                           )}
@@ -461,28 +600,56 @@ function EssayManagerContent() {
                       </div>
 
                       {essay.prompt && (
-                        <div className="bg-[#0a0a0a]/50 rounded-lg p-3 mb-3 border border-neutral-700/30">
-                          <p className="text-white/60 text-sm italic line-clamp-2">
+                        <div
+                          className={`rounded-lg p-3 mb-3 border ${
+                            theme === "dark"
+                              ? "bg-[#0a0a0a]/50 border-neutral-700/30"
+                              : "bg-white border-gray-200"
+                          }`}
+                        >
+                          <p
+                            className={`text-sm italic line-clamp-2 ${
+                              theme === "dark"
+                                ? "text-white/60"
+                                : "text-gray-600"
+                            }`}
+                          >
                             "{essay.prompt}"
                           </p>
                         </div>
                       )}
 
                       <div className="flex flex-wrap items-center gap-4 text-sm">
-                        <div className="flex items-center gap-1.5 text-white/50">
+                        <div
+                          className={`flex items-center gap-1.5 ${
+                            theme === "dark" ? "text-white/50" : "text-gray-500"
+                          }`}
+                        >
                           <span className="font-medium">{wordCount}</span>
                           <span>words</span>
                         </div>
                         {essay.ai_score !== undefined &&
                           essay.ai_score !== null && (
                             <div className="flex items-center gap-1.5">
-                              <span className="text-white/50">AI Score:</span>
+                              <span
+                                className={`${
+                                  theme === "dark"
+                                    ? "text-white/50"
+                                    : "text-gray-500"
+                                }`}
+                              >
+                                AI Score:
+                              </span>
                               <span className={getAIScoreColor(essay.ai_score)}>
                                 {essay.ai_score}/10
                               </span>
                             </div>
                           )}
-                        <div className="text-white/40 text-xs">
+                        <div
+                          className={`text-xs ${
+                            theme === "dark" ? "text-white/40" : "text-gray-400"
+                          }`}
+                        >
                           Updated{" "}
                           {new Date(
                             essay.updated_at || essay.created_at
@@ -493,7 +660,11 @@ function EssayManagerContent() {
 
                     <button
                       onClick={(e) => handleDeleteEssay(essay.id, e)}
-                      className="flex-shrink-0 p-2 text-white/40 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                      className={`flex-shrink-0 p-2 rounded-lg transition-colors ${
+                        theme === "dark"
+                          ? "text-white/40 hover:text-red-400"
+                          : "text-gray-400 hover:text-red-500"
+                      } hover:bg-red-500/10`}
                       title="Delete essay"
                     >
                       <FaTrash />

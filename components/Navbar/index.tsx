@@ -90,10 +90,10 @@ export default function Navbar() {
             {/* Logo */}
             <Link href="/" className="group flex items-center space-x-2">
               <div className="relative">
-                <span className="text-3xl font-bold font-climate-crisis text-[#FEEBD8]">
+                <span className="text-3xl font-bold font-climate-crisis text-white">
                   paccy
                 </span>
-                <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#FEEBD8] group-hover:w-full transition-all duration-300"></div>
+                <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-400 group-hover:w-full transition-all duration-300"></div>
               </div>
             </Link>
 
@@ -103,13 +103,13 @@ export default function Navbar() {
                 <Link
                   key={index}
                   href={item.link}
-                  className="relative group px-3 py-2 text-[#FEEBD8] hover:text-white transition-all duration-300"
+                  className="relative group px-3 py-2 text-white/80 hover:text-white transition-all duration-300"
                 >
                   <span className="relative z-10 font-medium">
                     {item.title}
                   </span>
-                  <div className="absolute inset-0 bg-[#FEEBD8]/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#FEEBD8] group-hover:w-full transition-all duration-300"></div>
+                  <div className="absolute inset-0 bg-blue-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-400 group-hover:w-full transition-all duration-300"></div>
                 </Link>
               ))}
 
@@ -122,19 +122,19 @@ export default function Navbar() {
                         <img
                           src={user.avatar}
                           alt={user.name || "User avatar"}
-                          className="w-10 h-10 rounded-full border-2 border-[#FEEBD8]/30 group-hover:border-[#FEEBD8]/60 transition-all duration-300"
+                          className="w-10 h-10 rounded-full border-2 border-blue-500/30 group-hover:border-blue-500/60 transition-all duration-300"
                         />
-                        <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-[#141414]"></div>
+                        <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-[#0a0a0a]"></div>
                         <div className="absolute top-full right-0 w-56 h-2 bg-transparent"></div>
                         {/* Dropdown Menu */}
                         <div className="absolute top-full pt-2 right-0 w-56 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none group-hover:pointer-events-auto z-50">
-                          <div className="bg-[#1A1A1A] border border-[#FEEBD8]/20 rounded-lg shadow-lg">
+                          <div className="bg-[#141414] border border-neutral-700/50 rounded-lg shadow-xl shadow-black/50">
                             {/* User Info Header */}
-                            <div className="p-4 border-b border-[#FEEBD8]/10">
-                              <p className="text-[#FEEBD8] text-sm font-medium">
+                            <div className="p-4 border-b border-neutral-700/50">
+                              <p className="text-white text-sm font-medium">
                                 {user?.name || user?.email}
                               </p>
-                              <p className="text-[#FEEBD8]/70 text-xs">
+                              <p className="text-white/60 text-xs">
                                 {formatUserRole(user)}
                               </p>
                             </div>
@@ -142,7 +142,7 @@ export default function Navbar() {
                             <div className="py-2">
                               <Link
                                 href="/dashboard"
-                                className="flex items-center px-4 py-2 text-[#FEEBD8]/80 hover:text-[#FEEBD8] hover:bg-[#FEEBD8]/10 transition-all duration-200"
+                                className="flex items-center px-4 py-2 text-white/70 hover:text-white hover:bg-blue-500/10 transition-all duration-200"
                               >
                                 <svg
                                   className="w-4 h-4 mr-3"
@@ -161,7 +161,7 @@ export default function Navbar() {
                               </Link>
                               <Link
                                 href="/dashboard/settings"
-                                className="flex items-center px-4 py-2 text-[#FEEBD8]/80 hover:text-[#FEEBD8] hover:bg-[#FEEBD8]/10 transition-all duration-200"
+                                className="flex items-center px-4 py-2 text-white/70 hover:text-white hover:bg-blue-500/10 transition-all duration-200"
                               >
                                 <svg
                                   className="w-4 h-4 mr-3"
@@ -186,7 +186,7 @@ export default function Navbar() {
                               </Link>
                               <Link
                                 href="/dashboard/essays"
-                                className="flex items-center px-4 py-2 text-[#FEEBD8]/80 hover:text-[#FEEBD8] hover:bg-[#FEEBD8]/10 transition-all duration-200"
+                                className="flex items-center px-4 py-2 text-white/70 hover:text-white hover:bg-blue-500/10 transition-all duration-200"
                               >
                                 <svg
                                   className="w-4 h-4 mr-3"
@@ -205,7 +205,7 @@ export default function Navbar() {
                               </Link>
                               <Link
                                 href="/dashboard/colleges"
-                                className="flex items-center px-4 py-2 text-[#FEEBD8]/80 hover:text-[#FEEBD8] hover:bg-[#FEEBD8]/10 transition-all duration-200"
+                                className="flex items-center px-4 py-2 text-white/70 hover:text-white hover:bg-blue-500/10 transition-all duration-200"
                               >
                                 <svg
                                   className="w-4 h-4 mr-3"
@@ -222,7 +222,7 @@ export default function Navbar() {
                                 </svg>
                                 Colleges
                               </Link>{" "}
-                              <div className="border-t border-[#FEEBD8]/10 mt-2 pt-2">
+                              <div className="border-t border-neutral-700/50 mt-2 pt-2">
                                 <button
                                   onClick={logout}
                                   className="flex items-center w-full px-4 py-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all duration-200"
@@ -253,7 +253,7 @@ export default function Navbar() {
               ) : (
                 <Link
                   href="/auth"
-                  className="ml-4 px-6 py-2 bg-[#FEEBD8] text-[#141414] font-semibold rounded-lg hover:shadow-lg hover:bg-[#ffe0b8] transform hover:scale-105 transition-all duration-300"
+                  className="ml-4 px-6 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-blue-700 transform hover:scale-105 transition-all duration-300 shadow-lg shadow-blue-500/30"
                 >
                   Get Started
                 </Link>
@@ -267,17 +267,17 @@ export default function Navbar() {
               aria-label="Toggle menu"
             >
               <span
-                className={`w-6 h-0.5 bg-[#FEEBD8] transition-all duration-300 ${
+                className={`w-6 h-0.5 bg-white transition-all duration-300 ${
                   isMenuOpen ? "rotate-45 translate-y-2" : "group-hover:w-7"
                 }`}
               />
               <span
-                className={`w-6 h-0.5 bg-[#FEEBD8] transition-all duration-300 ${
+                className={`w-6 h-0.5 bg-white transition-all duration-300 ${
                   isMenuOpen ? "opacity-0" : "group-hover:w-7"
                 }`}
               />
               <span
-                className={`w-6 h-0.5 bg-[#FEEBD8] transition-all duration-300 ${
+                className={`w-6 h-0.5 bg-white transition-all duration-300 ${
                   isMenuOpen ? "-rotate-45 -translate-y-2" : "group-hover:w-7"
                 }`}
               />
@@ -300,7 +300,7 @@ export default function Navbar() {
                   key={index}
                   href={item.link}
                   onClick={() => setIsMenuOpen(false)}
-                  className="block px-4 py-3 text-[#FEEBD8] hover:text-white hover:bg-neutral-700/30 rounded-lg transition-all duration-300 font-medium"
+                  className="block px-4 py-3 text-white/80 hover:text-white hover:bg-blue-500/10 rounded-lg transition-all duration-300 font-medium"
                 >
                   {item.mtitle}
                 </Link>
@@ -310,23 +310,23 @@ export default function Navbar() {
               <div className="px-4 pt-4">
                 {isAuthenticated ? (
                   <div className="space-y-3">
-                    <div className="flex items-center justify-between p-3 bg-[#1A1A1A] rounded-lg border border-[#FEEBD8]/20">
+                    <div className="flex items-center justify-between p-3 bg-[#141414] rounded-lg border border-neutral-700/50">
                       <div className="flex items-center space-x-3">
                         {user?.avatar && (
                           <div className="relative">
                             <img
                               src={user.avatar}
                               alt={user.name || "User avatar"}
-                              className="w-12 h-12 rounded-full border-2 border-[#FEEBD8]/30"
+                              className="w-12 h-12 rounded-full border-2 border-blue-500/30"
                             />
                             <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-[#141414]"></div>
                           </div>
                         )}
                         <div>
-                          <p className="text-[#FEEBD8] text-sm font-medium">
+                          <p className="text-white text-sm font-medium">
                             {user?.name || user?.email}
                           </p>
-                          <p className="text-[#FEEBD8]/70 text-xs">
+                          <p className="text-white/60 text-xs">
                             {formatUserRole(user)}
                           </p>
                         </div>
@@ -337,7 +337,7 @@ export default function Navbar() {
                       <Link
                         href="/dashboard"
                         onClick={() => setIsMenuOpen(false)}
-                        className="flex items-center justify-center p-3 bg-[#1A1A1A] border border-[#FEEBD8]/20 rounded-lg hover:bg-[#FEEBD8]/10 transition-all duration-300"
+                        className="flex items-center justify-center p-3 bg-[#141414] border border-neutral-700/50 rounded-lg hover:bg-blue-500/10 transition-all duration-300"
                       >
                         <svg
                           className="w-4 h-4 mr-2"
@@ -352,15 +352,13 @@ export default function Navbar() {
                             d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
                           />
                         </svg>
-                        <span className="text-[#FEEBD8] text-sm">
-                          Dashboard
-                        </span>
+                        <span className="text-white text-sm">Dashboard</span>
                       </Link>
 
                       <Link
                         href="/dashboard/settings"
                         onClick={() => setIsMenuOpen(false)}
-                        className="flex items-center justify-center p-3 bg-[#1A1A1A] border border-[#FEEBD8]/20 rounded-lg hover:bg-[#FEEBD8]/10 transition-all duration-300"
+                        className="flex items-center justify-center p-3 bg-[#141414] border border-neutral-700/50 rounded-lg hover:bg-blue-500/10 transition-all duration-300"
                       >
                         <svg
                           className="w-4 h-4 mr-2"
@@ -381,7 +379,7 @@ export default function Navbar() {
                             d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
                           />
                         </svg>
-                        <span className="text-[#FEEBD8] text-sm">Settings</span>
+                        <span className="text-white text-sm">Settings</span>
                       </Link>
                     </div>{" "}
                     <button
@@ -398,7 +396,7 @@ export default function Navbar() {
                   <Link
                     href="/auth"
                     onClick={() => setIsMenuOpen(false)}
-                    className="block w-full text-center px-6 py-3 bg-[#FEEBD8] text-[#141414] font-semibold rounded-lg hover:shadow-lg hover:bg-[#ffe0b8] transition-all duration-300"
+                    className="block w-full text-center px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-lg shadow-blue-500/30"
                   >
                     Get Started
                   </Link>
