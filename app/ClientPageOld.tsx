@@ -19,6 +19,8 @@ import {
   FaPen,
   FaCalendar,
   FaTrophy,
+  FaUsers,
+  FaBrain,
 } from "react-icons/fa";
 
 export default function Home() {
