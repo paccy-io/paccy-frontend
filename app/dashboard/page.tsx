@@ -79,7 +79,7 @@ export default function Dashboard() {
   const [applications, setApplications] = useState<CollegeApplication[]>([]);
   const [essays, setEssays] = useState<Essay[]>([]);
   const [extracurriculars, setExtracurriculars] = useState<Extracurricular[]>(
-    []
+    [],
   );
   const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([]);
   const [academicData, setAcademicData] = useState({
@@ -185,7 +185,7 @@ export default function Dashboard() {
   const getActiveApplicationsCount = () => {
     if (!applications || !Array.isArray(applications)) return 0;
     return applications.filter(
-      (app) => app.status !== "rejected" && app.status !== "withdrawn"
+      (app) => app.status !== "rejected" && app.status !== "withdrawn",
     ).length;
   };
 
@@ -195,7 +195,7 @@ export default function Dashboard() {
       (essay) =>
         essay.status === EssayStatus.IN_PROGRESS ||
         essay.status === EssayStatus.NOT_STARTED ||
-        essay.status === EssayStatus.REVIEW_NEEDED
+        essay.status === EssayStatus.REVIEW_NEEDED,
     ).length;
   };
 
@@ -371,20 +371,20 @@ export default function Dashboard() {
       }`}
     >
       {/* Dashboard Content */}
-      <div className="p-6 md:p-8 mt-8">
+      <div className="p-4 sm:p-6 md:p-8 mt-4 sm:mt-6 md:mt-8">
         {/* Welcome Section */}
-        <div className="max-w-screen-2xl mx-auto mb-8">
-          <div className="flex items-center justify-between">
-            <div>
+        <div className="max-w-screen-2xl mx-auto mb-6 sm:mb-8">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex-1 min-w-0">
               <h1
-                className={`text-2xl md:text-4xl font-extrabold ${
+                className={`text-xl sm:text-2xl md:text-4xl font-extrabold break-words ${
                   theme === "dark" ? "text-white" : "text-gray-900"
                 }`}
               >
                 Welcome back, {currentUser?.name || "Student"}! 👋
               </h1>
               <p
-                className={`text-sm md:text-base ${
+                className={`text-xs sm:text-sm md:text-base mt-1 ${
                   theme === "dark" ? "text-white/60" : "text-gray-600"
                 }`}
               >
@@ -393,7 +393,7 @@ export default function Dashboard() {
             </div>
             <Link
               href="/dashboard/colleges"
-              className="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-600 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/20"
+              className="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-600 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/20 whitespace-nowrap flex-shrink-0"
             >
               <FaPlus className="text-sm" />
               <span className="hidden sm:inline">Add College</span>
@@ -402,7 +402,7 @@ export default function Dashboard() {
         </div>
         <div className="max-w-screen-2xl mx-auto">
           {/* Stats Cards - Real Data Only */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
             <StatsCard
               icon={<FaUniversity />}
               value={getActiveApplicationsCount()}
@@ -436,8 +436,8 @@ export default function Dashboard() {
                 getTotalExtracurricularHours() > 0
                   ? `${getTotalExtracurricularHours()} hours/week total`
                   : extracurriculars.length === 0
-                  ? "Showcase your activities"
-                  : undefined
+                    ? "Showcase your activities"
+                    : undefined
               }
               iconColor="orange"
             />
@@ -457,18 +457,18 @@ export default function Dashboard() {
           </div>
 
           {/* Progress Overview */}
-          <div className="mb-10">
+          <div className="mb-8 sm:mb-10">
             <h2
-              className={`text-2xl font-semibold mb-5 flex items-center gap-2 ${
+              className={`text-xl sm:text-2xl font-semibold mb-4 sm:mb-5 flex items-center gap-2 ${
                 theme === "dark" ? "text-white" : "text-gray-900"
               }`}
             >
               <div className="p-2 bg-green-500/10 rounded-lg">
-                <FaCheckCircle className="text-xl text-green-400" />
+                <FaCheckCircle className="text-lg sm:text-xl text-green-400" />
               </div>
               Progress Overview
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4">
               {/* Application Status Breakdown */}
               <div
                 className={`rounded-xl p-5 border transition-all duration-300 ${
@@ -515,7 +515,7 @@ export default function Dashboard() {
                       "accepted",
                     ].map((status) => {
                       const count = applications.filter(
-                        (app) => app.status === status
+                        (app) => app.status === status,
                       ).length;
                       if (count === 0) return null;
                       return (
@@ -583,7 +583,7 @@ export default function Dashboard() {
                       <span className="text-green-400 font-semibold">
                         {
                           essays.filter(
-                            (e) => e.status === EssayStatus.COMPLETED
+                            (e) => e.status === EssayStatus.COMPLETED,
                           ).length
                         }
                       </span>
@@ -599,7 +599,7 @@ export default function Dashboard() {
                       <span className="text-blue-400 font-semibold">
                         {
                           essays.filter(
-                            (e) => e.status === EssayStatus.IN_PROGRESS
+                            (e) => e.status === EssayStatus.IN_PROGRESS,
                           ).length
                         }
                       </span>
@@ -615,7 +615,7 @@ export default function Dashboard() {
                           width: `${
                             essays.length > 0
                               ? (essays.filter(
-                                  (e) => e.status === EssayStatus.COMPLETED
+                                  (e) => e.status === EssayStatus.COMPLETED,
                                 ).length /
                                   essays.length) *
                                 100
@@ -697,7 +697,7 @@ export default function Dashboard() {
 
                     const daysUntil = Math.ceil(
                       (nextDeadline.date.getTime() - now.getTime()) /
-                        (1000 * 60 * 60 * 24)
+                        (1000 * 60 * 60 * 24),
                     );
 
                     return (
@@ -743,15 +743,15 @@ export default function Dashboard() {
                                 daysUntil <= 7
                                   ? "text-red-400"
                                   : daysUntil <= 14
-                                  ? "text-orange-400"
-                                  : "text-amber-400"
+                                    ? "text-orange-400"
+                                    : "text-amber-400"
                               }`}
                             >
                               {daysUntil === 0
                                 ? "Today!"
                                 : daysUntil === 1
-                                ? "Tomorrow"
-                                : `${daysUntil} days away`}
+                                  ? "Tomorrow"
+                                  : `${daysUntil} days away`}
                             </p>
                           </div>
                         </div>
@@ -763,20 +763,29 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="mb-10">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="mb-8 sm:mb-10">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
               {/* College Applications - Takes 2 columns */}
               <div className="lg:col-span-2">
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-semibold text-white flex items-center gap-2">
+                <div className="flex items-center justify-between mb-4 sm:mb-6 gap-4">
+                  <h2
+                    className={`text-xl sm:text-2xl font-semibold flex items-center gap-2 ${
+                      theme === "dark" ? "text-white" : "text-gray-900"
+                    }`}
+                  >
                     <div className="p-2 bg-blue-500/10 rounded-lg">
-                      <FaUniversity className="text-xl text-blue-400" />
+                      <FaUniversity className="text-lg sm:text-xl text-blue-400" />
                     </div>
-                    College Applications
+                    <span className="hidden sm:inline">
+                      College Applications
+                    </span>
+                    <span className="sm:hidden">Colleges</span>
                   </h2>
                   <Link
                     href="/dashboard/colleges"
-                    className="text-sm text-blue-400 hover:text-blue-300 flex items-center gap-1"
+                    className={`text-xs sm:text-sm hover:text-blue-300 flex items-center gap-1 whitespace-nowrap ${
+                      theme === "dark" ? "text-blue-400" : "text-blue-600"
+                    }`}
                   >
                     View All <FaArrowRight className="text-xs" />
                   </Link>
@@ -836,10 +845,10 @@ export default function Dashboard() {
                         .sort((a, b) => {
                           // Sort by updated_at (most recent first), fallback to created_at if not available
                           const dateA = new Date(
-                            a.updated_at || a.created_at || 0
+                            a.updated_at || a.created_at || 0,
                           ).getTime();
                           const dateB = new Date(
-                            b.updated_at || b.created_at || 0
+                            b.updated_at || b.created_at || 0,
                           ).getTime();
                           return dateB - dateA;
                         })
@@ -874,7 +883,7 @@ export default function Dashboard() {
                               if (
                                 app.status &&
                                 submittedStatuses.includes(
-                                  app.status.toLowerCase()
+                                  app.status.toLowerCase(),
                                 )
                               ) {
                                 return 100;
@@ -888,19 +897,19 @@ export default function Dashboard() {
                               const totalTasks = app.checklists.reduce(
                                 (acc, checklist) =>
                                   acc + checklist.tasks.length,
-                                0
+                                0,
                               );
                               const completedTasks = app.checklists.reduce(
                                 (acc, checklist) =>
                                   acc +
                                   checklist.tasks.filter(
-                                    (task) => task.completed
+                                    (task) => task.completed,
                                   ).length,
-                                0
+                                0,
                               );
                               return totalTasks > 0
                                 ? Math.round(
-                                    (completedTasks / totalTasks) * 100
+                                    (completedTasks / totalTasks) * 100,
                                   )
                                 : 0;
                             })();
@@ -910,7 +919,7 @@ export default function Dashboard() {
                             ? Math.ceil(
                                 (new Date(app.deadline).getTime() -
                                   new Date().getTime()) /
-                                  (1000 * 60 * 60 * 24)
+                                  (1000 * 60 * 60 * 24),
                               )
                             : null;
 
@@ -960,7 +969,7 @@ export default function Dashboard() {
                             <Link
                               key={app.id}
                               href={`/dashboard/colleges/${app.id}`}
-                              className={`group flex items-center gap-4 p-5 rounded-2xl transition-all ${
+                              className={`group flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 p-3 sm:p-5 rounded-xl sm:rounded-2xl transition-all ${
                                 theme === "dark"
                                   ? "bg-white/[0.02] border border-neutral-700/30 hover:border-white/20 hover:bg-white/[0.04]"
                                   : "bg-gray-50 border border-gray-200 hover:border-blue-300 hover:bg-blue-50"
@@ -1009,9 +1018,9 @@ export default function Dashboard() {
                               </div>
 
                               {/* College Info */}
-                              <div className="flex-1 min-w-0">
+                              <div className="flex-1 min-w-0 w-full sm:w-auto">
                                 <h4
-                                  className={`text-lg font-bold mb-1 group-hover:text-blue-400 transition-colors ${
+                                  className={`text-base sm:text-lg font-bold mb-1 group-hover:text-blue-400 transition-colors break-words ${
                                     theme === "dark"
                                       ? "text-white"
                                       : "text-gray-900"
@@ -1020,7 +1029,7 @@ export default function Dashboard() {
                                   {app.name}
                                 </h4>
                                 <p
-                                  className={`text-sm ${
+                                  className={`text-xs sm:text-sm break-words ${
                                     theme === "dark"
                                       ? "text-white/50"
                                       : "text-gray-500"
@@ -1032,16 +1041,16 @@ export default function Dashboard() {
                                     .split(" ")
                                     .map(
                                       (w) =>
-                                        w.charAt(0).toUpperCase() + w.slice(1)
+                                        w.charAt(0).toUpperCase() + w.slice(1),
                                     )
                                     .join(" ")}
                                 </p>
                               </div>
 
                               {/* Deadline and Status */}
-                              <div className="flex items-center gap-4 flex-shrink-0">
+                              <div className="flex flex-wrap items-center gap-2 sm:gap-4 w-full sm:w-auto sm:flex-shrink-0">
                                 {app.deadline && (
-                                  <div className="flex items-center gap-1.5 text-sm">
+                                  <div className="flex items-center gap-1.5 text-xs sm:text-sm">
                                     {daysUntilDeadline !== null &&
                                       daysUntilDeadline <= 30 &&
                                       daysUntilDeadline >= 0 && (
@@ -1050,7 +1059,7 @@ export default function Dashboard() {
                                         </span>
                                       )}
                                     <span
-                                      className={`uppercase text-xs font-semibold tracking-wider ${
+                                      className={`uppercase text-xs font-semibold tracking-wider hidden sm:inline ${
                                         theme === "dark"
                                           ? "text-white/40"
                                           : "text-gray-400"
@@ -1059,14 +1068,14 @@ export default function Dashboard() {
                                       DEADLINE
                                     </span>
                                     <span
-                                      className={`font-semibold ${
+                                      className={`font-semibold text-xs sm:text-sm ${
                                         theme === "dark"
                                           ? "text-white"
                                           : "text-gray-900"
                                       }`}
                                     >
                                       {new Date(
-                                        app.deadline
+                                        app.deadline,
                                       ).toLocaleDateString("en-US", {
                                         month: "short",
                                         day: "numeric",
@@ -1078,21 +1087,21 @@ export default function Dashboard() {
 
                                 {/* Status Badge */}
                                 <span
-                                  className={`px-3 py-1.5 rounded-full text-sm font-medium ${statusStyle.bg} ${statusStyle.text}`}
+                                  className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap ${statusStyle.bg} ${statusStyle.text}`}
                                 >
                                   {app.status
                                     ?.replace(/_/g, " ")
                                     .split(" ")
                                     .map(
                                       (w) =>
-                                        w.charAt(0).toUpperCase() + w.slice(1)
+                                        w.charAt(0).toUpperCase() + w.slice(1),
                                     )
                                     .join(" ")}
                                 </span>
                               </div>
 
                               {/* Arrow */}
-                              <FaChevronRight className="text-white/30 group-hover:text-white/50 transition-colors flex-shrink-0" />
+                              <FaChevronRight className="text-white/30 group-hover:text-white/50 transition-colors flex-shrink-0 hidden sm:block" />
                             </Link>
                           );
                         })}
@@ -1104,9 +1113,26 @@ export default function Dashboard() {
               {
                 /* Upcoming Deadlines - Takes 1 column */
                 <div className="lg:col-span-1">
+                  <div className="flex items-center justify-between mb-4 sm:mb-6 lg:mb-0">
+                    <h3
+                      className={`text-xl sm:text-2xl lg:text-lg font-semibold flex items-center gap-2 lg:hidden ${
+                        theme === "dark" ? "text-white" : "text-gray-900"
+                      }`}
+                    >
+                      <FaCalendar className="text-green-400" />
+                      <span className="hidden sm:inline">
+                        Upcoming Deadlines
+                      </span>
+                      <span className="sm:hidden">Deadlines</span>
+                    </h3>
+                  </div>
                   {dataLoading ? (
-                    <div className="flex items-center justify-center py-12">
-                      <FaSpinner className="text-white/50 animate-spin text-3xl" />
+                    <div className="flex items-center justify-center py-8 sm:py-12">
+                      <FaSpinner
+                        className={`animate-spin text-2xl sm:text-3xl ${
+                          theme === "dark" ? "text-white/50" : "text-gray-400"
+                        }`}
+                      />
                     </div>
                   ) : calendarEvents.filter((event) => {
                       if (!event.date) return false;
@@ -1114,10 +1140,20 @@ export default function Dashboard() {
                       const now = new Date();
                       return eventDate >= now;
                     }).length === 0 ? (
-                    <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-8 text-center">
-                      <FaCalendar className="text-4xl text-white/30 mx-auto mb-3" />
+                    <div
+                      className={`rounded-xl p-6 sm:p-8 text-center ${
+                        theme === "dark"
+                          ? "bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50"
+                          : "bg-white border border-gray-200"
+                      }`}
+                    >
+                      <FaCalendar
+                        className={`text-3xl sm:text-4xl mx-auto mb-3 ${
+                          theme === "dark" ? "text-white/30" : "text-gray-300"
+                        }`}
+                      />
                       <p
-                        className={`text-sm mb-3 ${
+                        className={`text-xs sm:text-sm mb-3 ${
                           theme === "dark" ? "text-white/60" : "text-gray-600"
                         }`}
                       >
@@ -1125,7 +1161,9 @@ export default function Dashboard() {
                       </p>
                       <Link
                         href="/dashboard/calendar"
-                        className="text-green-400 text-sm hover:text-green-300 inline-flex items-center gap-1"
+                        className={`text-xs sm:text-sm hover:text-green-300 inline-flex items-center gap-1 ${
+                          theme === "dark" ? "text-green-400" : "text-green-600"
+                        }`}
                       >
                         Add an event <FaArrowRight className="text-xs" />
                       </Link>
@@ -1157,14 +1195,14 @@ export default function Dashboard() {
                           .sort(
                             (a, b) =>
                               new Date(a.date!).getTime() -
-                              new Date(b.date!).getTime()
+                              new Date(b.date!).getTime(),
                           )
                           .slice(0, 3)
                           .map((event, index) => {
                             const eventDate = new Date(event.date!);
                             const daysUntil = Math.ceil(
                               (eventDate.getTime() - new Date().getTime()) /
-                                (1000 * 60 * 60 * 24)
+                                (1000 * 60 * 60 * 24),
                             );
 
                             // Cycle through colors for variety
@@ -1332,10 +1370,10 @@ export default function Dashboard() {
                               essay.status === EssayStatus.COMPLETED
                                 ? "bg-green-500/20 text-green-300"
                                 : essay.status === EssayStatus.IN_PROGRESS
-                                ? "bg-blue-500/20 text-blue-300"
-                                : essay.status === EssayStatus.REVIEW_NEEDED
-                                ? "bg-amber-500/20 text-amber-300"
-                                : "bg-neutral-500/20 text-neutral-300"
+                                  ? "bg-blue-500/20 text-blue-300"
+                                  : essay.status === EssayStatus.REVIEW_NEEDED
+                                    ? "bg-amber-500/20 text-amber-300"
+                                    : "bg-neutral-500/20 text-neutral-300"
                             }`}
                           >
                             {essay.status?.replace(/_/g, " ")}

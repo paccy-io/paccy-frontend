@@ -19,7 +19,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
         onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
       />
       <main
-        className={`flex-1 transition-all duration-300 ${
+        className={`flex-1 transition-all duration-300 pt-16 lg:pt-0 ${
           sidebarCollapsed ? "lg:ml-20" : "lg:ml-72"
         }`}
       >

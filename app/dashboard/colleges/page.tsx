@@ -74,7 +74,7 @@ interface CollegeDisplay {
 
 // Helper function to transform backend data to UI format
 const transformCollegeApplication = (
-  app: CollegeApplication
+  app: CollegeApplication,
 ): CollegeDisplay => {
   // Calculate progress from checklists/tasks
   let progress = 0;
@@ -93,12 +93,12 @@ const transformCollegeApplication = (
   } else if (app.checklists && app.checklists.length > 0) {
     const totalTasks = app.checklists.reduce(
       (acc, checklist) => acc + checklist.tasks.length,
-      0
+      0,
     );
     const completedTasks = app.checklists.reduce(
       (acc, checklist) =>
         acc + checklist.tasks.filter((task) => task.completed).length,
-      0
+      0,
     );
     progress =
       totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
@@ -245,7 +245,7 @@ export default function CollegeTracker() {
     } catch (error) {
       console.error("Failed to load colleges:", error);
       showError(
-        error instanceof ApiError ? error.message : "Failed to load colleges"
+        error instanceof ApiError ? error.message : "Failed to load colleges",
       );
     } finally {
       setIsLoading(false);
@@ -262,7 +262,7 @@ export default function CollegeTracker() {
       try {
         setIsLoadingUniversities(true);
         const response = await fetch(
-          "https://raw.githubusercontent.com/Hipo/university-domains-list/refs/heads/master/world_universities_and_domains.json"
+          "https://raw.githubusercontent.com/Hipo/university-domains-list/refs/heads/master/world_universities_and_domains.json",
         );
         const data: University[] = await response.json();
         setUniversities(data);
@@ -280,7 +280,7 @@ export default function CollegeTracker() {
   useEffect(() => {
     if (majorInput.trim()) {
       const filtered = COLLEGE_MAJORS.filter((major) =>
-        major.toLowerCase().includes(majorInput.toLowerCase())
+        major.toLowerCase().includes(majorInput.toLowerCase()),
       );
       setFilteredMajors(filtered);
     } else {
@@ -308,7 +308,7 @@ export default function CollegeTracker() {
     if (universitySearch && universities.length > 0 && !selectedUniversity) {
       const filtered = universities
         .filter((uni) =>
-          uni.name.toLowerCase().includes(universitySearch.toLowerCase())
+          uni.name.toLowerCase().includes(universitySearch.toLowerCase()),
         )
         .slice(0, 10); // Limit to 10 results for performance
       setFilteredUniversities(filtered);
@@ -440,10 +440,10 @@ export default function CollegeTracker() {
       // Navigate to the college detail page
       if (selectedUniversity) {
         const universityParam = encodeURIComponent(
-          JSON.stringify(selectedUniversity)
+          JSON.stringify(selectedUniversity),
         );
         router.push(
-          `/dashboard/colleges/${newCollege.id}?university=${universityParam}`
+          `/dashboard/colleges/${newCollege.id}?university=${universityParam}`,
         );
       } else {
         router.push(`/dashboard/colleges/${newCollege.id}`);
@@ -453,7 +453,7 @@ export default function CollegeTracker() {
       showError(
         error instanceof ApiError
           ? error.message
-          : "Failed to create college application"
+          : "Failed to create college application",
       );
     }
   };
@@ -499,12 +499,12 @@ export default function CollegeTracker() {
 
       const updatedApplication = await api.collegeApplications.update(
         collegeId,
-        updateData
+        updateData,
       );
       const updatedCollege = transformCollegeApplication(updatedApplication);
 
       setColleges((prev) =>
-        prev.map((c) => (c.id === collegeId ? updatedCollege : c))
+        prev.map((c) => (c.id === collegeId ? updatedCollege : c)),
       );
       setEditingCollegeId(null);
       showSuccess("College application updated successfully");
@@ -513,7 +513,7 @@ export default function CollegeTracker() {
       showError(
         error instanceof ApiError
           ? error.message
-          : "Failed to update college application"
+          : "Failed to update college application",
       );
     }
   };
@@ -533,7 +533,7 @@ export default function CollegeTracker() {
       showError(
         error instanceof ApiError
           ? error.message
-          : "Failed to delete college application"
+          : "Failed to delete college application",
       );
     }
   };
@@ -541,7 +541,7 @@ export default function CollegeTracker() {
   // Example: Create a checklist for a college application
   const handleCreateChecklist = async (
     collegeId: string,
-    checklistName: string
+    checklistName: string,
   ) => {
     try {
       const createData = {
@@ -559,7 +559,9 @@ export default function CollegeTracker() {
     } catch (error) {
       console.error("Failed to create checklist:", error);
       showError(
-        error instanceof ApiError ? error.message : "Failed to create checklist"
+        error instanceof ApiError
+          ? error.message
+          : "Failed to create checklist",
       );
     }
   };
@@ -575,7 +577,7 @@ export default function CollegeTracker() {
     const deadlineDate = new Date(
       parseInt(year),
       parseInt(month) - 1,
-      parseInt(day)
+      parseInt(day),
     );
     deadlineDate.setHours(0, 0, 0, 0); // Set to start of day
 
@@ -604,43 +606,43 @@ export default function CollegeTracker() {
   if (showAddCollegeForm) {
     return (
       <div className="min-h-screen bg-[#0a0a0a]">
-        <div className="max-w-screen-xl mx-auto px-4 md:px-10 py-8">
+        <div className="max-w-screen-xl mx-auto px-4 sm:px-6 md:px-10 py-4 sm:py-6 md:py-8">
           {/* Header */}
-          <div className="flex items-center space-x-4 mb-8">
+          <div className="flex items-center space-x-3 sm:space-x-4 mb-6 sm:mb-8">
             <button
               onClick={() => setShowAddCollegeForm(false)}
-              className="text-white/70 hover:text-white transition-colors"
+              className="text-white/70 hover:text-white transition-colors flex-shrink-0"
             >
-              <FaArrowLeft size={20} />
+              <FaArrowLeft size={18} className="sm:w-5 sm:h-5" />
             </button>
-            <div>
-              <h1 className="text-4xl font-bold text-white">
+            <div className="min-w-0">
+              <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white break-words">
                 Add College Application
               </h1>
-              <p className="text-white/70 mt-2">
+              <p className="text-white/70 mt-1 sm:mt-2 text-xs sm:text-sm md:text-base">
                 Search for your university or add a custom one
               </p>
             </div>
           </div>
 
           <div className="max-w-2xl mx-auto">
-            <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-8 shadow-2xl">
-              <div className="space-y-6">
+            <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-lg sm:rounded-xl p-4 sm:p-6 md:p-8 shadow-2xl">
+              <div className="space-y-4 sm:space-y-6">
                 {/* University Search */}
                 <div>
-                  <label className="block text-lg font-medium text-white mb-4">
+                  <label className="block text-base sm:text-lg font-medium text-white mb-3 sm:mb-4">
                     Find Your University
                   </label>
 
                   <div className="relative">
                     <div className="relative">
-                      <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/50" />
+                      <FaSearch className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 text-white/50 text-sm" />
                       <input
                         type="text"
-                        placeholder="Search for universities worldwide..."
+                        placeholder="Search universities..."
                         value={universitySearch}
                         onChange={(e) => setUniversitySearch(e.target.value)}
-                        className="w-full bg-neutral-800 border border-neutral-700/50 rounded-lg pl-12 pr-4 py-4 text-white focus:outline-none focus:border-blue-500 text-lg transition-colors"
+                        className="w-full bg-neutral-800 border border-neutral-700/50 rounded-lg pl-9 sm:pl-12 pr-3 sm:pr-4 py-3 sm:py-4 text-sm sm:text-base md:text-lg text-white focus:outline-none focus:border-blue-500 transition-colors"
                         disabled={isLoadingUniversities}
                       />
                       {isLoadingUniversities && (
@@ -904,49 +906,51 @@ export default function CollegeTracker() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a]">
-      <div className="max-w-screen-2xl mx-auto px-4 md:px-10 py-8">
+      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-10 py-4 sm:py-6 md:py-8">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-4 mb-6">
+        <div className="mb-6 sm:mb-8">
+          <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
             <button
               onClick={() => router.push("/dashboard")}
-              className="text-white/70 hover:text-white transition-colors"
+              className="text-white/70 hover:text-white transition-colors flex-shrink-0"
             >
-              <FaArrowLeft size={20} />
+              <FaArrowLeft size={18} className="sm:w-5 sm:h-5" />
             </button>
             <div className="flex-1 min-w-0">
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white">
+              <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white break-words">
                 College Applications
               </h1>
-              <p className="text-white/70 mt-2 text-sm sm:text-base">
+              <p className="text-white/70 mt-1 sm:mt-2 text-xs sm:text-sm md:text-base">
                 Track and manage your university applications
               </p>
             </div>
             <button
               onClick={() => setShowAddCollegeForm(true)}
-              className="bg-blue-500 text-white px-4 md:px-6 py-2.5 rounded-lg font-medium hover:bg-blue-600 transition-all flex items-center gap-2"
+              className="bg-blue-500 text-white px-3 sm:px-4 md:px-6 py-2 sm:py-2.5 rounded-lg font-medium hover:bg-blue-600 transition-all flex items-center gap-2 flex-shrink-0 text-sm sm:text-base"
             >
-              <FaPlus />
+              <FaPlus className="text-sm" />
               <span className="hidden sm:inline">Add Application</span>
             </button>
           </div>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-4 hover:border-blue-500/30 transition-all hover:shadow-lg hover:shadow-blue-500/5">
-            <div className="flex items-center justify-between mb-2">
-              <FaUniversity className="text-xl text-blue-400" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
+          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-lg sm:rounded-xl p-3 sm:p-4 hover:border-blue-500/30 transition-all hover:shadow-lg hover:shadow-blue-500/5">
+            <div className="flex items-center justify-between mb-1.5 sm:mb-2">
+              <FaUniversity className="text-lg sm:text-xl text-blue-400" />
             </div>
-            <div className="text-2xl font-bold text-white mb-0.5">
+            <div className="text-xl sm:text-2xl font-bold text-white mb-0.5">
               {colleges.length}
             </div>
-            <div className="text-white/60 text-sm">Total Applications</div>
+            <div className="text-white/60 text-xs sm:text-sm">
+              Total Applications
+            </div>
           </div>
 
-          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-4 hover:border-green-400/30 transition-all hover:shadow-lg hover:shadow-green-500/5">
-            <div className="flex items-center justify-between mb-2">
-              <FaCheckCircle className="text-xl text-green-400" />
+          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-lg sm:rounded-xl p-3 sm:p-4 hover:border-green-400/30 transition-all hover:shadow-lg hover:shadow-green-500/5">
+            <div className="flex items-center justify-between mb-1.5 sm:mb-2">
+              <FaCheckCircle className="text-lg sm:text-xl text-green-400" />
             </div>
             <div className="text-2xl font-bold text-green-400 mb-0.5">
               {colleges.filter((c) => c.status === Status.SUBMITTED).length}
@@ -954,21 +958,21 @@ export default function CollegeTracker() {
             <div className="text-white/60 text-sm">Submitted</div>
           </div>
 
-          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-4 hover:border-yellow-400/30 transition-all hover:shadow-lg hover:shadow-yellow-500/5">
-            <div className="flex items-center justify-between mb-2">
-              <FaClock className="text-xl text-yellow-400" />
+          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-lg sm:rounded-xl p-3 sm:p-4 hover:border-yellow-400/30 transition-all hover:shadow-lg hover:shadow-yellow-500/5">
+            <div className="flex items-center justify-between mb-1.5 sm:mb-2">
+              <FaClock className="text-lg sm:text-xl text-yellow-400" />
             </div>
-            <div className="text-2xl font-bold text-yellow-400 mb-0.5">
+            <div className="text-xl sm:text-2xl font-bold text-yellow-400 mb-0.5">
               {colleges.filter((c) => c.status === Status.IN_PROGRESS).length}
             </div>
-            <div className="text-white/60 text-sm">In Progress</div>
+            <div className="text-white/60 text-xs sm:text-sm">In Progress</div>
           </div>
 
-          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-4 hover:border-purple-400/30 transition-all hover:shadow-lg hover:shadow-purple-500/5">
-            <div className="flex items-center justify-between mb-2">
-              <FaBell className="text-xl text-purple-400" />
+          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-lg sm:rounded-xl p-3 sm:p-4 hover:border-purple-400/30 transition-all hover:shadow-lg hover:shadow-purple-500/5">
+            <div className="flex items-center justify-between mb-1.5 sm:mb-2">
+              <FaBell className="text-lg sm:text-xl text-purple-400" />
             </div>
-            <div className="text-2xl font-bold text-purple-400 mb-0.5">
+            <div className="text-xl sm:text-2xl font-bold text-purple-400 mb-0.5">
               {
                 colleges.filter((c) => {
                   const days = getDaysUntilDeadlineMain(c.deadline);
@@ -976,30 +980,30 @@ export default function CollegeTracker() {
                 }).length
               }
             </div>
-            <div className="text-white/60 text-sm">Due Soon</div>
+            <div className="text-white/60 text-xs sm:text-sm">Due Soon</div>
           </div>
         </div>
 
         {/* Search Bar and Filters */}
-        <div className="bg-white/[0.02] border border-neutral-700/30 rounded-xl p-3 mb-8">
-          <div className="flex items-center gap-4">
+        <div className="bg-white/[0.02] border border-neutral-700/30 rounded-lg sm:rounded-xl p-2.5 sm:p-3 mb-6 sm:mb-8">
+          <div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-3 sm:gap-4">
             {/* Search Bar - Left Side (~50%) */}
             <div className="flex-1 relative">
-              <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/40 text-sm" />
+              <FaSearch className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 text-white/40 text-xs sm:text-sm" />
               <input
                 type="text"
                 placeholder="Search colleges..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full bg-white/5 border border-neutral-700/30 rounded-lg pl-12 pr-4 py-2.5 text-white placeholder:text-white/40 focus:outline-none focus:border-white/30 transition-all"
+                className="w-full bg-white/5 border border-neutral-700/30 rounded-lg pl-9 sm:pl-12 pr-3 sm:pr-4 py-2 sm:py-2.5 text-sm sm:text-base text-white placeholder:text-white/40 focus:outline-none focus:border-white/30 transition-all"
               />
             </div>
 
             {/* Tabs and Sort - Right Side (~50%) */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide">
               <button
                 onClick={() => setActiveTab("all")}
-                className={`px-4 py-2.5 rounded-lg font-medium transition-all whitespace-nowrap ${
+                className={`px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg font-medium transition-all whitespace-nowrap text-xs sm:text-sm ${
                   activeTab === "all"
                     ? "bg-blue-500/20 text-blue-400 border border-blue-500/30"
                     : "text-white/60 hover:text-white hover:bg-white/5"
@@ -1009,7 +1013,7 @@ export default function CollegeTracker() {
               </button>
               <button
                 onClick={() => setActiveTab("submitted")}
-                className={`px-4 py-2.5 rounded-lg font-medium transition-all whitespace-nowrap ${
+                className={`px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg font-medium transition-all whitespace-nowrap text-xs sm:text-sm ${
                   activeTab === "submitted"
                     ? "bg-blue-500/20 text-blue-400 border border-blue-500/30"
                     : "text-white/60 hover:text-white hover:bg-white/5"
@@ -1019,7 +1023,7 @@ export default function CollegeTracker() {
               </button>
               <button
                 onClick={() => setActiveTab("in_progress")}
-                className={`px-4 py-2.5 rounded-lg font-medium transition-all whitespace-nowrap ${
+                className={`px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg font-medium transition-all whitespace-nowrap text-xs sm:text-sm ${
                   activeTab === "in_progress"
                     ? "bg-blue-500/20 text-blue-400 border border-blue-500/30"
                     : "text-white/60 hover:text-white hover:bg-white/5"
@@ -1030,10 +1034,10 @@ export default function CollegeTracker() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-                className="px-4 py-2.5 rounded-lg text-white/80 bg-white/5 border border-neutral-700/30 hover:bg-white/10 hover:border-white/20 focus:outline-none focus:border-blue-500/50 transition-all whitespace-nowrap cursor-pointer"
+                className="px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm text-white/80 bg-white/5 border border-neutral-700/30 hover:bg-white/10 hover:border-white/20 focus:outline-none focus:border-blue-500/50 transition-all whitespace-nowrap cursor-pointer"
               >
                 <option value="alphabetic" className="bg-neutral-800">
-                  Alphabetic (A-Z)
+                  A-Z
                 </option>
                 <option value="deadline" className="bg-neutral-800">
                   Deadline
@@ -1073,19 +1077,19 @@ export default function CollegeTracker() {
               <div
                 key={college.id}
                 onClick={() => handleCollegeClick(college.id)}
-                className={`group flex items-center gap-4 p-4 bg-white/[0.02] hover:bg-white/[0.04] border rounded-xl cursor-pointer transition-all duration-200 ${
+                className={`group flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-white/[0.02] hover:bg-white/[0.04] border rounded-lg sm:rounded-xl cursor-pointer transition-all duration-200 ${
                   isUrgent
                     ? "border-red-400/30 hover:border-red-400/50"
                     : "border-neutral-800/50 hover:border-blue-400/30"
                 }`}
               >
                 {/* College Icon */}
-                <div className="flex-shrink-0">
+                <div className="flex-shrink-0 self-start sm:self-center">
                   {faviconUrl ? (
                     <img
                       src={faviconUrl}
                       alt={`${college.universityName} logo`}
-                      className="w-12 h-12 rounded-lg object-cover bg-neutral-800/50 border border-neutral-700/30"
+                      className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg object-cover bg-neutral-800/50 border border-neutral-700/30"
                       onError={(e) => {
                         e.currentTarget.style.display = "none";
                         const fallback = e.currentTarget
@@ -1106,16 +1110,16 @@ export default function CollegeTracker() {
                   <div
                     className={`${
                       faviconUrl ? "hidden" : ""
-                    } w-12 h-12 bg-neutral-800/50 rounded-lg flex items-center justify-center border border-neutral-700/30`}
+                    } w-10 h-10 sm:w-12 sm:h-12 bg-neutral-800/50 rounded-lg flex items-center justify-center border border-neutral-700/30`}
                   >
-                    <FaUniversity className="text-lg text-blue-400" />
+                    <FaUniversity className="text-base sm:text-lg text-blue-400" />
                   </div>
                 </div>
 
                 {/* College Info */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h4 className="font-semibold text-white group-hover:text-blue-400 transition-colors truncate">
+                <div className="flex-1 min-w-0 w-full sm:w-auto">
+                  <div className="flex items-start sm:items-center gap-2 mb-1 flex-wrap">
+                    <h4 className="font-semibold text-sm sm:text-base text-white group-hover:text-blue-400 transition-colors break-words">
                       {college.universityName}
                     </h4>
                     {isUrgent && (
@@ -1125,29 +1129,33 @@ export default function CollegeTracker() {
                       </span>
                     )}
                   </div>
-                  <div className="flex items-center gap-3 text-xs text-white/50">
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-[10px] sm:text-xs text-white/50">
                     <span className="flex items-center gap-1">
-                      <FaMapMarkerAlt className="text-[10px]" />
-                      {college.location || college.universityCountry}
+                      <FaMapMarkerAlt className="text-[8px] sm:text-[10px]" />
+                      <span className="truncate max-w-[150px] sm:max-w-none">
+                        {college.location || college.universityCountry}
+                      </span>
                     </span>
                     {college.major && (
                       <>
-                        <span>•</span>
-                        <span>{college.major}</span>
+                        <span className="hidden sm:inline">•</span>
+                        <span className="truncate max-w-[120px] sm:max-w-none">
+                          {college.major}
+                        </span>
                       </>
                     )}
                   </div>
                 </div>
 
                 {/* Status & Type */}
-                <div className="hidden sm:flex items-center gap-2 flex-shrink-0">
+                <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto sm:flex-shrink-0">
                   <span
                     className={`text-xs px-2.5 py-1 rounded-md font-medium ${
                       college.status === Status.SUBMITTED
                         ? "bg-green-500/10 text-green-400 border border-green-500/20"
                         : college.status === Status.IN_PROGRESS
-                        ? "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20"
-                        : "bg-neutral-700/30 text-white/60 border border-neutral-600/30"
+                          ? "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20"
+                          : "bg-neutral-700/30 text-white/60 border border-neutral-600/30"
                     }`}
                   >
                     {college.status.replace(/_/g, " ")}
@@ -1157,8 +1165,8 @@ export default function CollegeTracker() {
                       college.priority === Priority.REACH
                         ? "bg-purple-500/10 text-purple-400 border border-purple-500/20"
                         : college.priority === Priority.TARGET
-                        ? "bg-blue-500/10 text-blue-400 border border-blue-500/20"
-                        : "bg-green-500/10 text-green-400 border border-green-500/20"
+                          ? "bg-blue-500/10 text-blue-400 border border-blue-500/20"
+                          : "bg-green-500/10 text-green-400 border border-green-500/20"
                     }`}
                   >
                     {college.priority}
@@ -1166,9 +1174,11 @@ export default function CollegeTracker() {
                 </div>
 
                 {/* Deadline */}
-                <div className="hidden md:flex items-center gap-1.5 text-sm text-white/70 flex-shrink-0 min-w-[140px]">
-                  <FaCalendar className="text-xs" />
-                  <span>{formatDeadlineMain(college.deadline)}</span>
+                <div className="flex items-center gap-1.5 text-xs sm:text-sm text-white/70 flex-shrink-0 w-full sm:w-auto sm:min-w-[140px]">
+                  <FaCalendar className="text-[10px] sm:text-xs" />
+                  <span className="text-[11px] sm:text-sm">
+                    {formatDeadlineMain(college.deadline)}
+                  </span>
                   {daysUntil !== null && daysUntil > 0 && (
                     <span
                       className={`text-xs font-semibold ${
@@ -1196,7 +1206,7 @@ export default function CollegeTracker() {
                 </div>
 
                 {/* Arrow */}
-                <FaArrowRight className="text-white/30 group-hover:text-blue-400 group-hover:translate-x-1 transition-all text-sm flex-shrink-0" />
+                <FaArrowRight className="hidden sm:block text-white/30 group-hover:text-blue-400 group-hover:translate-x-1 transition-all text-sm flex-shrink-0" />
               </div>
             );
           })}
@@ -1302,8 +1312,8 @@ export default function CollegeTracker() {
                     onClick={() =>
                       handleUpdateCollege(
                         filteredCollegesMain.find(
-                          (c) => c.id === editingCollegeId
-                        )?.id || ""
+                          (c) => c.id === editingCollegeId,
+                        )?.id || "",
                       )
                     }
                     className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-500 to-violet-500 text-white rounded-lg hover:from-blue-600 hover:to-violet-600 flex items-center justify-center gap-2 font-medium"
