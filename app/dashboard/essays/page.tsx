@@ -112,8 +112,8 @@ function EssayManagerContent() {
       if (majorParam) {
         setFilterCollege(
           `${decodeURIComponent(collegeParam)} [${decodeURIComponent(
-            majorParam
-          )}]`
+            majorParam,
+          )}]`,
         );
       } else {
         setFilterCollege(decodeURIComponent(collegeParam));
@@ -164,7 +164,7 @@ function EssayManagerContent() {
         // If filter has brackets (college + major), match exactly
         if (filterCollege.includes("[")) {
           const collegeApp = colleges.find(
-            (c) => c.id === essay.college_application_id
+            (c) => c.id === essay.college_application_id,
           );
           if (collegeApp) {
             const expectedFormat = `${collegeApp.name} [${collegeApp.major}]`;
@@ -200,12 +200,12 @@ function EssayManagerContent() {
 
           // Find college application to get major
           const collegeApp = colleges.find(
-            (c) => c.id === essay.college_application_id
+            (c) => c.id === essay.college_application_id,
           );
 
           // Check if there are multiple applications with the same college name
           const sameName = colleges.filter(
-            (c) => c.name === essay.college_name
+            (c) => c.name === essay.college_name,
           );
 
           if (sameName.length > 1 && collegeApp?.major) {
@@ -214,8 +214,8 @@ function EssayManagerContent() {
 
           return essay.college_name;
         })
-        .filter(Boolean)
-    )
+        .filter(Boolean),
+    ),
   ).filter((name): name is string => name !== null);
 
   const handleCreateEssay = async () => {
@@ -259,30 +259,30 @@ function EssayManagerContent() {
         theme === "dark" ? "bg-[#0a0a0a]" : "bg-gray-50"
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 md:py-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-8">
+          <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto">
             <Link
               href="/dashboard"
               className={`${
                 theme === "dark"
                   ? "text-white/70 hover:text-white"
                   : "text-gray-600 hover:text-gray-900"
-              } transition-colors`}
+              } transition-colors flex-shrink-0`}
             >
-              <FaArrowLeft size={20} />
+              <FaArrowLeft size={18} className="sm:w-5 sm:h-5" />
             </Link>
             <div className="flex-1 min-w-0">
               <h1
-                className={`text-2xl sm:text-3xl lg:text-4xl font-bold ${
+                className={`text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold break-words ${
                   theme === "dark" ? "text-white" : "text-gray-900"
                 }`}
               >
                 Essays
               </h1>
               <p
-                className={`mt-2 text-sm sm:text-base ${
+                className={`mt-1 sm:mt-2 text-xs sm:text-sm md:text-base ${
                   theme === "dark" ? "text-white/70" : "text-gray-600"
                 }`}
               >
@@ -292,7 +292,7 @@ function EssayManagerContent() {
           </div>
           <button
             onClick={handleCreateEssay}
-            className="bg-gradient-to-r from-purple-500 to-purple-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-purple-600 hover:to-purple-700 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20 flex items-center gap-2"
+            className="bg-gradient-to-r from-purple-500 to-purple-600 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base font-semibold hover:from-purple-600 hover:to-purple-700 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20 flex items-center gap-2 w-full sm:w-auto justify-center flex-shrink-0"
           >
             <FaPlus />
             <span>New Essay</span>
@@ -300,33 +300,33 @@ function EssayManagerContent() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
           <div
             className={`bg-gradient-to-br ${
               theme === "dark"
                 ? "from-[#141414] to-[#1a1a1a] border-neutral-700/50"
                 : "from-gray-50 to-gray-100 border-gray-200"
-            } border rounded-xl p-6`}
+            } border rounded-lg sm:rounded-xl p-4 sm:p-6`}
           >
             <div className="flex items-center justify-between">
               <div>
                 <div
-                  className={`text-3xl font-bold mb-1 ${
+                  className={`text-2xl sm:text-3xl font-bold mb-0.5 sm:mb-1 ${
                     theme === "dark" ? "text-white" : "text-gray-900"
                   }`}
                 >
                   {essays.length}
                 </div>
                 <div
-                  className={`text-sm ${
+                  className={`text-xs sm:text-sm ${
                     theme === "dark" ? "text-white/60" : "text-gray-600"
                   }`}
                 >
                   Total Essays
                 </div>
               </div>
-              <div className="p-3 bg-purple-500/10 rounded-lg">
-                <FaFileAlt className="text-2xl text-purple-400" />
+              <div className="p-2 sm:p-3 bg-purple-500/10 rounded-lg">
+                <FaFileAlt className="text-xl sm:text-2xl text-purple-400" />
               </div>
             </div>
           </div>
@@ -425,9 +425,9 @@ function EssayManagerContent() {
             theme === "dark"
               ? "from-[#141414] to-[#1a1a1a] border-neutral-700/50"
               : "from-gray-50 to-gray-100 border-gray-200"
-          } border rounded-xl p-6 mb-8`}
+          } border rounded-lg sm:rounded-xl p-3 sm:p-4 md:p-6 mb-6 sm:mb-8`}
         >
-          <div className="flex flex-col lg:flex-row gap-4">
+          <div className="flex flex-col lg:flex-row gap-3 sm:gap-4">
             {/* Search */}
             <div className="flex-1 relative">
               <FaSearch
@@ -449,20 +449,20 @@ function EssayManagerContent() {
             </div>
 
             {/* Status Filter */}
-            <div className="relative">
+            <div className="relative flex-1 sm:flex-initial">
               <FaFilter
-                className={`absolute left-4 top-1/2 transform -translate-y-1/2 pointer-events-none ${
+                className={`absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 pointer-events-none text-xs sm:text-sm ${
                   theme === "dark" ? "text-white/40" : "text-gray-400"
                 }`}
               />
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className={`${
+                className={`w-full ${
                   theme === "dark"
                     ? "bg-[#0a0a0a]/50 border-neutral-700/50 text-white focus:bg-[#0a0a0a]/80"
                     : "bg-white border-gray-300 text-gray-900 focus:bg-white"
-                } border rounded-xl pl-11 pr-10 py-3 focus:outline-none focus:border-purple-500/50 transition-all appearance-none cursor-pointer min-w-[160px]`}
+                } border rounded-lg sm:rounded-xl pl-9 sm:pl-11 pr-8 sm:pr-10 py-2.5 sm:py-3 text-sm sm:text-base focus:outline-none focus:border-purple-500/50 transition-all appearance-none cursor-pointer sm:min-w-[160px]`}
               >
                 <option value="All">All Statuses</option>
                 <option value={EssayStatus.NOT_STARTED}>Not Started</option>
@@ -478,11 +478,11 @@ function EssayManagerContent() {
             <select
               value={filterCollege}
               onChange={(e) => handleCollegeFilterChange(e.target.value)}
-              className={`${
+              className={`flex-1 sm:flex-initial ${
                 theme === "dark"
                   ? "bg-[#0a0a0a]/50 border-neutral-700/50 text-white focus:bg-[#0a0a0a]/80"
                   : "bg-white border-gray-300 text-gray-900 focus:bg-white"
-              } border rounded-xl px-4 py-3 focus:outline-none focus:border-purple-500/50 transition-all cursor-pointer min-w-[180px]`}
+              } border rounded-lg sm:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base focus:outline-none focus:border-purple-500/50 transition-all cursor-pointer sm:min-w-[180px]`}
             >
               <option value="All">All Colleges</option>
               {collegeNames.map((collegeName) => (
@@ -554,17 +554,17 @@ function EssayManagerContent() {
                     theme === "dark"
                       ? "from-[#141414] to-[#1a1a1a] border-neutral-700/50"
                       : "from-gray-50 to-gray-100 border-gray-200"
-                  } border rounded-xl p-6 hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/10 transition-all duration-300`}
+                  } border rounded-lg sm:rounded-xl p-4 sm:p-6 hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/10 transition-all duration-300`}
                 >
-                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-3 sm:gap-4">
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-start gap-3 mb-3">
-                        <div className="p-2 bg-purple-500/10 rounded-lg flex-shrink-0 group-hover:bg-purple-500/20 transition-colors">
-                          <FaPen className="text-purple-400 text-lg" />
+                      <div className="flex items-start gap-2 sm:gap-3 mb-2 sm:mb-3">
+                        <div className="p-1.5 sm:p-2 bg-purple-500/10 rounded-lg flex-shrink-0 group-hover:bg-purple-500/20 transition-colors">
+                          <FaPen className="text-purple-400 text-base sm:text-lg" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <h3
-                            className={`text-xl font-semibold mb-1 group-hover:text-purple-400 transition-colors truncate ${
+                            className={`text-base sm:text-lg md:text-xl font-semibold mb-0.5 sm:mb-1 group-hover:text-purple-400 transition-colors break-words ${
                               theme === "dark" ? "text-white" : "text-gray-900"
                             }`}
                           >
@@ -572,7 +572,7 @@ function EssayManagerContent() {
                           </h3>
                           {essay.college_name && (
                             <p
-                              className={`text-sm ${
+                              className={`text-xs sm:text-sm truncate ${
                                 theme === "dark"
                                   ? "text-white/50"
                                   : "text-gray-500"
@@ -583,16 +583,16 @@ function EssayManagerContent() {
                           )}
                         </div>
                         <span
-                          className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0 ${
+                          className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-medium whitespace-nowrap flex-shrink-0 ${
                             essay.status === EssayStatus.COMPLETED
                               ? "bg-green-500/20 text-green-300"
                               : essay.status === EssayStatus.IN_PROGRESS
-                              ? "bg-blue-500/20 text-blue-300"
-                              : essay.status === EssayStatus.REVIEW_NEEDED
-                              ? "bg-orange-500/20 text-orange-300"
-                              : essay.status === EssayStatus.SUBMITTED
-                              ? "bg-emerald-500/20 text-emerald-300"
-                              : "bg-neutral-500/20 text-neutral-300"
+                                ? "bg-blue-500/20 text-blue-300"
+                                : essay.status === EssayStatus.REVIEW_NEEDED
+                                  ? "bg-orange-500/20 text-orange-300"
+                                  : essay.status === EssayStatus.SUBMITTED
+                                    ? "bg-emerald-500/20 text-emerald-300"
+                                    : "bg-neutral-500/20 text-neutral-300"
                           }`}
                         >
                           {getStatusDisplayName(essay.status)}
@@ -652,7 +652,7 @@ function EssayManagerContent() {
                         >
                           Updated{" "}
                           {new Date(
-                            essay.updated_at || essay.created_at
+                            essay.updated_at || essay.created_at,
                           ).toLocaleDateString()}
                         </div>
                       </div>

@@ -377,14 +377,14 @@ export default function Dashboard() {
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex-1 min-w-0">
               <h1
-                className={`text-xl sm:text-2xl md:text-4xl font-extrabold break-words ${
+                className={`text-2xl sm:text-3xl md:text-4xl font-extrabold break-words ${
                   theme === "dark" ? "text-white" : "text-gray-900"
                 }`}
               >
                 Welcome back, {currentUser?.name || "Student"}! 👋
               </h1>
               <p
-                className={`text-xs sm:text-sm md:text-base mt-1 ${
+                className={`text-sm sm:text-base md:text-lg mt-1.5 sm:mt-2 ${
                   theme === "dark" ? "text-white/60" : "text-gray-600"
                 }`}
               >

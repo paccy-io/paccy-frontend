@@ -122,7 +122,7 @@ export default function ExtracurricularsPage() {
   const router = useRouter();
   const { theme } = useTheme();
   const [extracurriculars, setExtracurriculars] = useState<Extracurricular[]>(
-    []
+    [],
   );
   const [loading, setLoading] = useState(true);
   const [previewActivity, setPreviewActivity] =
@@ -157,7 +157,7 @@ export default function ExtracurricularsPage() {
     try {
       await extracurricularsApi.delete(activityId);
       setExtracurriculars((prev) =>
-        prev.filter((item) => item.id !== activityId)
+        prev.filter((item) => item.id !== activityId),
       );
       showSuccessToast("Extracurricular activity deleted successfully!");
     } catch (error) {
@@ -216,33 +216,33 @@ export default function ExtracurricularsPage() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
           <div
             className={`bg-gradient-to-br ${
               theme === "dark"
                 ? "from-[#141414] to-[#1a1a1a] border-neutral-700/50"
                 : "from-gray-50 to-gray-100 border-gray-200"
-            } border rounded-xl p-6`}
+            } border rounded-lg sm:rounded-xl p-4 sm:p-6`}
           >
             <div className="flex items-center justify-between">
               <div>
                 <div
-                  className={`text-3xl font-bold mb-1 ${
+                  className={`text-2xl sm:text-3xl font-bold mb-0.5 sm:mb-1 ${
                     theme === "dark" ? "text-white" : "text-gray-900"
                   }`}
                 >
                   {extracurriculars.length}
                 </div>
                 <div
-                  className={`text-sm ${
+                  className={`text-xs sm:text-sm ${
                     theme === "dark" ? "text-white/60" : "text-gray-600"
                   }`}
                 >
                   Total Activities
                 </div>
               </div>
-              <div className="p-3 bg-purple-500/10 rounded-lg">
-                <FaUsers className="text-2xl text-purple-400" />
+              <div className="p-2 sm:p-3 bg-purple-500/10 rounded-lg">
+                <FaUsers className="text-xl sm:text-2xl text-purple-400" />
               </div>
             </div>
           </div>
@@ -259,7 +259,7 @@ export default function ExtracurricularsPage() {
                 <div className="text-3xl font-bold text-blue-400 mb-1">
                   {extracurriculars.reduce(
                     (total, activity) => total + activity.hours_per_week,
-                    0
+                    0,
                   )}
                 </div>
                 <div
@@ -288,7 +288,7 @@ export default function ExtracurricularsPage() {
                 <div className="text-3xl font-bold text-yellow-400 mb-1">
                   {
                     new Set(
-                      extracurriculars.map((activity) => activity.category)
+                      extracurriculars.map((activity) => activity.category),
                     ).size
                   }
                 </div>
@@ -326,7 +326,7 @@ export default function ExtracurricularsPage() {
               {extracurriculars.reduce(
                 (total, activity) =>
                   total + (activity.achievements?.length || 0),
-                0
+                0,
               )}
             </div>
             <div
@@ -402,19 +402,19 @@ export default function ExtracurricularsPage() {
                   theme === "dark"
                     ? "from-[#141414] to-[#1a1a1a] border-neutral-700/50 hover:border-green-500/50"
                     : "from-gray-50 to-gray-100 border-gray-200 hover:border-green-400"
-                } border rounded-xl p-6 hover:shadow-lg hover:shadow-green-500/10 transition-all duration-300`}
+                } border rounded-lg sm:rounded-xl p-4 sm:p-6 hover:shadow-lg hover:shadow-green-500/10 transition-all duration-300`}
               >
-                <div className="flex flex-col lg:flex-row gap-6">
+                <div className="flex flex-col lg:flex-row gap-4 sm:gap-6">
                   <div className="flex-1">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex items-center gap-4">
-                        <div className="p-3 bg-green-500/10 rounded-lg flex-shrink-0 group-hover:bg-green-500/20 transition-colors">
+                    <div className="flex flex-col sm:flex-row items-start justify-between gap-3 sm:gap-4 mb-3 sm:mb-4">
+                      <div className="flex items-start gap-3 sm:gap-4 w-full sm:w-auto">
+                        <div className="p-2 sm:p-3 bg-green-500/10 rounded-lg flex-shrink-0 group-hover:bg-green-500/20 transition-colors">
                           {categoryIcons[activity.category]}
                         </div>
-                        <div>
-                          <div className="flex items-center gap-3 mb-2">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
                             <h3
-                              className={`text-xl font-semibold group-hover:text-green-400 transition-colors ${
+                              className={`text-base sm:text-lg md:text-xl font-semibold group-hover:text-green-400 transition-colors break-words ${
                                 theme === "dark"
                                   ? "text-white"
                                   : "text-gray-900"
@@ -423,7 +423,7 @@ export default function ExtracurricularsPage() {
                               {activity.activity_name}
                             </h3>
                             <span
-                              className={`px-3 py-1 rounded-full text-xs font-medium ${
+                              className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-medium ${
                                 categoryColors[activity.category]
                               }`}
                             >
@@ -432,7 +432,7 @@ export default function ExtracurricularsPage() {
                             {renderAiScoreBadge(activity.ai_score)}
                           </div>
                           <p
-                            className={`font-medium ${
+                            className={`font-medium text-xs sm:text-sm md:text-base break-words ${
                               theme === "dark"
                                 ? "text-white/80"
                                 : "text-gray-700"
@@ -445,9 +445,9 @@ export default function ExtracurricularsPage() {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-4 mb-3 sm:mb-4">
                       <div
-                        className={`flex items-center gap-2 text-sm ${
+                        className={`flex items-center gap-2 text-xs sm:text-sm ${
                           theme === "dark" ? "text-white/70" : "text-gray-600"
                         }`}
                       >
@@ -489,7 +489,7 @@ export default function ExtracurricularsPage() {
                     </div>
 
                     <p
-                      className={`mb-4 ${
+                      className={`mb-3 sm:mb-4 text-sm sm:text-base ${
                         theme === "dark" ? "text-white/80" : "text-gray-700"
                       }`}
                     >
@@ -521,7 +521,7 @@ export default function ExtracurricularsPage() {
                                   <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
                                   {achievement}
                                 </li>
-                              )
+                              ),
                             )}
                           </ul>
                         </div>
@@ -761,7 +761,7 @@ export default function ExtracurricularsPage() {
                             <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 flex-shrink-0" />
                             <span>{achievement}</span>
                           </li>
-                        )
+                        ),
                       )}
                     </ul>
                   </div>

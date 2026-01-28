@@ -139,10 +139,12 @@ export default function DashboardSidebar({
 
   return (
     <>
-      {/* Mobile Menu Button */}
+      {/* Mobile Menu Button - Hamburger on left, Close on right */}
       <button
         onClick={() => setMobileOpen(!mobileOpen)}
-        className={`lg:hidden fixed top-4 left-4 z-50 rounded-lg p-3 border transition-colors ${
+        className={`lg:hidden fixed top-4 z-50 rounded-lg p-3 border transition-all ${
+          mobileOpen ? "right-4" : "left-4"
+        } ${
           theme === "dark"
             ? "bg-[#141414] border-neutral-700/50 text-white hover:border-white/30"
             : "bg-white border-gray-200 text-gray-900 hover:border-gray-300 shadow-md"
@@ -289,8 +291,8 @@ export default function DashboardSidebar({
                           ? "bg-white/10 text-white border border-white/20"
                           : "bg-blue-50 text-blue-600 border border-blue-200"
                         : theme === "dark"
-                        ? "text-white/70 hover:bg-[#141414] hover:text-white"
-                        : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                          ? "text-white/70 hover:bg-[#141414] hover:text-white"
+                          : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                     } ${collapsed ? "justify-center" : ""}`}
                     title={collapsed ? item.label : undefined}
                   >
@@ -301,8 +303,8 @@ export default function DashboardSidebar({
                             ? "text-white"
                             : "text-blue-600"
                           : theme === "dark"
-                          ? "text-white/70 group-hover:text-white"
-                          : "text-gray-700 group-hover:text-gray-900"
+                            ? "text-white/70 group-hover:text-white"
+                            : "text-gray-700 group-hover:text-gray-900"
                       }
                     >
                       {item.icon}

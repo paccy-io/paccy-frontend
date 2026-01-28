@@ -905,7 +905,7 @@ export default function CollegeTracker() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a]">
+    <div className="min-h-screen bg-[#0a0a0a] overflow-x-hidden">
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-10 py-4 sm:py-6 md:py-8">
         {/* Header */}
         <div className="mb-6 sm:mb-8">
@@ -985,7 +985,7 @@ export default function CollegeTracker() {
         </div>
 
         {/* Search Bar and Filters */}
-        <div className="bg-white/[0.02] border border-neutral-700/30 rounded-lg sm:rounded-xl p-2.5 sm:p-3 mb-6 sm:mb-8">
+        <div className="bg-white/[0.02] border border-neutral-700/30 rounded-lg sm:rounded-xl p-2.5 sm:p-3 mb-6 sm:mb-8 overflow-hidden">
           <div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-3 sm:gap-4">
             {/* Search Bar - Left Side (~50%) */}
             <div className="flex-1 relative">
@@ -1000,7 +1000,7 @@ export default function CollegeTracker() {
             </div>
 
             {/* Tabs and Sort - Right Side (~50%) */}
-            <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide">
+            <div className="flex flex-wrap items-center gap-2">
               <button
                 onClick={() => setActiveTab("all")}
                 className={`px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg font-medium transition-all whitespace-nowrap text-xs sm:text-sm ${
@@ -1077,7 +1077,7 @@ export default function CollegeTracker() {
               <div
                 key={college.id}
                 onClick={() => handleCollegeClick(college.id)}
-                className={`group flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-white/[0.02] hover:bg-white/[0.04] border rounded-lg sm:rounded-xl cursor-pointer transition-all duration-200 ${
+                className={`group flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-white/[0.02] hover:bg-white/[0.04] border rounded-lg sm:rounded-xl cursor-pointer transition-all duration-200 overflow-hidden ${
                   isUrgent
                     ? "border-red-400/30 hover:border-red-400/50"
                     : "border-neutral-800/50 hover:border-blue-400/30"
@@ -1174,7 +1174,7 @@ export default function CollegeTracker() {
                 </div>
 
                 {/* Deadline */}
-                <div className="flex items-center gap-1.5 text-xs sm:text-sm text-white/70 flex-shrink-0 w-full sm:w-auto sm:min-w-[140px]">
+                <div className="flex items-center gap-1.5 text-xs sm:text-sm text-white/70 flex-shrink-0 w-full sm:w-auto">
                   <FaCalendar className="text-[10px] sm:text-xs" />
                   <span className="text-[11px] sm:text-sm">
                     {formatDeadlineMain(college.deadline)}
