@@ -350,7 +350,7 @@ function AuthContent() {
   const handleActualSubmit = async () => {
     setShowDevModal(false);
     // Redirect to alpha registration instead of actual login
-    router.push("/alpha");
+    router.push("/auth");
   };
 
   const toggleMode = () => {
@@ -815,8 +815,7 @@ function AuthContent() {
                   Feature Under Development
                 </h3>
                 <p className="text-white/60 mb-6 leading-relaxed">
-                  Authentication is currently being developed. This is a
-                  demonstration of the UI design.
+                  Google and Github Authentication are currently being developed. <span className="text-red-500 font-bold">Please use the email / password login for now</span>.
                   <br />
                   <br />
                   <span className="text-orange-400 font-medium">
@@ -837,7 +836,7 @@ function AuthContent() {
                   onClick={handleActualSubmit}
                   className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg text-sm font-bold hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-lg shadow-blue-500/30"
                 >
-                  Join Alpha Program
+                  Sign Up via Email
                 </button>
               </div>
             </div>

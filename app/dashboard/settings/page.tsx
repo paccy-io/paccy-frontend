@@ -126,7 +126,7 @@ export default function Settings() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(profileData),
-        }
+        },
       );
 
       if (!response.ok) {
@@ -155,13 +155,13 @@ export default function Settings() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(preferences),
-        }
+        },
       );
 
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(
-          errorData.message || "Failed to update user preferences"
+          errorData.message || "Failed to update user preferences",
         );
       }
 
@@ -629,7 +629,7 @@ export default function Settings() {
       setTimeout(() => setUpdateSuccess(null), 3000);
     } catch (error: any) {
       setUpdateError(
-        error.message || "Failed to update notification preference"
+        error.message || "Failed to update notification preference",
       );
       console.error("Error updating notification:", error);
     }
@@ -669,7 +669,7 @@ export default function Settings() {
       setUpdateSuccess(
         `${
           friendlyKey.charAt(0).toUpperCase() + friendlyKey.slice(1)
-        } updated successfully!`
+        } updated successfully!`,
       );
 
       // Auto-refresh data after successful update
@@ -1483,7 +1483,7 @@ export default function Settings() {
                 onClick={() =>
                   updatePrivacy(
                     "isProfilePublic",
-                    !userData.privacy.isProfilePublic
+                    !userData.privacy.isProfilePublic,
                   )
                 }
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors touch-manipulation ${
@@ -1517,7 +1517,7 @@ export default function Settings() {
                 onClick={() =>
                   updatePrivacy(
                     "searchableProfile",
-                    !userData.privacy.searchableProfile
+                    !userData.privacy.searchableProfile,
                   )
                 }
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors touch-manipulation ${
@@ -1551,7 +1551,7 @@ export default function Settings() {
                 onClick={() =>
                   updatePrivacy(
                     "showOnlineStatus",
-                    !userData.privacy.showOnlineStatus
+                    !userData.privacy.showOnlineStatus,
                   )
                 }
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors touch-manipulation ${
@@ -1668,7 +1668,7 @@ export default function Settings() {
                 onClick={() =>
                   updatePrivacy(
                     "allowMessaging",
-                    !userData.privacy.allowMessaging
+                    !userData.privacy.allowMessaging,
                   )
                 }
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors touch-manipulation ${
@@ -1710,7 +1710,7 @@ export default function Settings() {
                 onClick={() =>
                   updatePrivacy(
                     "dataCollection",
-                    !userData.privacy.dataCollection
+                    !userData.privacy.dataCollection,
                   )
                 }
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors touch-manipulation ${
@@ -1835,35 +1835,37 @@ export default function Settings() {
                 <FaCheck className="text-green-400 text-sm" />
                 <span className="text-white/70 text-sm">{feature}</span>
               </div>
-            )
+            ),
           )}
         </div>
       </div>
 
-      {/* Billing History */}
+      {/* Account Status */}
       <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-neutral-700/50 rounded-xl p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-white">Billing History</h3>
-          <button className="text-white hover:text-blue-400 transition-colors flex items-center gap-2">
-            <FaDownload />
-            <span>Download</span>
-          </button>
+          <h3 className="text-lg font-semibold text-white">Account Status</h3>
+          <div className="flex items-center gap-2 px-3 py-1 bg-green-500/20 border border-green-500/30 rounded-full">
+            <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+            <span className="text-green-400 text-sm font-medium">Active</span>
+          </div>
         </div>
 
-        <div className="space-y-3">
-          <div className="flex items-center justify-between p-3 bg-neutral-800 rounded-lg">
+        <div className="space-y-4">
+          <div className="flex items-center justify-between p-4 bg-neutral-800 rounded-lg">
             <div>
-              <p className="text-white font-medium">Pro Plan - Annual</p>
-              <p className="text-white/60 text-sm">December 15, 2024</p>
+              <p className="text-white font-medium">Paccy Free Plan</p>
+              <p className="text-white/60 text-sm">All features included</p>
             </div>
-            <p className="text-white font-semibold">$99.00</p>
+            <div className="text-right">
+              <p className="text-green-400 font-bold text-lg">$0.00</p>
+              <p className="text-white/60 text-xs">Forever free</p>
+            </div>
           </div>
-          <div className="flex items-center justify-between p-3 bg-neutral-800 rounded-lg">
-            <div>
-              <p className="text-white font-medium">Pro Plan - Annual</p>
-              <p className="text-white/60 text-sm">December 15, 2023</p>
-            </div>
-            <p className="text-white font-semibold">$89.00</p>
+          <div className="text-center py-4">
+            <p className="text-white/70 text-sm">
+              🎉 You're using Paccy completely free! All premium features are
+              included at no cost.
+            </p>
           </div>
         </div>
       </div>
@@ -2202,7 +2204,7 @@ export default function Settings() {
                       "mailto:support@paccy.io?subject=Early Access Request for " +
                         alertInfo.planName +
                         " Plan",
-                      "_blank"
+                      "_blank",
                     );
                     closeAlert();
                   }}
