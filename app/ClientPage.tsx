@@ -55,12 +55,12 @@ export default function Home() {
     {
       icon: <FaCheckCircle className="text-3xl" />,
       label: "BETA USERS",
-      value: "50+",
+      value: "30+",
     },
     {
       icon: <FaCalendarAlt className="text-3xl" />,
       label: "ESSAYS TRACKED",
-      value: "200+",
+      value: "100+",
     },
     {
       icon: <FaDollarSign className="text-3xl" />,
