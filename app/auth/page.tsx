@@ -3,7 +3,6 @@
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "../../components/AuthProvider";
-import { authenticateUser, checkEnvironment } from "../actions/auth";
 import { API_BASE_URL, API_ENDPOINTS } from "../../config/api";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
