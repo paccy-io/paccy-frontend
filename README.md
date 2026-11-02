@@ -1,36 +1,35 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Paccy — Frontend
 
-## Getting Started
+Paccy is a college application workspace: track target colleges and deadlines, draft
+essays (with optional AI feedback), log extracurriculars and coursework, and keep
+everything on one calendar.
 
-First, run the development server:
+This repository is the web client. The API lives in
+[paccy-io/paccy-backend](https://github.com/paccy-io/paccy-backend).
+
+## Stack
+
+- Next.js (App Router), React, TypeScript
+- Tailwind CSS
+
+## Getting started
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open <http://localhost:3000>.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+The API base URL is set in `config/api.ts` and points at the hosted API. Change it to
+target your own backend instance.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## AI essay feedback
 
-## Learn More
+Essay evaluation calls the Google Gemini API directly from the browser using a key the
+user pastes into **Settings → Preferences**. The key is kept in that browser's
+`localStorage` and is never sent to the Paccy backend.
 
-To learn more about Next.js, take a look at the following resources:
+## License
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+[MIT](LICENSE)
